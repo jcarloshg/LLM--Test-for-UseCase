@@ -1,0 +1,99 @@
+{
+  "examples": [
+    {
+      "user_story": "As a registered user, I want to log in with my email and password so that I can access my account",
+      "test_cases": [
+        {
+          "id": "TC_001",
+          "title": "Successful login with valid credentials",
+          "priority": "high",
+          "given": "User is on the login page AND has a registered account",
+          "when": "User enters valid email and password AND clicks login button",
+          "then": "User is redirected to dashboard AND session is created"
+        },
+        {
+          "id": "TC_002",
+          "title": "Login fails with invalid password",
+          "priority": "high",
+          "given": "User is on the login page",
+          "when": "User enters valid email and incorrect password",
+          "then": "Error message 'Invalid credentials' is displayed AND user remains on login page"
+        },
+        {
+          "id": "TC_003",
+          "title": "Login fails with non-existent email",
+          "priority": "medium",
+          "given": "User is on the login page",
+          "when": "User enters email not in system",
+          "then": "Error message 'Account not found' is displayed"
+        },
+        {
+          "id": "TC_004",
+          "title": "Empty fields validation",
+          "priority": "medium",
+          "given": "User is on the login page",
+          "when": "User clicks login with empty email or password",
+          "then": "Validation error messages are displayed for empty fields"
+        }
+      ]
+    },
+    {
+      "user_story": "As a customer, I want to add items to my shopping cart so that I can purchase multiple products",
+      "test_cases": [
+        {
+          "id": "TC_001",
+          "title": "Add single item to empty cart",
+          "priority": "high",
+          "given": "User is viewing a product page AND cart is empty",
+          "when": "User clicks 'Add to Cart' button",
+          "then": "Item is added to cart AND cart count shows 1 AND success message appears"
+        },
+        {
+          "id": "TC_002",
+          "title": "Add multiple quantities of same item",
+          "priority": "high",
+          "given": "User is viewing a product page",
+          "when": "User selects quantity 3 and clicks 'Add to Cart'",
+          "then": "Cart shows 3 units of the product AND total price is calculated correctly"
+        },
+        {
+          "id": "TC_003",
+          "title": "Add item when out of stock",
+          "priority": "high",
+          "given": "Product is marked as out of stock",
+          "when": "User attempts to add item to cart",
+          "then": "'Add to Cart' button is disabled AND message 'Out of Stock' is displayed"
+        }
+      ]
+    },
+    {
+      "user_story": "As an admin, I want to delete user accounts so that I can remove inactive or banned users",
+      "test_cases": [
+        {
+          "id": "TC_001",
+          "title": "Successful account deletion",
+          "priority": "critical",
+          "given": "Admin is logged in AND viewing user management page",
+          "when": "Admin clicks delete on a user account AND confirms deletion",
+          "then": "User account is removed from database AND confirmation message appears"
+        },
+        {
+          "id": "TC_002",
+          "title": "Cancel deletion operation",
+          "priority": "medium",
+          "given": "Admin initiates account deletion",
+          "when": "Admin clicks 'Cancel' on confirmation dialog",
+          "then": "Account remains unchanged AND user is returned to management page"
+        },
+        {
+          "id": "TC_003",
+          "title": "Cannot delete own account",
+          "priority": "high",
+          "given": "Admin is viewing their own account",
+          "when": "Admin attempts to delete their own account",
+          "then": "Delete button is disabled OR error message prevents deletion"
+        }
+      ]
+    }
+  ]
+}
