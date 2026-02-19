@@ -11,12 +11,20 @@ from src.mlflow_tracker import MLflowTracker
 from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
 import uvicorn
 
+from src.presentation.routes import test_use_cases
+
 
 app = FastAPI(
     title="Test Case Generator API",
     description="Generate structured test cases from user stories",
     version="1.0.0"
 )
+
+# // ─────────────────────────────────────
+# new architecture
+# // ─────────────────────────────────────
+
+app.include_router(test_use_cases)
 
 # Initialize components
 llm_config = LLMConfig()
@@ -27,8 +35,6 @@ quality_validator = QualityValidator(llm_client)
 mlflow_tracker = MLflowTracker()
 
 # Request/Response models
-
-
 class GenerateRequest(BaseModel):
     user_story: str = Field(..., min_length=20, max_length=500)
     include_quality_check: bool = True
