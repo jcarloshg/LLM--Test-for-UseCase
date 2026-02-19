@@ -26,6 +26,10 @@ app = FastAPI(
 
 app.include_router(test_use_cases)
 
+# // ─────────────────────────────────────
+# ToDo
+# // ─────────────────────────────────────
+
 # Initialize components
 llm_config = LLMConfig()
 llm_client = LLMClient(llm_config)
@@ -35,6 +39,8 @@ quality_validator = QualityValidator(llm_client)
 mlflow_tracker = MLflowTracker()
 
 # Request/Response models
+
+
 class GenerateRequest(BaseModel):
     user_story: str = Field(..., min_length=20, max_length=500)
     include_quality_check: bool = True
