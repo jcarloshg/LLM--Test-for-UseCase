@@ -1,0 +1,25 @@
+# requirements.yaml
+project_name: "Test Case Generator from User Stories"
+
+use_case: |
+  Convert user stories (As a...I want...So that...) into structured 
+  test cases with Given-When-Then format
+
+success_metrics:
+  - structural_validity: ">= 95%" # All test cases have G-W-T structure
+  - coverage: ">= 3" # Generate at least 3 test cases per story
+  - semantic_relevance: ">= 0.75" # LLM-judge score
+  - api_latency: "< 5 seconds" # Response time
+  - cost_per_request: "< $0.05" # API cost
+
+constraints:
+  - Must work with both Ollama (free) and OpenAI
+  - Output must be parseable JSON
+  - Must validate quality before returning
+  - Must track all metrics in MLflow
+
+deliverables:
+  - FastAPI with /generate-test-cases endpoint
+  - MLflow dashboard tracking experiments
+  - Validation report for each generation
+  - Documentation with examples
