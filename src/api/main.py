@@ -8,7 +8,9 @@ from src.llm.prompts import PromptBuilder
 from src.validators.structure import StructureValidator
 from src.validators.quality import QualityValidator
 from src.mlflow_tracker import MLflowTracker
+from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
 import uvicorn
+
 
 app = FastAPI(
     title="Test Case Generator API",
@@ -59,6 +61,13 @@ async def root():
             "generate": "/generate-test-cases",
             "health": "/health",
             "metrics": "/metrics"
+        },
+        "environment_config": {
+            "ollama_service_host": ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+            "ollama_model": ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL4B,
+            "max_retries": ENVIRONMENT_CONFIG.MAX_RETRIES,
+            "max_retries_user_msg": ENVIRONMENT_CONFIG.MAX_RETRIES_USER_MSG,
+            "max_retries_dev_msg": ENVIRONMENT_CONFIG.MAX_RETRIES_DEV_MSG
         }
     }
 
