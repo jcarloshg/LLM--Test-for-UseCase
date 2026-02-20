@@ -1,5 +1,6 @@
 import json
 
+from src.application.shared.models.llm_exceptions import LLMClientException
 from src.application.generate_test.models.structure import StructureValidator
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.generate_test.models.llm_client import LlmClient
@@ -47,10 +48,14 @@ class GenerateTestCasesUseCase():
                 data=test_cases
             )
 
+        except LLMClientException as e:
+            # TODO: add this a logging
+            print("="*60)
+            print(f"[GenerateTestCasesUseCase] - LLMClientException {str(e)}")
+            print("="*60)
+            return CustomResponse.something_was_wrong()
         except Exception as e:
             print("="*60)
-            print(f"Error: {str(e)}")
+            print(f"[GenerateTestCasesUseCase] - Exception {str(e)}")
             print("="*60)
-            return CustomResponse.error(
-                message=f"Failed to generate test cases: {str(e)}"
-            )
+            return CustomResponse.something_was_wrong()
