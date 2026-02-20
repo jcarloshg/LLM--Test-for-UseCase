@@ -41,7 +41,7 @@ async def generate_test_controller(request: Request) -> CustomResponse:
             message="Test cases generated successfully",
             data={
                 "user_story": generate_request.user_story,
-                "test_cases": tests_cases_response.model_dump()
+                "test_cases": tests_cases_response.data
             }
         )
 
