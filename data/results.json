@@ -1,143 +1,16 @@
 {
-  "message": "Test cases generated from use case",
-  "is_success": true,
-  "data": [
-    {
-      "id": "TC_001",
-      "title": "Successful password reset",
-      "priority": "high",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "positive",
-      "preconditions": [
-        "User is on the login page",
-        "Has a registered account"
-      ],
-      "steps": [
-        {
-          "given": "Enter valid email address",
-          "when": "Click on password reset link",
-          "then": "Redirect to password reset page"
-        },
-        {
-          "given": "Enter correct password",
-          "when": "Submit the form",
-          "then": "Password is reset successfully"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "User is redirected to dashboard AND session is created",
-      "quality_score": 8,
-      "tags": [
-        "password_reset"
-      ]
-    },
-    {
-      "id": "TC_002",
-      "title": "Login fails with invalid password",
-      "priority": "high",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "negative",
-      "preconditions": [
-        "User is on the login page"
-      ],
-      "steps": [
-        {
-          "given": "Enter valid email address",
-          "when": "Click on login button",
-          "then": "Redirect to error page"
-        },
-        {
-          "given": "Enter incorrect password",
-          "when": "Submit the form",
-          "then": "Error message 'Invalid credentials' is displayed AND user remains on login page"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Error message 'Invalid credentials' is displayed AND user remains on login page",
-      "quality_score": 6,
-      "tags": [
-        "login_failure"
-      ]
-    },
-    {
-      "id": "TC_003",
-      "title": "Login fails with non-existent email",
-      "priority": "high",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "negative",
-      "preconditions": [
-        "User is on the login page"
-      ],
-      "steps": [
-        {
-          "given": "Enter valid password",
-          "when": "Submit the form",
-          "then": "Redirect to error page"
-        },
-        {
-          "given": "Click on login button",
-          "when": "Submit the form",
-          "then": "Error message 'Account not found' is displayed"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Error message 'Account not found' is displayed",
-      "quality_score": 6,
-      "tags": [
-        "login_failure"
-      ]
-    },
-    {
-      "id": "TC_004",
-      "title": "Validation error messages for empty fields",
-      "priority": "medium",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "negative",
-      "preconditions": [
-        "User is on the login page"
-      ],
-      "steps": [
-        {
-          "given": "Leave email field empty",
-          "when": "Submit the form",
-          "then": "Validation error message 'Email cannot be blank' is displayed"
-        },
-        {
-          "given": "Leave password field empty",
-          "when": "Submit the form",
-          "then": "Validation error message 'Password cannot be blank' is displayed"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Validation error messages are displayed for empty fields",
-      "quality_score": 6,
-      "tags": [
-        "validation_error"
-      ]
-    }
-  ]
+  "model": "llama3.2:1b",
+  "created_at": "2026-02-20T19:28:11.601913845Z",
+  "message": {
+    "role": "assistant",
+    "content": "A positive expression of agreement or approval."
+  },
+  "done": true,
+  "done_reason": "stop",
+  "total_duration": 427757880,
+  "load_duration": 91172255,
+  "prompt_eval_count": 36,
+  "prompt_eval_duration": 82078123,
+  "eval_count": 9,
+  "eval_duration": 247467505
 }

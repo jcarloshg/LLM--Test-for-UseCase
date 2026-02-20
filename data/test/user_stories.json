@@ -1,0 +1,249 @@
+{
+  "examples": [
+    {
+      "id": "US_001",
+      "user_story": "As a registered user, I want to log in with my email and password so that I can access my account",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_002",
+      "user_story": "As a customer, I want to add items to my shopping cart so that I can purchase multiple products",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_003",
+      "user_story": "As an admin, I want to delete user accounts so that I can remove inactive or banned users",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_004",
+      "user_story": "As a customer, I want to search for products by name or category so that I can find what I'm looking for quickly",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_005",
+      "user_story": "As a user, I want to update my profile information so that my account details are current and accurate",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_006",
+      "user_story": "As a user, I want to reset my password so that I can regain access if I forget it",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_007",
+      "user_story": "As a customer, I want to view my order history so that I can track previous purchases",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_008",
+      "user_story": "As a shopper, I want to apply discount codes so that I can receive discounts on my purchases",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_009",
+      "user_story": "As a user, I want to manage my notification preferences so that I receive only relevant communications",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_010",
+      "user_story": "As a vendor, I want to upload product images so that customers can see what they're buying",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_011",
+      "user_story": "As a customer, I want to filter products by price range so that I can find items within my budget",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_012",
+      "user_story": "As a customer, I want to leave product reviews so that I can share my experience with other buyers",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_013",
+      "user_story": "As a customer, I want to save favorite products to my wishlist so that I can revisit them later",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_014",
+      "user_story": "As a customer, I want to track my shipment so that I know when my order will arrive",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_015",
+      "user_story": "As a vendor, I want to manage product inventory so that I can track stock levels",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_016",
+      "user_story": "As a customer, I want to checkout securely so that my payment information is protected",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_017",
+      "user_story": "As a customer, I want to change shipping address before checkout so that items are sent to correct location",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_018",
+      "user_story": "As a customer, I want to apply gift cards to my purchase so that I can use promotional credits",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_019",
+      "user_story": "As an admin, I want to view customer analytics so that I can understand buying patterns",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_020",
+      "user_story": "As a customer, I want to contact customer support so that I can resolve issues quickly",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_021",
+      "user_story": "As a user, I want to export my account data so that I can backup my information",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_022",
+      "user_story": "As a user, I want to enable two-factor authentication so that my account is more secure",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_023",
+      "user_story": "As a customer, I want to set up subscription renewals so that I don't run out of products",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_024",
+      "user_story": "As a vendor, I want to set promotional pricing so that I can run sales campaigns",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_025",
+      "user_story": "As a customer, I want to compare products side by side so that I can make informed decisions",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_026",
+      "user_story": "As a customer, I want to view product recommendations so that I can discover new items",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_027",
+      "user_story": "As a vendor, I want to respond to customer reviews so that I can address concerns",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_028",
+      "user_story": "As a customer, I want to create a profile picture so that other users can recognize me",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_029",
+      "user_story": "As an admin, I want to manage product categories so that I can organize inventory",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_030",
+      "user_story": "As a customer, I want to filter reviews by rating so that I can see specific feedback",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_031",
+      "user_story": "As a user, I want to link my social media accounts so that I can sign in easily",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_032",
+      "user_story": "As a vendor, I want to create product bundles so that I can increase sales",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_033",
+      "user_story": "As a customer, I want to receive personalized email campaigns so that I see relevant offers",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_034",
+      "user_story": "As an admin, I want to generate sales reports so that I can analyze business performance",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_035",
+      "user_story": "As a customer, I want to pay in installments so that I can afford larger purchases",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_036",
+      "user_story": "As a vendor, I want to manage shipping settings so that I can set accurate delivery times",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_037",
+      "user_story": "As a customer, I want to print my invoice so that I have a physical copy",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_038",
+      "user_story": "As an admin, I want to manage staff accounts so that I can control access levels",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_039",
+      "user_story": "As a customer, I want to view my account balance so that I know my store credit",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_040",
+      "user_story": "As a vendor, I want to set product variants so that customers can choose options",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_041",
+      "user_story": "As a customer, I want to see product availability in nearby stores so that I can pick up items",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_042",
+      "user_story": "As a user, I want to manage my delivery addresses so that I can ship to multiple locations",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_043",
+      "user_story": "As an admin, I want to view system logs so that I can monitor platform activity",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_044",
+      "user_story": "As a customer, I want to receive order alerts so that I'm informed about status changes",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_045",
+      "user_story": "As a vendor, I want to customize my storefront so that my brand stands out",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_046",
+      "user_story": "As a customer, I want to use voice search so that I can find products faster",
+      "difficulty": "hard"
+    },
+    {
+      "id": "US_047",
+      "user_story": "As a user, I want to schedule purchases so that I can receive items on specific dates",
+      "difficulty": "medium"
+    },
+    {
+      "id": "US_048",
+      "user_story": "As an admin, I want to manage banner promotions so that I can highlight offers",
+      "difficulty": "easy"
+    },
+    {
+      "id": "US_049",
+      "user_story": "As a customer, I want to join loyalty program so that I can earn rewards",
+      "difficulty": "hard"
+    }
+  ]
+}
