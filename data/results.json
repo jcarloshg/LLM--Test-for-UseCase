@@ -1,107 +1,122 @@
 {
-  "test_cases": [
+  "message": "Test cases generated from use case",
+  "is_success": true,
+  "data": [
     {
       "id": "TC-001",
-      "title": "Print Invoice Test Case",
+      "title": "Reset Password with Valid Credentials",
       "priority": "high",
+      "given": null,
+      "when": null,
+      "then": null,
       "type": "positive",
       "preconditions": [
-        "Setup requirement 1",
-        "Setup requirement 2"
+        "User is logged in",
+        "Account is enabled"
       ],
       "steps": [
-        {
-          "name": "Step 1: Log in as customer",
-          "description": "Log in to the application using valid credentials",
-          "action": "Open the login page and enter valid username and password"
-        },
-        {
-          "name": "Step 2: Navigate to invoice page",
-          "description": "Navigate to the invoice page after logging in",
-          "action": "Click on the 'Invoices' tab"
-        },
-        {
-          "name": "Step 3: Print invoice",
-          "description": "Print the invoice by clicking on the 'Print Invoice' button",
-          "action": "Click on the 'Print Invoice' button"
-        }
+        "1. Enter current password",
+        "2. Enter new password",
+        "3. Confirm new password"
       ],
       "gherkin": {
-        "given": "Login as customer with valid username and password",
-        "when": "Navigate to invoices page",
-        "then": "Print invoice"
+        "given": "User is logged in with valid credentials",
+        "when": "User clicks reset password button",
+        "then": "Password reset form appears with fields to enter new password"
       },
-      "expected_result": "Invoice printed successfully",
-      "quality_score": 9,
-      "tags": ["tag1", "tag2"]
+      "expected_result": "Password reset successful, user receives confirmation email",
+      "quality_score": 8,
+      "tags": [
+        "Authentication",
+        "Password Reset"
+      ]
     },
     {
       "id": "TC-002",
-      "title": "Error Handling Test Case",
+      "title": "Reset Password with Invalid Credentials",
       "priority": "high",
+      "given": null,
+      "when": null,
+      "then": null,
       "type": "negative",
       "preconditions": [
-        "Setup requirement 3"
+        "User is logged in",
+        "Account is enabled"
       ],
       "steps": [
-        {
-          "name": "Step 1: Log in as customer with invalid username and password",
-          "description": "Log in to the application using invalid credentials",
-          "action": "Open the login page and enter invalid username and password"
-        },
-        {
-          "name": "Step 2: Navigate to invoice page",
-          "description": "Navigate to the invoice page after logging in",
-          "action": "Click on the 'Invoices' tab"
-        },
-        {
-          "name": "Step 3: Print invoice",
-          "description": "Print the invoice by clicking on the 'Print Invoice' button",
-          "action": "Click on the 'Print Invoice' button"
-        }
+        "1. Enter incorrect current password",
+        "2. Enter new password",
+        "3. Confirm new password"
       ],
       "gherkin": {
-        "given": "Login as customer with invalid username and password",
-        "when": "Navigate to invoices page",
-        "then": "Error message displayed: Invalid credentials"
+        "given": "User is logged in with invalid credentials",
+        "when": "User clicks reset password button",
+        "then": "Error message appears indicating invalid credentials"
       },
-      "expected_result": "Error message displayed: Invalid credentials",
-      "quality_score": 7,
-      "tags": ["tag1", "tag2"]
+      "expected_result": "Password reset failed, error message displayed",
+      "quality_score": 8,
+      "tags": [
+        "Authentication",
+        "Password Reset"
+      ]
     },
     {
       "id": "TC-003",
-      "title": "Edge Case Test Case",
-      "priority": "high",
-      "type": "edge_case",
+      "title": "Reset Password with Empty Fields",
+      "priority": "medium",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "negative",
       "preconditions": [
-        "Setup requirement 4"
+        "User is logged in",
+        "Account is enabled"
       ],
       "steps": [
-        {
-          "name": "Step 1: Log in as customer with empty username and password",
-          "description": "Log in to the application using empty credentials",
-          "action": "Open the login page and enter empty username and password"
-        },
-        {
-          "name": "Step 2: Navigate to invoice page",
-          "description": "Navigate to the invoice page after logging in",
-          "action": "Click on the 'Invoices' tab"
-        },
-        {
-          "name": "Step 3: Print invoice",
-          "description": "Print the invoice by clicking on the 'Print Invoice' button",
-          "action": "Click on the 'Print Invoice' button"
-        }
+        "1. Leave current password field blank",
+        "2. Enter new password",
+        "3. Confirm new password"
       ],
       "gherkin": {
-        "given": "Login as customer with empty username and password",
-        "when": "Navigate to invoices page",
-        "then": "Error message displayed: Invalid credentials"
+        "given": "User is logged in with valid credentials",
+        "when": "User clicks reset password button",
+        "then": "Error message appears indicating required fields are missing"
       },
-      "expected_result": "Error message displayed: Invalid credentials",
+      "expected_result": "Password reset failed, error message displayed",
+      "quality_score": 7,
+      "tags": [
+        "Authentication",
+        "Password Reset"
+      ]
+    },
+    {
+      "id": "TC-004",
+      "title": "Reset Password with Special Characters",
+      "priority": "medium",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "positive",
+      "preconditions": [
+        "User is logged in",
+        "Account is enabled"
+      ],
+      "steps": [
+        "1. Enter special character in current password field",
+        "2. Enter new password",
+        "3. Confirm new password"
+      ],
+      "gherkin": {
+        "given": "User is logged in with valid credentials",
+        "when": "User clicks reset password button",
+        "then": "Password reset form accepts special characters"
+      },
+      "expected_result": "Password reset successful, user receives confirmation email",
       "quality_score": 8,
-      "tags": ["tag1", "tag2"]
+      "tags": [
+        "Authentication",
+        "Password Reset"
+      ]
     }
   ]
 }

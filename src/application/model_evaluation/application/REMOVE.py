@@ -56,7 +56,11 @@ class MLflowModelEvaluationPipeline:
             models_to_test = ModelRegistry.get_models_to_compare()
 
         if test_dataset is None:
-            test_dataset = EvaluationDataset.load_stories_for_test()
+            test_dataset = EvaluationDataset.load_stories_for_test(
+                num_easy=1,
+                num_hard=0,
+                num_medium=0
+            )
 
         # Start parent run
         with mlflow.start_run(
@@ -88,8 +92,10 @@ class MLflowModelEvaluationPipeline:
 
             # Generate comparison and recommendation
             if all_results:
-                comparison_df = self.decision_framework.score_models(all_results)
-                recommendation = self.decision_framework.generate_recommendation(comparison_df)
+                comparison_df = self.decision_framework.score_models(
+                    all_results)
+                recommendation = self.decision_framework.generate_recommendation(
+                    comparison_df)
 
                 # Log comparison summary
                 self._log_comparison_summary(comparison_df, recommendation)

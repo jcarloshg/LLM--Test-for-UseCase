@@ -81,28 +81,34 @@ class EvaluationDataset(ABC):
         pass
 
     @staticmethod
-    def load_stories_for_test() -> List[TestCase]:
-        """Load stratified user stories: 1 easy, 2 medium, 1 hard TestCase"""
+    def load_stories_for_test(num_easy: int = 1, num_medium: int = 2, num_hard: int = 1) -> List[TestCase]:
+        """Load stratified user stories with configurable difficulty distribution.
+
+        Args:
+            num_easy: Number of easy test cases to load (default: 1)
+            num_medium: Number of medium test cases to load (default: 2)
+            num_hard: Number of hard test cases to load (default: 1)
+
+        Returns:
+            List of TestCase objects with specified difficulty distribution
+        """
         try:
             with open('data/test/user_stories.json') as f:
                 data = json.load(f)
                 examples = data.get('examples', [])
 
             # Separate stories by difficulty
-            easy_stories = [ex for ex in examples if ex.get(
-                'difficulty') == 'easy']
-            medium_stories = [ex for ex in examples if ex.get(
-                'difficulty') == 'medium']
-            hard_stories = [ex for ex in examples if ex.get(
-                'difficulty') == 'hard']
+            easy_stories = [ex for ex in examples if ex.get('difficulty') == 'easy']
+            medium_stories = [ex for ex in examples if ex.get('difficulty') == 'medium']
+            hard_stories = [ex for ex in examples if ex.get('difficulty') == 'hard']
 
-            # Randomly select: 1 easy, 2 medium, 1 hard
+            # Randomly select based on parameters
             selected_easy = random.sample(
-                easy_stories, min(1, len(easy_stories)))
+                easy_stories, min(num_easy, len(easy_stories)))
             selected_medium = random.sample(
-                medium_stories, min(2, len(medium_stories)))
+                medium_stories, min(num_medium, len(medium_stories)))
             selected_hard = random.sample(
-                hard_stories, min(1, len(hard_stories)))
+                hard_stories, min(num_hard, len(hard_stories)))
 
             # Create TestCase objects
             test_cases = []
