@@ -1,6 +1,7 @@
 from fastapi import Request
 from pydantic import ValidationError
 from src.application.generate_test.application.generate_test_cases_use_case import GenerateTestCasesUseCase
+from src.application.generate_test.infrastructure.prompt_builder import PromptBuilder
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.shared.models.custom_response import CustomResponse
 
@@ -19,8 +20,13 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         body = await request.json()
         generate_request = GenerateRequest(**body)
 
-        # init use case
-        generate_test_cases = GenerateTestCasesUseCase()
+        # Initialize dependencies
+        prompt_builder = PromptBuilder()
+
+        # Initialize and run use case
+        generate_test_cases = GenerateTestCasesUseCase(
+            prompt_builder=prompt_builder
+        )
         tests_cases_response = generate_test_cases.run(
             generate_request=generate_request
         )
