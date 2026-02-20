@@ -3,17 +3,20 @@ from datetime import datetime
 from typing import List, Dict, Any
 import mlflow
 
-from src.application.generate_test.models.structure import TestCase
-from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
 from src.application.generate_test.infrastructure.anthropic.llm_client_anthropic import LLMClientAnthropic
-from src.application.model_evaluation.models.model_configs import ModelConfig, ModelRegistry
+from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
+from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
+from src.application.generate_test.models.prompt_builder import PromptBuilder
+
+from src.application.model_evaluation.infrastructure.mlflow.mlflow_config import MLflowConfig
 from src.application.model_evaluation.models.cost_analysis import CostAnalyzer
 from src.application.model_evaluation.models.decision_framework import ModelDecisionFramework
 from src.application.model_evaluation.models.detailed_evaluation import DetailedEvaluator
 from src.application.model_evaluation.models.evaluators import EvaluationMetrics
+from src.application.model_evaluation.models.model_configs import ModelConfig, ModelRegistry
 from src.application.model_evaluation.models.performance_tracker import PerformanceTracker
+from src.application.model_evaluation.models.test_case import TestCase
 from src.application.model_evaluation.models.test_dataset import EvaluationDataset
-from src.application.model_evaluation.infrastructure.mlflow.mlflow_config import MLflowConfig
 
 
 class MLflowModelEvaluationPipeline:
@@ -36,6 +39,7 @@ class MLflowModelEvaluationPipeline:
         self.cost_analyzer = CostAnalyzer()
         self.performance_tracker = PerformanceTracker()
         self.decision_framework = ModelDecisionFramework()
+        self.prompt_builder: PromptBuilder = PromptBuilderCla()
 
     def run_complete_evaluation(
         self,
@@ -52,7 +56,7 @@ class MLflowModelEvaluationPipeline:
             models_to_test = ModelRegistry.get_models_to_compare()
 
         if test_dataset is None:
-            test_dataset = EvaluationDataset.create_stratified_dataset()
+            test_dataset = EvaluationDataset.load_stories_for_test()
 
         # Start parent run
         with mlflow.start_run(
@@ -84,7 +88,8 @@ class MLflowModelEvaluationPipeline:
 
             # Generate comparison and recommendation
             if all_results:
-                comparison_df = self.decision_framework.score_models(all_results)
+                comparison_df = self.decision_framework.score_models(
+                    all_results)
                 recommendation = self.decision_framework.generate_recommendation(
                     comparison_df)
 
@@ -150,8 +155,13 @@ class MLflowModelEvaluationPipeline:
                 if i % 10 == 0:
                     print(f"  Progress: {i}/{len(test_dataset)}")
 
+                prompts = self.prompt_builder.build(test_case.input)
+
                 try:
-                    result = client.generate(test_case.input)
+                    result = client.generate(
+                        prompt=prompts.get("user", ""),
+                        system_prompt=prompts.get("system", "")
+                    )
                     predictions.append(result.text)
                     latencies.append(result.latency)
                     token_counts.append(result.tokens)
@@ -162,7 +172,8 @@ class MLflowModelEvaluationPipeline:
 
             # Check if we have any successful predictions
             if not latencies:
-                print(f"  ⚠️  All {len(test_dataset)} test cases failed for {model_config.name}")
+                print(
+                    f"  ⚠️  All {len(test_dataset)} test cases failed for {model_config.name}")
                 return {
                     "model_name": model_config.name,
                     "run_id": run.info.run_id,
@@ -321,12 +332,14 @@ class MLflowModelEvaluationPipeline:
             # Get latest run
             experiment = mlflow.get_experiment_by_name(self.experiment_name)
             if experiment is None:
-                print(f"⚠️  Could not find experiment '{self.experiment_name}'")
+                print(
+                    f"⚠️  Could not find experiment '{self.experiment_name}'")
                 return
 
             runs = mlflow.search_runs([experiment.experiment_id])
             if runs.empty:
-                print(f"⚠️  No runs found for experiment '{self.experiment_name}'")
+                print(
+                    f"⚠️  No runs found for experiment '{self.experiment_name}'")
                 return
 
             run_id = runs.iloc[0]['run_id']
