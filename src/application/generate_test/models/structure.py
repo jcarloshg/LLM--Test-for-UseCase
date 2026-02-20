@@ -17,6 +17,19 @@ class GherkinFormat(BaseModel):
         return v.strip()
 
 
+class Step(BaseModel):
+    """Single step with Gherkin format"""
+    given: str = Field(..., min_length=1)
+    when: str = Field(..., min_length=1)
+    then: str = Field(..., min_length=1)
+
+    @validator('given', 'when', 'then')
+    def validate_step_fields(cls, v):
+        if not v or v.strip() == "":
+            raise ValueError("Step field cannot be empty")
+        return v.strip()
+
+
 class TestCase(BaseModel):
     """Single test case structure - supports both simple and comprehensive formats"""
     id: str = Field(..., pattern=r"^TC[_-]\d+$")
@@ -31,7 +44,7 @@ class TestCase(BaseModel):
     # Comprehensive format fields
     type: Optional[Literal["positive", "negative", "edge_case", "boundary"]] = None
     preconditions: Optional[List[str]] = None
-    steps: Optional[List[str]] = None
+    steps: Optional[List] = None
     gherkin: Optional[GherkinFormat] = None
     expected_result: Optional[str] = None
     quality_score: Optional[int] = Field(None, ge=1, le=10)
@@ -43,13 +56,32 @@ class TestCase(BaseModel):
             raise ValueError("Field cannot be empty")
         return v.strip() if v else None
 
-    @validator('preconditions', 'steps', 'tags', pre=True, always=True)
+    @validator('preconditions', 'tags', pre=True, always=True)
     def validate_lists(cls, v):
         if v is None:
             return None
         if not isinstance(v, list):
             raise ValueError("Field must be a list")
         return v
+
+    @validator('steps', pre=True, always=True)
+    def validate_steps(cls, v):
+        if v is None:
+            return None
+        if not isinstance(v, list):
+            raise ValueError("Steps must be a list")
+        # Steps can be either strings or Step objects (dicts with given/when/then)
+        validated_steps = []
+        for step in v:
+            if isinstance(step, dict):
+                # Convert dict to Step object for validation
+                validated_steps.append(Step(**step))
+            elif isinstance(step, str):
+                # Keep string steps as-is
+                validated_steps.append(step)
+            else:
+                raise ValueError("Step must be either a string or an object with given/when/then")
+        return validated_steps
 
 
 class TestCaseOutput(BaseModel):
