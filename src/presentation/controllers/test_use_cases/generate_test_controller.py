@@ -29,17 +29,19 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         # Initialize dependencies
         # prompt_builder = PromptBuilder()
         prompt_builder = PromptBuilderCla()
-        llm_config = LLMConfig(
-            api_key=ENVIRONMENT_CONFIG.ANTHOPIC_KEY,
-            model=ENVIRONMENT_CONFIG.ANTHOPIC_MODEL
-        )
-        # llm_client_ollama = LLMClientOllama(config=llm_config)
-        llm_client_ollama = LLMClientAnthropic(llm_config)
+        # llm_config = LLMConfig(
+        #     provider="anthropic",
+        #     api_key=ENVIRONMENT_CONFIG.ANTHOPIC_KEY,
+        #     model=ENVIRONMENT_CONFIG.ANTHOPIC_MODEL
+        # )
+        # llm_client = LLMClientAnthropic(llm_config)
+        llm_config = LLMConfig()
+        llm_client = LLMClientOllama(config=llm_config)
 
         # Initialize && run use case
         generate_test_cases = GenerateTestCasesUseCase(
             prompt_builder=prompt_builder,
-            llm_client=llm_client_ollama
+            llm_client=llm_client
         )
         tests_cases_response = generate_test_cases.run(
             generate_request=generate_request
