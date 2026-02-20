@@ -1,59 +1,143 @@
 {
-  "model": "llama3.2:3b",
-  "created_at": "2026-02-20T01:30:30.378841565Z",
-  "message": {
-    "role": "assistant",
-    "content": {
-      "test_cases": [
+  "message": "Test cases generated from use case",
+  "is_success": true,
+  "data": [
+    {
+      "id": "TC_001",
+      "title": "Successful password reset",
+      "priority": "high",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "positive",
+      "preconditions": [
+        "User is on the login page",
+        "Has a registered account"
+      ],
+      "steps": [
         {
-          "id": "TC_001",
-          "title": "Successful password reset",
-          "priority": "high",
-          "given": "User is on the login page AND has a registered account",
-          "when": "User clicks Reset Password button",
-          "then": "User receives a password reset link via email"
+          "given": "Enter valid email address",
+          "when": "Click on password reset link",
+          "then": "Redirect to password reset page"
         },
         {
-          "id": "TC_002",
-          "title": "Password reset fails due to invalid token",
-          "priority": "high",
-          "given": "User is on the login page AND has a registered account",
-          "when": "User enters an invalid password reset token",
-          "then": "Error message 'Invalid token' is displayed"
-        },
-        {
-          "id": "TC_003",
-          "title": "Password reset fails due to non-existent email",
-          "priority": "medium",
-          "given": "User has a registered account with an invalid email address",
-          "when": "User clicks Reset Password button",
-          "then": "Error message 'Account not found' is displayed"
-        },
-        {
-          "id": "TC_004",
-          "title": "Password reset fails due to empty password field",
-          "priority": "medium",
-          "given": "User is on the login page AND has a registered account",
-          "when": "User leaves password field empty and clicks Reset Password button",
-          "then": "Validation error message 'Password cannot be empty' is displayed"
-        },
-        {
-          "id": "TC_005",
-          "title": "Successful password reset with new password",
-          "priority": "high",
-          "given": "User has a registered account AND has an active password reset token",
-          "when": "User enters new password and confirms it on the password reset page",
-          "then": "User is redirected to login page WITH session created"
+          "given": "Enter correct password",
+          "when": "Submit the form",
+          "then": "Password is reset successfully"
         }
+      ],
+      "gherkin": {
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
+      },
+      "expected_result": "User is redirected to dashboard AND session is created",
+      "quality_score": 8,
+      "tags": [
+        "password_reset"
+      ]
+    },
+    {
+      "id": "TC_002",
+      "title": "Login fails with invalid password",
+      "priority": "high",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "negative",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "given": "Enter valid email address",
+          "when": "Click on login button",
+          "then": "Redirect to error page"
+        },
+        {
+          "given": "Enter incorrect password",
+          "when": "Submit the form",
+          "then": "Error message 'Invalid credentials' is displayed AND user remains on login page"
+        }
+      ],
+      "gherkin": {
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
+      },
+      "expected_result": "Error message 'Invalid credentials' is displayed AND user remains on login page",
+      "quality_score": 6,
+      "tags": [
+        "login_failure"
+      ]
+    },
+    {
+      "id": "TC_003",
+      "title": "Login fails with non-existent email",
+      "priority": "high",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "negative",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "given": "Enter valid password",
+          "when": "Submit the form",
+          "then": "Redirect to error page"
+        },
+        {
+          "given": "Click on login button",
+          "when": "Submit the form",
+          "then": "Error message 'Account not found' is displayed"
+        }
+      ],
+      "gherkin": {
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
+      },
+      "expected_result": "Error message 'Account not found' is displayed",
+      "quality_score": 6,
+      "tags": [
+        "login_failure"
+      ]
+    },
+    {
+      "id": "TC_004",
+      "title": "Validation error messages for empty fields",
+      "priority": "medium",
+      "given": null,
+      "when": null,
+      "then": null,
+      "type": "negative",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "steps": [
+        {
+          "given": "Leave email field empty",
+          "when": "Submit the form",
+          "then": "Validation error message 'Email cannot be blank' is displayed"
+        },
+        {
+          "given": "Leave password field empty",
+          "when": "Submit the form",
+          "then": "Validation error message 'Password cannot be blank' is displayed"
+        }
+      ],
+      "gherkin": {
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
+      },
+      "expected_result": "Validation error messages are displayed for empty fields",
+      "quality_score": 6,
+      "tags": [
+        "validation_error"
       ]
     }
-  },
-  "done": true,
-  "done_reason": "stop",
-  "total_duration": 40612626417,
-  "load_duration": 1891638220,
-  "prompt_eval_count": 968,
-  "prompt_eval_duration": 12625535497,
-  "eval_count": 417,
-  "eval_duration": 25863556848
+  ]
 }
