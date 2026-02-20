@@ -1,5 +1,6 @@
 from jinja2 import Template
 import json
+import random
 from typing import List, Dict, Any
 
 from src.application.generate_test.models.prompt_builder import PromptBuilder
@@ -15,7 +16,8 @@ class PromptBuilderCla(PromptBuilder):
 
     def __init__(self):
         """Initialize the prompt builder with comprehensive system prompt and templates."""
-        self.system_prompt = """You are an expert QA Engineer specializing in test case design for Agile user stories.
+        self.system_prompt = """
+You are an expert QA Engineer specializing in test case design for Agile user stories.
 
 Your Role:
 Given a user story, create comprehensive test cases covering positive, negative, and edge case scenarios.
@@ -68,25 +70,90 @@ OUTPUT FORMAT - Respond with ONLY valid JSON (no markdown, no explanations):
 }"""
 
         self.user_template = Template("""
-User Story:
+**ID:** {{ user_story_id | default("US-000") }}
+**Title:** {{ user_story_title | default("Untitled Story") }}
+
+**Description:**
 {{ user_story }}
 
-{% if examples %}
-Examples of good test cases:
-
-{% for example in examples %}
-User Story: {{ example.user_story }}
-Generated Test Cases:
-{{ example.test_cases | tojson(indent=2) }}
-Quality Score: {{ example.quality_score | default(0.85) }}
-
+{% if acceptance_criteria %}
+**Acceptance Criteria:**
+{% for criterion in acceptance_criteria %}
+- {{ criterion }}
 {% endfor %}
 {% endif %}
 
-Now generate comprehensive test cases for the user story above. Remember:
-- Output ONLY valid JSON with complete test case structure
-- Include all required fields for each test case
-- Ensure diverse coverage with multiple test types
+---
+## CONTEXT
+---
+
+{% if app_type %}
+**Application Type:** {{ app_type }}
+{% endif %}
+
+{% if test_focus %}
+**Test Focus Areas:** {{ test_focus | join(", ") }}
+{% endif %}
+
+{% if min_test_cases %}
+**Minimum Test Cases Required:** {{ min_test_cases }}
+{% endif %}
+
+{% if max_test_cases %}
+**Maximum Test Cases Allowed:** {{ max_test_cases }}
+{% endif %}
+
+{% if priority_focus %}
+**Priority Focus:** {{ priority_focus }}
+{% endif %}
+
+{% if specific_scenarios %}
+---
+## SPECIFIC SCENARIOS TO COVER
+---
+{% for scenario in specific_scenarios %}
+- {{ scenario }}
+{% endfor %}
+{% endif %}
+
+{% if examples %}
+---
+## REFERENCE EXAMPLES
+---
+
+The following are examples of well-structured test cases for similar user stories:
+
+{% for example in examples %}
+### Example {{ loop.index }}
+
+**User Story:** {{ example.user_story }}
+
+**Test Cases:**
+```json
+{{ example.test_cases | tojson(indent=2) }}
+```
+
+{% if example.quality_notes %}
+**Quality Notes:** {{ example.quality_notes }}
+{% endif %}
+
+---
+{% endfor %}
+{% endif %}
+
+---
+## GENERATION INSTRUCTIONS
+---
+
+Generate test cases for the user story above.
+
+**Requirements:**
+1. Output ONLY valid JSON — no markdown code fences, no explanations
+2. Include all required fields for each test case
+3. Ensure coverage: positive ({{ positive_min | default(2) }}+), negative ({{ negative_min | default(2) }}+), edge cases ({{ edge_min | default(1) }}+)
+4. Start test case IDs from: {{ start_id | default("TC-001") }}
+
+**Output:**
 """)
 
     def build(self, user_story: str, include_examples: bool = True) -> Dict[str, str]:
@@ -103,7 +170,8 @@ Now generate comprehensive test cases for the user story above. Remember:
         """
         examples = []
         if include_examples:
-            examples = self._load_examples()[:2]  # Use 2 examples
+            all_examples = self._load_examples()
+            examples = random.sample(all_examples, k=min(3, len(all_examples)))
 
         user_prompt = self.user_template.render(
             user_story=user_story,
@@ -125,12 +193,10 @@ Now generate comprehensive test cases for the user story above. Remember:
             List of example dictionaries containing sample inputs and outputs
         """
         try:
-            with open('data/examples/hundred_user_stories_with_test_cases.json') as f:
+            with open('data/examples/hundred_user_stories_with_test_cases.json', encoding='utf-8') as f:
                 data = json.load(f)
                 return data.get('examples', [])
         except FileNotFoundError:
             return []
         except (json.JSONDecodeError, KeyError):
-            return []
-        except Exception:
             return []
