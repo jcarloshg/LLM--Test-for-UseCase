@@ -121,13 +121,13 @@ class CustomResponse(BaseModel):
         )
 
     @staticmethod
-    def something_was_wrong(message: str = "Something went wrong") -> "CustomResponse":
+    def something_was_wrong(message: str = "Something went wrong. Try later.") -> "CustomResponse":
         """Create an internal server error response (500 Internal Server Error).
 
         Convenience method for creating 500 Internal Server Error responses.
 
         Args:
-            message: Error message (default: "Something went wrong")
+            message: Error message (default: "Something went wrong. Try later.")
 
         Returns:
             CustomResponse: Error response instance with 500 status code
