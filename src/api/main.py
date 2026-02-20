@@ -1,8 +1,8 @@
 # src/api/main.py
+import json
+from typing import Optional, List
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
-from typing import Optional, List
-import json
 import uvicorn
 
 from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG

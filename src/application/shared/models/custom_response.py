@@ -44,10 +44,15 @@ class CustomResponse(BaseModel):
         return response
 
     def get_JSONResponse(self):
+        # Serialize data if it's a Pydantic model
+        data = self.data
+        if isinstance(self.data, BaseModel):
+            data = self.data.model_dump()
+
         response = {
             "message": self.message,
             "is_success": self.is_success,
-            "data": self.data
+            "data": data
         }
         return JSONResponse(
             content=response,
