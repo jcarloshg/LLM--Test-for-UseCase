@@ -93,7 +93,6 @@ class ModelRegistry:
         Only includes Anthropic and Ollama providers.
         """
         return [
-            cls.MODELS["claude-haiku"],
             cls.MODELS["llama-3.2-1b"],
             cls.MODELS["llama-3.2-3b"],
             cls.MODELS["qwen3-vl-8b"]
