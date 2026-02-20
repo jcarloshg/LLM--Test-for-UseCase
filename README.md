@@ -237,6 +237,16 @@ python scripts/run_evaluation.py
 # Avg Latency: 2.4s
 ```
 
+### Run Model Evaluation (REMOVE.py)
+
+```bash
+# Run complete model evaluation pipeline in Docker
+docker exec -w /app test-case-api bash -c "PYTHONPATH=. python3.10 src/application/model_evaluation/application/REMOVE.py"
+
+# Evaluates: Claude Haiku (Anthropic), Llama 3.2 3B (Ollama), Qwen3-VL 8B (Ollama)
+# Output: MLflow tracking, comparison metrics, and recommendations
+```
+
 ### View in MLflow
 
 ```bash
