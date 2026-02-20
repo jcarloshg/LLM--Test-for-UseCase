@@ -1,0 +1,1194 @@
+{
+  "examples": [
+    {
+      "user_story": "As a registered user, I want to log in with my email and password so that I can access my account",
+      "quality_score": 0.92,
+      "test_cases": [
+        {
+          "id": "TC_001",
+          "title": "Successful login with valid credentials",
+          "priority": "high",
+          "preconditions": "User is on the login page AND has a registered account",
+          "steps": [
+            "Enter valid email address",
+            "Enter valid password",
+            "Click login button"
+          ],
+          "expected_result": "User is redirected to dashboard AND session is created"
+        },
+        {
+          "id": "TC_002",
+          "title": "Login fails with invalid password",
+          "priority": "high",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter valid email address",
+            "Enter incorrect password",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Invalid credentials' is displayed AND user remains on login page"
+        },
+        {
+          "id": "TC_003",
+          "title": "Login fails with non-existent email",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter email not in system",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Account not found' is displayed"
+        },
+        {
+          "id": "TC_004",
+          "title": "Empty fields validation",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Leave email field empty",
+            "Leave password field empty",
+            "Click login button"
+          ],
+          "expected_result": "Validation error messages are displayed for empty fields"
+        },
+        {
+          "id": "TC_005",
+          "title": "Login with only email field filled",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter valid email address",
+            "Leave password field empty",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Password is required' is displayed"
+        },
+        {
+          "id": "TC_006",
+          "title": "Login with only password field filled",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Leave email field empty",
+            "Enter valid password",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Email is required' is displayed"
+        },
+        {
+          "id": "TC_007",
+          "title": "Login with invalid email format",
+          "priority": "high",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter invalid email format (e.g., 'notanemail')",
+            "Enter valid password",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Please enter a valid email' is displayed"
+        },
+        {
+          "id": "TC_008",
+          "title": "Login with email containing special characters",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter email with special characters (e.g., 'user@#$@example.com')",
+            "Enter valid password",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Please enter a valid email' is displayed"
+        },
+        {
+          "id": "TC_009",
+          "title": "Login with extremely long password",
+          "priority": "low",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter valid email address",
+            "Enter password with 500+ characters",
+            "Click login button"
+          ],
+          "expected_result": "Error message 'Password exceeds maximum length' is displayed OR invalid credentials message"
+        },
+        {
+          "id": "TC_010",
+          "title": "Login with spaces in email field",
+          "priority": "medium",
+          "preconditions": "User is on the login page",
+          "steps": [
+            "Enter email with leading/trailing spaces (e.g., ' user@example.com ')",
+            "Enter valid password",
+            "Click login button"
+          ],
+          "expected_result": "System trims spaces AND user is successfully logged in"
+        },
+        {
+          "id": "TC_011",
+          "title": "Login case sensitivity for email",
+          "priority": "medium",
+          "preconditions": "User is on the login page AND has account with 'User@Example.com'",
+          "steps": [
+            "Enter email in lowercase (e.g., 'user@example.com')",
+            "Enter correct password",
+            "Click login button"
+          ],
+          "expected_result": "User is successfully logged in (email is case-insensitive)"
+        },
+        {
+          "id": "TC_012",
+          "title": "Session timeout after successful login",
+          "priority": "high",
+          "preconditions": "User is logged in AND session timeout is set to 5 minutes",
+          "steps": [
+            "Login successfully",
+            "Wait for 6 minutes without activity",
+            "Attempt to access protected page"
+          ],
+          "expected_result": "User is redirected to login page AND session message 'Session expired' is shown"
+        }
+      ]
+    },
+    {
+      "user_story": "As a customer, I want to add items to my shopping cart so that I can purchase multiple products",
+      "quality_score": 0.88,
+      "test_cases": [
+        {
+          "id": "TC_013",
+          "title": "Add single item to empty cart",
+          "priority": "high",
+          "preconditions": "User is viewing a product page AND cart is empty",
+          "steps": [
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Item is added to cart AND cart count shows 1 AND success message appears"
+        },
+        {
+          "id": "TC_014",
+          "title": "Add multiple quantities of same item",
+          "priority": "high",
+          "preconditions": "User is viewing a product page",
+          "steps": [
+            "Select quantity 3",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Cart shows 3 units of the product AND total price is calculated correctly"
+        },
+        {
+          "id": "TC_015",
+          "title": "Add item when out of stock",
+          "priority": "high",
+          "preconditions": "Product is marked as out of stock",
+          "steps": [
+            "Attempt to click 'Add to Cart' button"
+          ],
+          "expected_result": "'Add to Cart' button is disabled AND message 'Out of Stock' is displayed"
+        },
+        {
+          "id": "TC_016",
+          "title": "Add multiple different items to cart",
+          "priority": "high",
+          "preconditions": "User is on product listing page",
+          "steps": [
+            "Navigate to product 1 and click 'Add to Cart'",
+            "Navigate to product 2 and click 'Add to Cart'",
+            "Navigate to product 3 and click 'Add to Cart'"
+          ],
+          "expected_result": "Cart count shows 3 AND all three products appear in cart with correct prices"
+        },
+        {
+          "id": "TC_017",
+          "title": "Add item with zero quantity selected",
+          "priority": "medium",
+          "preconditions": "User is viewing a product page",
+          "steps": [
+            "Set quantity to 0",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Error message 'Please select a quantity greater than 0' is displayed"
+        },
+        {
+          "id": "TC_018",
+          "title": "Add item with negative quantity",
+          "priority": "medium",
+          "preconditions": "User is viewing a product page",
+          "steps": [
+            "Enter negative number in quantity field",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Error message 'Quantity must be positive' is displayed"
+        },
+        {
+          "id": "TC_019",
+          "title": "Add item exceeding maximum stock",
+          "priority": "high",
+          "preconditions": "User is viewing a product with 10 units in stock",
+          "steps": [
+            "Select quantity 15",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Error message 'Only 10 units available' is displayed"
+        },
+        {
+          "id": "TC_020",
+          "title": "Add item with maximum available quantity",
+          "priority": "high",
+          "preconditions": "User is viewing a product with 10 units in stock",
+          "steps": [
+            "Select quantity 10",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "All 10 units are added to cart AND success message appears"
+        },
+        {
+          "id": "TC_021",
+          "title": "Cart persistence after page refresh",
+          "priority": "high",
+          "preconditions": "User has added items to cart",
+          "steps": [
+            "Add item to cart",
+            "Refresh the page",
+            "Check cart contents"
+          ],
+          "expected_result": "Item remains in cart AND quantity is unchanged"
+        },
+        {
+          "id": "TC_022",
+          "title": "Add same item multiple times increases quantity",
+          "priority": "high",
+          "preconditions": "User has one item in cart",
+          "steps": [
+            "Add same product again with quantity 2",
+            "View cart"
+          ],
+          "expected_result": "Cart shows single product entry with total quantity 3 AND price is updated"
+        },
+        {
+          "id": "TC_023",
+          "title": "Add item with decimal quantity",
+          "priority": "medium",
+          "preconditions": "User is viewing a product page",
+          "steps": [
+            "Enter decimal quantity (e.g., 2.5)",
+            "Click 'Add to Cart' button"
+          ],
+          "expected_result": "Error message 'Quantity must be a whole number' is displayed"
+        },
+        {
+          "id": "TC_024",
+          "title": "Cart total updates correctly after adding items",
+          "priority": "high",
+          "preconditions": "User is viewing products with known prices",
+          "steps": [
+            "Add item priced at $10 with quantity 2",
+            "Add item priced at $15 with quantity 1",
+            "Check cart total"
+          ],
+          "expected_result": "Cart total displays correctly as $35 AND breakdown is accurate"
+        }
+      ]
+    },
+    {
+      "user_story": "As an admin, I want to delete user accounts so that I can remove inactive or banned users",
+      "quality_score": 0.87,
+      "test_cases": [
+        {
+          "id": "TC_025",
+          "title": "Successful account deletion",
+          "priority": "critical",
+          "preconditions": "Admin is logged in AND viewing user management page",
+          "steps": [
+            "Click delete on a user account",
+            "Confirm deletion on dialog"
+          ],
+          "expected_result": "User account is removed from database AND confirmation message appears"
+        },
+        {
+          "id": "TC_026",
+          "title": "Cancel deletion operation",
+          "priority": "medium",
+          "preconditions": "Admin initiates account deletion",
+          "steps": [
+            "Click 'Cancel' on confirmation dialog"
+          ],
+          "expected_result": "Account remains unchanged AND user is returned to management page"
+        },
+        {
+          "id": "TC_027",
+          "title": "Cannot delete own account",
+          "priority": "high",
+          "preconditions": "Admin is viewing their own account",
+          "steps": [
+            "Attempt to click delete button on own account"
+          ],
+          "expected_result": "Delete button is disabled OR error message prevents deletion"
+        },
+        {
+          "id": "TC_028",
+          "title": "Delete user with active sessions",
+          "priority": "critical",
+          "preconditions": "Admin is logged in AND user has active session",
+          "steps": [
+            "Click delete on user account with active session",
+            "Confirm deletion"
+          ],
+          "expected_result": "User account is deleted AND active session is terminated"
+        },
+        {
+          "id": "TC_029",
+          "title": "Delete user with pending orders",
+          "priority": "high",
+          "preconditions": "Admin is logged in AND user has pending orders",
+          "steps": [
+            "Click delete on user account with pending orders",
+            "View warning message"
+          ],
+          "expected_result": "Warning message 'User has pending orders' is displayed AND deletion is prevented"
+        },
+        {
+          "id": "TC_030",
+          "title": "Delete user and verify data removal from database",
+          "priority": "critical",
+          "preconditions": "Admin is logged in AND viewing user management page",
+          "steps": [
+            "Note user ID to be deleted",
+            "Click delete on user account",
+            "Confirm deletion",
+            "Search for deleted user ID"
+          ],
+          "expected_result": "User record no longer exists in database AND search returns no results"
+        },
+        {
+          "id": "TC_031",
+          "title": "Bulk delete multiple users",
+          "priority": "high",
+          "preconditions": "Admin is logged in AND multiple users are selected",
+          "steps": [
+            "Select three user accounts",
+            "Click 'Delete Selected' button",
+            "Confirm bulk deletion"
+          ],
+          "expected_result": "All three users are deleted AND confirmation message shows count deleted"
+        },
+        {
+          "id": "TC_032",
+          "title": "Cannot delete user without admin privileges",
+          "priority": "critical",
+          "preconditions": "Non-admin user is logged in",
+          "steps": [
+            "Navigate to user management page",
+            "Attempt to access delete functionality"
+          ],
+          "expected_result": "Delete button is not visible OR access denied message is shown"
+        },
+        {
+          "id": "TC_033",
+          "title": "Delete user audit trail is recorded",
+          "priority": "high",
+          "preconditions": "Admin is logged in AND viewing audit logs",
+          "steps": [
+            "Delete a user account",
+            "Check admin audit logs"
+          ],
+          "expected_result": "Audit log shows deletion event with timestamp AND admin name"
+        },
+        {
+          "id": "TC_034",
+          "title": "Deletion confirmation dialog displays user details",
+          "priority": "medium",
+          "preconditions": "Admin is initiating user deletion",
+          "steps": [
+            "Click delete on a user",
+            "Observe confirmation dialog"
+          ],
+          "expected_result": "Dialog shows user name AND email address AND warning message"
+        },
+        {
+          "id": "TC_035",
+          "title": "Delete user removes associated files",
+          "priority": "high",
+          "preconditions": "Admin is logged in AND user has uploaded files",
+          "steps": [
+            "Delete user account",
+            "Verify file storage"
+          ],
+          "expected_result": "User's files are deleted from storage AND associated records removed"
+        },
+        {
+          "id": "TC_036",
+          "title": "Delete inactive user with no recent activity",
+          "priority": "medium",
+          "preconditions": "Admin is logged in AND user has no activity for 12 months",
+          "steps": [
+            "Filter for inactive users",
+            "Select user with no recent activity",
+            "Click delete AND confirm"
+          ],
+          "expected_result": "Inactive user is successfully deleted AND confirmation appears"
+        }
+      ]
+    },
+    {
+      "user_story": "As a customer, I want to search for products by name or category so that I can find what I'm looking for quickly",
+      "quality_score": 0.89,
+      "test_cases": [
+        {
+          "id": "TC_037",
+          "title": "Search with single keyword",
+          "priority": "high",
+          "preconditions": "User is on the search page AND products with keyword exist",
+          "steps": [
+            "Enter 'laptop' in search field",
+            "Click search button"
+          ],
+          "expected_result": "Search results display all products matching 'laptop' AND result count is shown"
+        },
+        {
+          "id": "TC_038",
+          "title": "Search with multiple keywords",
+          "priority": "high",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Enter 'blue wireless mouse' in search field",
+            "Click search button"
+          ],
+          "expected_result": "Results show products matching all keywords OR products with best keyword match"
+        },
+        {
+          "id": "TC_039",
+          "title": "Search returns no results",
+          "priority": "medium",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Enter search term that has no matches (e.g., 'xyzabc123')",
+            "Click search button"
+          ],
+          "expected_result": "Message 'No products found' is displayed AND suggestions are provided"
+        },
+        {
+          "id": "TC_040",
+          "title": "Search with special characters",
+          "priority": "medium",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Enter special characters (e.g., '@#$%') in search field",
+            "Click search button"
+          ],
+          "expected_result": "Error message 'Invalid search characters' OR empty results are returned"
+        },
+        {
+          "id": "TC_041",
+          "title": "Search is case insensitive",
+          "priority": "medium",
+          "preconditions": "User is on the search page AND product 'Laptop' exists",
+          "steps": [
+            "Enter 'LAPTOP' in search field",
+            "Click search button"
+          ],
+          "expected_result": "Results display products matching 'laptop' regardless of case"
+        },
+        {
+          "id": "TC_042",
+          "title": "Search with leading/trailing spaces",
+          "priority": "low",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Enter '  laptop  ' with leading/trailing spaces",
+            "Click search button"
+          ],
+          "expected_result": "System trims spaces AND search results are accurate"
+        },
+        {
+          "id": "TC_043",
+          "title": "Search filter by category",
+          "priority": "high",
+          "preconditions": "User is on the search page AND categories are displayed",
+          "steps": [
+            "Enter 'mouse' in search field",
+            "Select 'Electronics' category filter",
+            "Click search button"
+          ],
+          "expected_result": "Results show only mice in Electronics category"
+        },
+        {
+          "id": "TC_044",
+          "title": "Search with price range filter",
+          "priority": "high",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Enter search term",
+            "Set price range $50-$200",
+            "Click search button"
+          ],
+          "expected_result": "Results display only products within specified price range"
+        },
+        {
+          "id": "TC_045",
+          "title": "Search suggestions appear while typing",
+          "priority": "medium",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Start typing 'lap' in search field",
+            "Observe dropdown suggestions"
+          ],
+          "expected_result": "Autocomplete suggestions appear AND show 'laptop', 'laptop bag', etc."
+        },
+        {
+          "id": "TC_046",
+          "title": "Search with empty field",
+          "priority": "medium",
+          "preconditions": "User is on the search page",
+          "steps": [
+            "Leave search field empty",
+            "Click search button"
+          ],
+          "expected_result": "Warning message 'Please enter search term' is displayed OR all products shown"
+        },
+        {
+          "id": "TC_047",
+          "title": "Search results can be sorted",
+          "priority": "high",
+          "preconditions": "User has search results displayed",
+          "steps": [
+            "Perform search",
+            "Click sort dropdown",
+            "Select 'Price: Low to High'"
+          ],
+          "expected_result": "Results are re-sorted by price in ascending order"
+        },
+        {
+          "id": "TC_048",
+          "title": "Search pagination works correctly",
+          "priority": "medium",
+          "preconditions": "User has search results with more than 10 products",
+          "steps": [
+            "Perform search returning 50+ results",
+            "Click 'Next' page button",
+            "Verify different products displayed"
+          ],
+          "expected_result": "Page 2 displays products 11-20 AND pagination controls work"
+        }
+      ]
+    },
+    {
+      "user_story": "As a user, I want to update my profile information so that my account details are current and accurate",
+      "quality_score": 0.90,
+      "test_cases": [
+        {
+          "id": "TC_049",
+          "title": "Update first name successfully",
+          "priority": "high",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Clear first name field",
+            "Enter new first name 'John'",
+            "Click save button"
+          ],
+          "expected_result": "First name is updated AND confirmation message appears AND page refreshes with new name"
+        },
+        {
+          "id": "TC_050",
+          "title": "Update email address",
+          "priority": "high",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Click email field",
+            "Enter new email address",
+            "Click save button"
+          ],
+          "expected_result": "Verification email is sent AND user is prompted to verify new email"
+        },
+        {
+          "id": "TC_051",
+          "title": "Update with invalid email format",
+          "priority": "high",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Enter invalid email (e.g., 'notanemail')",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Invalid email format' is displayed AND changes are not saved"
+        },
+        {
+          "id": "TC_052",
+          "title": "Update with email already in use",
+          "priority": "high",
+          "preconditions": "User is logged in AND another account uses the email",
+          "steps": [
+            "Enter email already registered",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Email already in use' is displayed"
+        },
+        {
+          "id": "TC_053",
+          "title": "Update profile picture",
+          "priority": "medium",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Click 'Upload photo' button",
+            "Select image file",
+            "Click save button"
+          ],
+          "expected_result": "Image is uploaded AND displayed in profile AND success message shown"
+        },
+        {
+          "id": "TC_054",
+          "title": "Update profile with oversized image",
+          "priority": "medium",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Attempt to upload image larger than 5MB",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'File size exceeds 5MB limit' is displayed"
+        },
+        {
+          "id": "TC_055",
+          "title": "Update phone number",
+          "priority": "medium",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Enter phone number with correct format",
+            "Click save button"
+          ],
+          "expected_result": "Phone number is saved AND formatted correctly AND confirmation appears"
+        },
+        {
+          "id": "TC_056",
+          "title": "Update with invalid phone number format",
+          "priority": "medium",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Enter phone number with invalid format",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Invalid phone format' is displayed"
+        },
+        {
+          "id": "TC_057",
+          "title": "Update address information",
+          "priority": "high",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Update street address",
+            "Update city",
+            "Update postal code",
+            "Click save button"
+          ],
+          "expected_result": "All address fields are updated AND confirmation message appears"
+        },
+        {
+          "id": "TC_058",
+          "title": "Update with empty required field",
+          "priority": "high",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Clear a required field (e.g., first name)",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'This field is required' is displayed"
+        },
+        {
+          "id": "TC_059",
+          "title": "Cancel profile update without saving",
+          "priority": "medium",
+          "preconditions": "User has made changes to profile",
+          "steps": [
+            "Modify profile information",
+            "Click cancel button",
+            "Return to profile page"
+          ],
+          "expected_result": "Changes are discarded AND original information is displayed"
+        },
+        {
+          "id": "TC_060",
+          "title": "Update personal bio",
+          "priority": "low",
+          "preconditions": "User is logged in AND on profile edit page",
+          "steps": [
+            "Enter bio text up to 500 characters",
+            "Click save button"
+          ],
+          "expected_result": "Bio is saved AND displayed on profile AND character limit enforced"
+        }
+      ]
+    },
+    {
+      "user_story": "As a user, I want to reset my password so that I can regain access if I forget it",
+      "quality_score": 0.91,
+      "test_cases": [
+        {
+          "id": "TC_061",
+          "title": "Initiate password reset with valid email",
+          "priority": "critical",
+          "preconditions": "User is on login page AND cannot remember password",
+          "steps": [
+            "Click 'Forgot Password' link",
+            "Enter registered email address",
+            "Click send button"
+          ],
+          "expected_result": "Confirmation message appears AND password reset email is sent"
+        },
+        {
+          "id": "TC_062",
+          "title": "Password reset with non-existent email",
+          "priority": "high",
+          "preconditions": "User is on password reset page",
+          "steps": [
+            "Enter email not in system",
+            "Click send button"
+          ],
+          "expected_result": "Generic confirmation message appears (for security) AND no email sent"
+        },
+        {
+          "id": "TC_063",
+          "title": "Password reset link expires after time limit",
+          "priority": "critical",
+          "preconditions": "User has received password reset email",
+          "steps": [
+            "Wait for link to expire (24 hours)",
+            "Click expired password reset link"
+          ],
+          "expected_result": "Error message 'Link has expired' is displayed AND user must request new link"
+        },
+        {
+          "id": "TC_064",
+          "title": "Reset password with new valid password",
+          "priority": "critical",
+          "preconditions": "User has valid password reset link",
+          "steps": [
+            "Click reset link",
+            "Enter new password",
+            "Confirm new password",
+            "Click save button"
+          ],
+          "expected_result": "Password is updated AND user is redirected to login AND can login with new password"
+        },
+        {
+          "id": "TC_065",
+          "title": "Reset password with mismatched confirmation",
+          "priority": "high",
+          "preconditions": "User is on password reset form",
+          "steps": [
+            "Enter new password",
+            "Enter different password in confirmation field",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Passwords do not match' is displayed"
+        },
+        {
+          "id": "TC_066",
+          "title": "Reset password with weak password",
+          "priority": "high",
+          "preconditions": "User is on password reset form",
+          "steps": [
+            "Enter password '123' (too weak)",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Password too weak' AND password requirements are displayed"
+        },
+        {
+          "id": "TC_067",
+          "title": "Reset password cannot reuse old password",
+          "priority": "high",
+          "preconditions": "User is on password reset form",
+          "steps": [
+            "Enter previous password",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Cannot reuse previous password' is displayed"
+        },
+        {
+          "id": "TC_068",
+          "title": "Password reset with empty new password field",
+          "priority": "medium",
+          "preconditions": "User is on password reset form",
+          "steps": [
+            "Leave new password field empty",
+            "Click save button"
+          ],
+          "expected_result": "Error message 'Password is required' is displayed"
+        },
+        {
+          "id": "TC_069",
+          "title": "Multiple password reset requests",
+          "priority": "medium",
+          "preconditions": "User has requested password reset",
+          "steps": [
+            "Request password reset",
+            "Request another reset immediately",
+            "Check emails received"
+          ],
+          "expected_result": "Latest link is valid AND previous link is invalidated"
+        },
+        {
+          "id": "TC_070",
+          "title": "Password reset invalidates all active sessions",
+          "priority": "critical",
+          "preconditions": "User is logged in on another device",
+          "steps": [
+            "Reset password",
+            "Return to other logged-in device",
+            "Attempt to perform action"
+          ],
+          "expected_result": "All previous sessions are terminated AND re-login is required"
+        },
+        {
+          "id": "TC_071",
+          "title": "Password reset with very long password",
+          "priority": "low",
+          "preconditions": "User is on password reset form",
+          "steps": [
+            "Enter password with 256 characters",
+            "Confirm password",
+            "Click save button"
+          ],
+          "expected_result": "Password is accepted if within system limits OR error shown"
+        },
+        {
+          "id": "TC_072",
+          "title": "Password reset email not received",
+          "priority": "high",
+          "preconditions": "User requested password reset",
+          "steps": [
+            "Wait for email",
+            "Check spam folder",
+            "Request new email"
+          ],
+          "expected_result": "User can request new reset email AND receives it"
+        }
+      ]
+    },
+    {
+      "user_story": "As a customer, I want to view my order history so that I can track previous purchases",
+      "quality_score": 0.86,
+      "test_cases": [
+        {
+          "id": "TC_073",
+          "title": "View order history list",
+          "priority": "high",
+          "preconditions": "User is logged in AND has made purchases",
+          "steps": [
+            "Navigate to order history page",
+            "Observe list of orders"
+          ],
+          "expected_result": "All past orders are displayed with order number, date, AND total"
+        },
+        {
+          "id": "TC_074",
+          "title": "View order details",
+          "priority": "high",
+          "preconditions": "User is on order history page",
+          "steps": [
+            "Click on specific order",
+            "Observe order details"
+          ],
+          "expected_result": "Order details display items, quantities, prices, shipping address, AND order status"
+        },
+        {
+          "id": "TC_075",
+          "title": "Order history empty state",
+          "priority": "medium",
+          "preconditions": "User with no purchases is logged in",
+          "steps": [
+            "Navigate to order history page"
+          ],
+          "expected_result": "Message 'No orders found' is displayed AND shop link is provided"
+        },
+        {
+          "id": "TC_076",
+          "title": "Filter orders by status",
+          "priority": "high",
+          "preconditions": "User is on order history page with multiple orders",
+          "steps": [
+            "Click status filter",
+            "Select 'Delivered'",
+            "View filtered results"
+          ],
+          "expected_result": "Only delivered orders are displayed"
+        },
+        {
+          "id": "TC_077",
+          "title": "Filter orders by date range",
+          "priority": "medium",
+          "preconditions": "User is on order history page",
+          "steps": [
+            "Select date range (e.g., last 3 months)",
+            "Click filter button"
+          ],
+          "expected_result": "Orders within selected date range are displayed"
+        },
+        {
+          "id": "TC_078",
+          "title": "Search order by order number",
+          "priority": "high",
+          "preconditions": "User is on order history page",
+          "steps": [
+            "Enter order number in search field",
+            "Click search button"
+          ],
+          "expected_result": "Specific order is displayed if found OR 'No results' message shown"
+        },
+        {
+          "id": "TC_079",
+          "title": "Order history pagination",
+          "priority": "medium",
+          "preconditions": "User has 50+ orders",
+          "steps": [
+            "View order history page",
+            "Click next page button",
+            "Verify different orders displayed"
+          ],
+          "expected_result": "Pagination works AND 10 orders per page displayed"
+        },
+        {
+          "id": "TC_080",
+          "title": "Reorder from order history",
+          "priority": "high",
+          "preconditions": "User is viewing order details",
+          "steps": [
+            "Click 'Reorder' button",
+            "Review cart with reordered items"
+          ],
+          "expected_result": "All items from previous order are added to new cart"
+        },
+        {
+          "id": "TC_081",
+          "title": "View tracking information for shipped order",
+          "priority": "high",
+          "preconditions": "User is viewing shipped order details",
+          "steps": [
+            "Click 'Track Order' button",
+            "Observe tracking details"
+          ],
+          "expected_result": "Tracking number AND estimated delivery date are displayed"
+        },
+        {
+          "id": "TC_082",
+          "title": "Download order invoice",
+          "priority": "medium",
+          "preconditions": "User is viewing order details",
+          "steps": [
+            "Click 'Download Invoice' button",
+            "Verify PDF download"
+          ],
+          "expected_result": "Invoice PDF is downloaded with order details AND items"
+        },
+        {
+          "id": "TC_083",
+          "title": "Return item from order",
+          "priority": "high",
+          "preconditions": "User is viewing delivered order AND within return window",
+          "steps": [
+            "Click 'Return Item' button",
+            "Select item to return",
+            "Provide reason for return"
+          ],
+          "expected_result": "Return request is created AND confirmation shown"
+        },
+        {
+          "id": "TC_084",
+          "title": "Cannot return order outside return window",
+          "priority": "medium",
+          "preconditions": "User is viewing order delivered 60+ days ago",
+          "steps": [
+            "Attempt to click 'Return Item' button"
+          ],
+          "expected_result": "'Return Item' button is disabled OR message 'Return window expired'"
+        }
+      ]
+    },
+    {
+      "user_story": "As a shopper, I want to apply discount codes so that I can receive discounts on my purchases",
+      "quality_score": 0.87,
+      "test_cases": [
+        {
+          "id": "TC_085",
+          "title": "Apply valid discount code",
+          "priority": "high",
+          "preconditions": "User has items in cart AND valid code exists",
+          "steps": [
+            "Click 'Apply Coupon' button",
+            "Enter valid discount code",
+            "Click apply button"
+          ],
+          "expected_result": "Discount is applied AND cart total is reduced AND confirmation message shown"
+        },
+        {
+          "id": "TC_086",
+          "title": "Apply invalid discount code",
+          "priority": "medium",
+          "preconditions": "User is on checkout page",
+          "steps": [
+            "Enter non-existent code",
+            "Click apply button"
+          ],
+          "expected_result": "Error message 'Invalid coupon code' is displayed"
+        },
+        {
+          "id": "TC_087",
+          "title": "Apply expired discount code",
+          "priority": "high",
+          "preconditions": "User is on checkout page AND code has expired",
+          "steps": [
+            "Enter expired code",
+            "Click apply button"
+          ],
+          "expected_result": "Error message 'Coupon has expired' is displayed"
+        },
+        {
+          "id": "TC_088",
+          "title": "Apply code with minimum purchase requirement",
+          "priority": "medium",
+          "preconditions": "User has cart total below minimum requirement",
+          "steps": [
+            "Enter code requiring $50 minimum",
+            "Click apply button"
+          ],
+          "expected_result": "Error message 'Minimum purchase of $50 required' is displayed"
+        },
+        {
+          "id": "TC_089",
+          "title": "Remove applied discount code",
+          "priority": "high",
+          "preconditions": "User has discount code applied",
+          "steps": [
+            "Click remove button next to discount code",
+            "Confirm removal"
+          ],
+          "expected_result": "Discount is removed AND cart total reverts to original"
+        },
+        {
+          "id": "TC_090",
+          "title": "Apply percentage discount code",
+          "priority": "high",
+          "preconditions": "User has items in cart AND percentage code exists",
+          "steps": [
+            "Apply 20% discount code",
+            "View cart total"
+          ],
+          "expected_result": "20% discount is calculated correctly AND applied to total"
+        },
+        {
+          "id": "TC_091",
+          "title": "Apply fixed amount discount code",
+          "priority": "high",
+          "preconditions": "User has items in cart AND fixed amount code exists",
+          "steps": [
+            "Apply $10 off code",
+            "View cart total"
+          ],
+          "expected_result": "$10 is deducted from total AND reflected accurately"
+        },
+        {
+          "id": "TC_092",
+          "title": "Apply BOGO discount code",
+          "priority": "medium",
+          "preconditions": "User has matching items in cart AND BOGO code exists",
+          "steps": [
+            "Apply buy one get one code",
+            "View cart items AND total"
+          ],
+          "expected_result": "Second item is free AND total correctly calculated"
+        },
+        {
+          "id": "TC_093",
+          "title": "Cannot apply same code twice",
+          "priority": "high",
+          "preconditions": "User has code applied",
+          "steps": [
+            "Attempt to apply same code again"
+          ],
+          "expected_result": "Error message 'Code already applied' is displayed"
+        },
+        {
+          "id": "TC_094",
+          "title": "Apply code with category restriction",
+          "priority": "medium",
+          "preconditions": "User has items from restricted category in cart",
+          "steps": [
+            "Apply code restricted to electronics",
+            "Cart has clothing items"
+          ],
+          "expected_result": "Error message 'Code not applicable to items in cart' is displayed"
+        },
+        {
+          "id": "TC_095",
+          "title": "Stack multiple discount codes",
+          "priority": "medium",
+          "preconditions": "User attempts to apply multiple codes",
+          "steps": [
+            "Apply first discount code",
+            "Attempt to apply second code"
+          ],
+          "expected_result": "Only one code allowed OR both codes apply per policy"
+        },
+        {
+          "id": "TC_096",
+          "title": "Discount code case insensitive",
+          "priority": "low",
+          "preconditions": "User is on checkout page",
+          "steps": [
+            "Enter code in lowercase when registered as uppercase",
+            "Click apply button"
+          ],
+          "expected_result": "Code is accepted AND discount applied regardless of case"
+        }
+      ]
+    },
+    {
+      "user_story": "As a user, I want to manage my notification preferences so that I receive only relevant communications",
+      "quality_score": 0.85,
+      "test_cases": [
+        {
+          "id": "TC_097",
+          "title": "Enable email notifications",
+          "priority": "medium",
+          "preconditions": "User is on notification preferences page AND email is disabled",
+          "steps": [
+            "Toggle email notifications on",
+            "Click save button"
+          ],
+          "expected_result": "Email notifications are enabled AND confirmation message appears"
+        },
+        {
+          "id": "TC_098",
+          "title": "Disable SMS notifications",
+          "priority": "medium",
+          "preconditions": "User is on notification preferences page AND SMS is enabled",
+          "steps": [
+            "Toggle SMS notifications off",
+            "Click save button"
+          ],
+          "expected_result": "SMS notifications are disabled AND confirmation message appears"
+        },
+        {
+          "id": "TC_099",
+          "title": "Select specific notification types",
+          "priority": "high",
+          "preconditions": "User is on notification preferences page",
+          "steps": [
+            "Check 'Order updates' notification",
+            "Check 'Promotions' notification",
+            "Uncheck 'Newsletter' notification",
+            "Click save button"
+          ],
+          "expected_result": "Selected preferences are saved AND user receives only selected notification types"
+        },
+        {
+          "id": "TC_100",
+          "title": "Set quiet hours for notifications",
+          "priority": "medium",
+          "preconditions": "User is on notification preferences page",
+          "steps": [
+            "Enable quiet hours",
+            "Set time range 9 PM to 8 AM",
+            "Click save button"
+          ],
+          "expected_result": "Quiet hours are set AND notifications not sent during this time"
+        }
+      ]
+    }
+  ]
+}
