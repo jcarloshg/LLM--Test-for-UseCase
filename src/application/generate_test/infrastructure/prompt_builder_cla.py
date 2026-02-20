@@ -118,14 +118,14 @@ Now generate comprehensive test cases for the user story above. Remember:
     def _load_examples(self) -> List[Dict[str, Any]]:
         """Load few-shot examples for prompt context.
 
-        Attempts to load examples from data/examples/user_stories.json.
+        Attempts to load examples from data/examples/hundred_user_stories_with_test_cases.json.
         Returns empty list if file not found or invalid.
 
         Returns:
             List of example dictionaries containing sample inputs and outputs
         """
         try:
-            with open('data/examples/user_stories.json') as f:
+            with open('data/examples/hundred_user_stories_with_test_cases.json') as f:
                 data = json.load(f)
                 return data.get('examples', [])
         except FileNotFoundError:
