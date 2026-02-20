@@ -39,6 +39,9 @@ class LLMClientOllama(LlmClient):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        # ─────────────────────────────────────
+        # TODO: add this a logging
+        # ─────────────────────────────────────
         response = ollama.chat(
             model=self.config.model,
             messages=messages,
@@ -47,6 +50,13 @@ class LLMClientOllama(LlmClient):
                 "num_predict": self.config.max_tokens
             }
         )
+
+        # ─────────────────────────────────────
+        # TODO: add this a logging
+        # ─────────────────────────────────────
+        print(f"="*60)
+        print(response)
+        print(f"="*60)
 
         latency = time.time() - start
         tokens = response.get('eval_count', 0) + \
