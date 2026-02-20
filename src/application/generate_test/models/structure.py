@@ -74,8 +74,15 @@ class TestCase(BaseModel):
         validated_steps = []
         for step in v:
             if isinstance(step, dict):
-                # Convert dict to Step object for validation
-                validated_steps.append(Step(**step))
+                # Check if it has Gherkin format fields
+                if 'given' in step and 'when' in step and 'then' in step:
+                    # Convert dict to Step object for validation
+                    validated_steps.append(Step(**step))
+                else:
+                    # If it's just a numbered step or other format, convert to string
+                    # Extract the step description if available
+                    step_text = step.get('step_id', step.get('description', str(step)))
+                    validated_steps.append(str(step_text))
             elif isinstance(step, str):
                 # Keep string steps as-is
                 validated_steps.append(step)

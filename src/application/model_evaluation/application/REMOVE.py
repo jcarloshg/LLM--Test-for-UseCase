@@ -1,13 +1,17 @@
 # complete_evaluation_pipeline.py
 from datetime import datetime
+import json
 from typing import List, Dict, Any
 import mlflow
 
+from src.application.generate_test.models.llm_client import ILlmClientResponse
 from src.application.generate_test.infrastructure.anthropic.llm_client_anthropic import LLMClientAnthropic
 from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
 from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
 from src.application.generate_test.models.prompt_builder import PromptBuilder
+from src.application.generate_test.models.structure import StructureValidator
 
+from src.application.model_evaluation.models.quality import QualityValidator
 from src.application.model_evaluation.infrastructure.mlflow.mlflow_config import MLflowConfig
 from src.application.model_evaluation.models.cost_analysis import CostAnalyzer
 from src.application.model_evaluation.models.decision_framework import ModelDecisionFramework
@@ -151,6 +155,7 @@ class MLflowModelEvaluationPipeline:
             predictions = []
             latencies = []
             token_counts = []
+            qualities = []
             errors = 0
 
             print(f"Running {len(test_dataset)} test cases...")
@@ -160,13 +165,25 @@ class MLflowModelEvaluationPipeline:
                     print(f"  Progress: {i}/{len(test_dataset)}")
 
                 prompts = self.prompt_builder.build(test_case.input)
-
+                # result: ILlmClientResponse | None
                 try:
                     result = client.generate(
                         prompt=prompts.get("user", ""),
                         system_prompt=prompts.get("system", "")
                     )
-                    predictions.append(result.text)
+                    output_text = str(result.text).strip()
+                    output_json = json.loads(output_text)
+                    output_json_validated = StructureValidator.validate(
+                        output_json)
+
+                    quality_validator = QualityValidator(client)
+                    quality = quality_validator.evaluate_relevance(
+                        test_case.input,
+                        output_json_validated['test_cases']
+                    )
+
+                    qualities.append(quality)
+                    predictions.append(output_text)
                     latencies.append(result.latency)
                     token_counts.append(result.tokens)
                 except Exception as e:

@@ -58,9 +58,6 @@ class LLMClientOllama(LlmClient):
         # ─────────────────────────────────────
         # TODO: add this a logging
         # ─────────────────────────────────────
-        print(f"="*60)
-        print(response)
-        print(f"="*60)
 
         latency = time.time() - start
         tokens = response.get('eval_count', 0) + \
