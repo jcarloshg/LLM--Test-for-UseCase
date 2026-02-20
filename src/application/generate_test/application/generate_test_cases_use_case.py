@@ -8,14 +8,19 @@ class GenerateTestCasesUseCase():
         self.prompt_builder = prompt_builder
 
     def run(self, generate_request: GenerateRequest) -> CustomResponse:
-        # create prompt
-        prompts = self.prompt_builder.build(generate_request.user_story)
-        print(prompts)
+        try:
+            # create prompt
+            prompts = self.prompt_builder.build(generate_request.user_story)
+            print(prompts)
 
-        return CustomResponse.created(
-            data={
-                "generate_request": generate_request.model_dump(),
-                "prompts": prompts
-            },
-            msg="Test cases generated from use case",
-        )
+            return CustomResponse.created(
+                data={
+                    "generate_request": generate_request.model_dump(),
+                    "prompts": prompts
+                },
+                msg="Test cases generated from use case",
+            )
+        except Exception as e:
+            return CustomResponse.error(
+                msg=f"Failed to generate test cases: {str(e)}"
+            )
