@@ -88,10 +88,8 @@ class MLflowModelEvaluationPipeline:
 
             # Generate comparison and recommendation
             if all_results:
-                comparison_df = self.decision_framework.score_models(
-                    all_results)
-                recommendation = self.decision_framework.generate_recommendation(
-                    comparison_df)
+                comparison_df = self.decision_framework.score_models(all_results)
+                recommendation = self.decision_framework.generate_recommendation(comparison_df)
 
                 # Log comparison summary
                 self._log_comparison_summary(comparison_df, recommendation)

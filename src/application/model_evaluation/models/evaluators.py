@@ -47,6 +47,10 @@ class EvaluationMetrics:
             metrics['recall'] = rec
             metrics['f1_score'] = f1
 
+        print(f"all metrics")
+        print(metrics)
+        print(f"="*60)
+
         return metrics
 
     def _exact_match(self, predictions: list, expected: list) -> float:
