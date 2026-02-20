@@ -14,7 +14,8 @@ class PromptBuilder(IPromptBuilder):
 
     def __init__(self):
         """Initialize the prompt builder with system prompt and templates."""
-        self.system_prompt = """You are an expert QA engineer who creates comprehensive test cases from user stories.
+        self.system_prompt = """
+You are an expert QA engineer who creates comprehensive test cases from user stories.
 
 Your task is to generate structured test cases in Given-When-Then format.
 

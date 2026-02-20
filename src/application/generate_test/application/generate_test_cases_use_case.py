@@ -27,18 +27,12 @@ class GenerateTestCasesUseCase():
             # ─────────────────────────────────────
             # TODO: add this a logging
             # ─────────────────────────────────────
-            print(f"="*60)
-            print(response)
-            print(f"="*60)
 
             return CustomResponse.created(
                 message="Test cases generated from use case",
-                data={
-                    "generate_request": generate_request.model_dump(),
-                    "prompts": prompts,
-                    "generated_tests": response.model_dump()
-                }
+                data=response
             )
+
         except Exception as e:
             print("="*60)
             print(f"Error: {str(e)}")
