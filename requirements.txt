@@ -17,12 +17,14 @@ uvicorn==0.24.0
 # Configuration & Environment
 pydantic==2.5.0
 python-dotenv==1.0.0
+setuptools>=68.0.0
 
 # MLOps & Experiment Tracking
 mlflow==2.9.0
 
 # Templating & Text Processing
 jinja2==3.1.2
+sentence-transformers>=2.2.0
 
 # Testing
 pytest==7.4.3

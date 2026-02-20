@@ -1,15 +1,18 @@
 # complete_evaluation_pipeline.py
-import mlflow
 from datetime import datetime
 from typing import List, Dict, Any
+import mlflow
 
 from src.application.generate_test.models.structure import TestCase
-from src.application.model_evaluation.models.model_configs import ModelConfig
+from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
+from src.application.generate_test.infrastructure.anthropic.llm_client_anthropic import LLMClientAnthropic
+from src.application.model_evaluation.models.model_configs import ModelConfig, ModelRegistry
 from src.application.model_evaluation.models.cost_analysis import CostAnalyzer
 from src.application.model_evaluation.models.decision_framework import ModelDecisionFramework
 from src.application.model_evaluation.models.detailed_evaluation import DetailedEvaluator
 from src.application.model_evaluation.models.evaluators import EvaluationMetrics
 from src.application.model_evaluation.models.performance_tracker import PerformanceTracker
+from src.application.model_evaluation.models.test_dataset import EvaluationDataset
 from src.application.model_evaluation.infrastructure.mlflow.mlflow_config import MLflowConfig
 
 
@@ -80,19 +83,28 @@ class MLflowModelEvaluationPipeline:
                 all_results.append(result)
 
             # Generate comparison and recommendation
-            comparison_df = self.decision_framework.score_models(all_results)
-            recommendation = self.decision_framework.generate_recommendation(
-                comparison_df)
+            if all_results:
+                comparison_df = self.decision_framework.score_models(all_results)
+                recommendation = self.decision_framework.generate_recommendation(
+                    comparison_df)
 
-            # Log comparison summary
-            self._log_comparison_summary(comparison_df, recommendation)
+                # Log comparison summary
+                self._log_comparison_summary(comparison_df, recommendation)
 
-            return {
-                "parent_run_id": parent_run.info.run_id,
-                "results": all_results,
-                "comparison": comparison_df.to_dict('records'),
-                "recommendation": recommendation
-            }
+                return {
+                    "parent_run_id": parent_run.info.run_id,
+                    "results": all_results,
+                    "comparison": comparison_df.to_dict('records'),
+                    "recommendation": recommendation
+                }
+            else:
+                print("\n⚠️  All model evaluations failed. No results to compare.")
+                return {
+                    "parent_run_id": parent_run.info.run_id,
+                    "results": all_results,
+                    "comparison": [],
+                    "recommendation": "Unable to generate recommendation due to evaluation failures."
+                }
 
     def _evaluate_single_model(
         self,
@@ -116,13 +128,20 @@ class MLflowModelEvaluationPipeline:
                 "max_tokens": model_config.max_tokens
             })
 
-            # Initialize client
-            client = UnifiedModelClient(model_config)
+            # Initialize appropriate client based on provider
+            # Use the llm_config from model_config
+            if model_config.provider.lower() == "anthropic":
+                client = LLMClientAnthropic(model_config.llm_config)
+            elif model_config.provider.lower() == "ollama":
+                client = LLMClientOllama(model_config.llm_config)
+            else:
+                raise ValueError(
+                    f"Unsupported provider: {model_config.provider}")
 
             # Run predictions
             predictions = []
             latencies = []
-            costs = []
+            token_counts = []
             errors = 0
 
             print(f"Running {len(test_dataset)} test cases...")
@@ -131,18 +150,36 @@ class MLflowModelEvaluationPipeline:
                 if i % 10 == 0:
                     print(f"  Progress: {i}/{len(test_dataset)}")
 
-                result = client.generate(test_case.input)
-
-                predictions.append(result['output'])
-                latencies.append(result['latency'])
-                costs.append(result['cost'])
-
-                if result['error']:
+                try:
+                    result = client.generate(test_case.input)
+                    predictions.append(result.text)
+                    latencies.append(result.latency)
+                    token_counts.append(result.tokens)
+                except Exception as e:
+                    print(f"  Error on test case {i}: {e}")
+                    predictions.append("")
                     errors += 1
 
-            # Calculate metrics
-            expected = [tc.expected_output for tc in test_dataset]
+            # Check if we have any successful predictions
+            if not latencies:
+                print(f"  ⚠️  All {len(test_dataset)} test cases failed for {model_config.name}")
+                return {
+                    "model_name": model_config.name,
+                    "run_id": run.info.run_id,
+                    "accuracy": 0.0,
+                    "semantic_similarity": 0.0,
+                    "f1_score": 0.0,
+                    "p95_latency": 0.0,
+                    "mean_latency": 0.0,
+                    "monthly_cost": 0.0,
+                    "per_request_cost": 0.0,
+                    "success_rate": 0.0,
+                    "total_tests": len(test_dataset),
+                    "easy_accuracy": 0.0,
+                    "hard_accuracy": 0.0
+                }
 
+            # Calculate metrics
             # 1. Quality metrics
             quality_metrics = self.detailed_evaluator.evaluate_detailed(
                 test_dataset,
@@ -154,15 +191,15 @@ class MLflowModelEvaluationPipeline:
                 latencies)
 
             # 3. Cost analysis
-            avg_input_tokens = sum(r['input_tokens'] for r in
-                                   [client.generate(tc.input) for tc in test_dataset[:5]]) / 5
-            avg_output_tokens = sum(r['output_tokens'] for r in
-                                    [client.generate(tc.input) for tc in test_dataset[:5]]) / 5
+            avg_input_tokens = int(sum(token_counts) /
+                                   len(token_counts)) if token_counts else 0
+            avg_output_tokens = int(
+                sum(token_counts) / len(token_counts)) if token_counts else 0
 
             cost_estimates = self.cost_analyzer.estimate_monthly_cost(
                 model_config,
-                int(avg_input_tokens),
-                int(avg_output_tokens),
+                avg_input_tokens,
+                avg_output_tokens,
                 expected_requests_per_day
             )
 
@@ -283,11 +320,23 @@ class MLflowModelEvaluationPipeline:
         if run_id is None:
             # Get latest run
             experiment = mlflow.get_experiment_by_name(self.experiment_name)
+            if experiment is None:
+                print(f"⚠️  Could not find experiment '{self.experiment_name}'")
+                return
+
             runs = mlflow.search_runs([experiment.experiment_id])
+            if runs.empty:
+                print(f"⚠️  No runs found for experiment '{self.experiment_name}'")
+                return
+
             run_id = runs.iloc[0]['run_id']
 
         # Load run data
-        run = mlflow.get_run(run_id)
+        try:
+            run = mlflow.get_run(run_id)
+        except Exception as e:
+            print(f"⚠️  Could not load run {run_id}: {e}")
+            return
 
         # Generate HTML report
         html = f"""
