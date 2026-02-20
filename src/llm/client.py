@@ -13,11 +13,16 @@ class LLMConfig(BaseModel):
     temperature: float = 0.3  # Low for consistency
     max_tokens: int = 2000
     api_key: Optional[str] = None
+    ollama_host: Optional[str] = None
 
 
 class LLMClient:
     def __init__(self, config: LLMConfig):
         self.config = config
+        # Set Ollama host from environment or config
+        if config.provider == "ollama":
+            ollama_host = config.ollama_host or os.getenv("OLLAMA_HOST", "http://localhost:11434")
+            os.environ["OLLAMA_HOST"] = ollama_host
         if config.provider == "openai":
             openai.api_key = config.api_key or os.getenv("OPENAI_API_KEY")
 
