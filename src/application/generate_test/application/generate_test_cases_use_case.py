@@ -24,6 +24,13 @@ class GenerateTestCasesUseCase():
                 system_prompt=prompts.get("system", "")
             )
 
+            # ─────────────────────────────────────
+            # TODO: add this a logging
+            # ─────────────────────────────────────
+            print(f"="*60)
+            print(response)
+            print(f"="*60)
+
             return CustomResponse.created(
                 message="Test cases generated from use case",
                 data={
