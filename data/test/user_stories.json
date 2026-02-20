@@ -3,247 +3,1726 @@
     {
       "id": "US_001",
       "user_story": "As a registered user, I want to log in with my email and password so that I can access my account",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_001",
+        "user_story": "As a registered user, I want to log in with my email and password so that I can access my account",
+        "quality_score": 0.92,
+        "test_cases": [
+          {
+            "id": "TC_001",
+            "title": "Successful login with valid credentials",
+            "priority": "high",
+            "preconditions": "User is on the login page AND has a registered account",
+            "steps": [
+              "Enter valid email address",
+              "Enter valid password",
+              "Click login button"
+            ],
+            "expected_result": "User is redirected to dashboard AND session is created"
+          },
+          {
+            "id": "TC_002",
+            "title": "Login fails with invalid password",
+            "priority": "high",
+            "preconditions": "User is on the login page",
+            "steps": [
+              "Enter valid email address",
+              "Enter incorrect password",
+              "Click login button"
+            ],
+            "expected_result": "Error message 'Invalid credentials' is displayed AND user remains on login page"
+          },
+          {
+            "id": "TC_003",
+            "title": "Login fails with non-existent email",
+            "priority": "medium",
+            "preconditions": "User is on the login page",
+            "steps": [
+              "Enter email not in system",
+              "Click login button"
+            ],
+            "expected_result": "Error message 'Account not found' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_002",
       "user_story": "As a customer, I want to add items to my shopping cart so that I can purchase multiple products",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_002",
+        "user_story": "As a customer, I want to add items to my shopping cart so that I can purchase multiple products",
+        "quality_score": 0.88,
+        "test_cases": [
+          {
+            "id": "TC_004",
+            "title": "Add single item to empty cart",
+            "priority": "high",
+            "preconditions": "User is viewing a product page AND cart is empty",
+            "steps": [
+              "Click 'Add to Cart' button"
+            ],
+            "expected_result": "Item is added to cart AND cart count shows 1 AND success message appears"
+          },
+          {
+            "id": "TC_005",
+            "title": "Add multiple quantities of same item",
+            "priority": "high",
+            "preconditions": "User is viewing a product page",
+            "steps": [
+              "Select quantity 3",
+              "Click 'Add to Cart' button"
+            ],
+            "expected_result": "Cart shows 3 units of the product AND total price is calculated correctly"
+          },
+          {
+            "id": "TC_006",
+            "title": "Add item when out of stock",
+            "priority": "high",
+            "preconditions": "Product is marked as out of stock",
+            "steps": [
+              "Attempt to click 'Add to Cart' button"
+            ],
+            "expected_result": "'Add to Cart' button is disabled AND message 'Out of Stock' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_003",
       "user_story": "As an admin, I want to delete user accounts so that I can remove inactive or banned users",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_003",
+        "user_story": "As an admin, I want to delete user accounts so that I can remove inactive or banned users",
+        "quality_score": 0.87,
+        "test_cases": [
+          {
+            "id": "TC_007",
+            "title": "Successful account deletion",
+            "priority": "critical",
+            "preconditions": "Admin is logged in AND viewing user management page",
+            "steps": [
+              "Click delete on a user account",
+              "Confirm deletion on dialog"
+            ],
+            "expected_result": "User account is removed from database AND confirmation message appears"
+          },
+          {
+            "id": "TC_008",
+            "title": "Cancel deletion operation",
+            "priority": "medium",
+            "preconditions": "Admin initiates account deletion",
+            "steps": [
+              "Click 'Cancel' on confirmation dialog"
+            ],
+            "expected_result": "Account remains unchanged AND user is returned to management page"
+          }
+        ]
+      }
     },
     {
       "id": "US_004",
       "user_story": "As a customer, I want to search for products by name or category so that I can find what I'm looking for quickly",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_004",
+        "user_story": "As a customer, I want to search for products by name or category so that I can find what I'm looking for quickly",
+        "quality_score": 0.89,
+        "test_cases": [
+          {
+            "id": "TC_009",
+            "title": "Search with single keyword",
+            "priority": "high",
+            "preconditions": "User is on the search page AND products with keyword exist",
+            "steps": [
+              "Enter 'laptop' in search field",
+              "Click search button"
+            ],
+            "expected_result": "Search results display all products matching 'laptop' AND result count is shown"
+          },
+          {
+            "id": "TC_010",
+            "title": "Search returns no results",
+            "priority": "medium",
+            "preconditions": "User is on the search page",
+            "steps": [
+              "Enter search term that has no matches",
+              "Click search button"
+            ],
+            "expected_result": "Message 'No products found' is displayed AND suggestions are provided"
+          }
+        ]
+      }
     },
     {
       "id": "US_005",
       "user_story": "As a user, I want to update my profile information so that my account details are current and accurate",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_005",
+        "user_story": "As a user, I want to update my profile information so that my account details are current and accurate",
+        "quality_score": 0.90,
+        "test_cases": [
+          {
+            "id": "TC_011",
+            "title": "Update first name successfully",
+            "priority": "high",
+            "preconditions": "User is logged in AND on profile edit page",
+            "steps": [
+              "Clear first name field",
+              "Enter new first name 'John'",
+              "Click save button"
+            ],
+            "expected_result": "First name is updated AND confirmation message appears"
+          },
+          {
+            "id": "TC_012",
+            "title": "Update email address",
+            "priority": "high",
+            "preconditions": "User is logged in AND on profile edit page",
+            "steps": [
+              "Click email field",
+              "Enter new email address",
+              "Click save button"
+            ],
+            "expected_result": "Verification email is sent AND user is prompted to verify new email"
+          }
+        ]
+      }
     },
     {
       "id": "US_006",
       "user_story": "As a user, I want to reset my password so that I can regain access if I forget it",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_006",
+        "user_story": "As a user, I want to reset my password so that I can regain access if I forget it",
+        "quality_score": 0.91,
+        "test_cases": [
+          {
+            "id": "TC_013",
+            "title": "Initiate password reset with valid email",
+            "priority": "critical",
+            "preconditions": "User is on login page AND cannot remember password",
+            "steps": [
+              "Click 'Forgot Password' link",
+              "Enter registered email address",
+              "Click send button"
+            ],
+            "expected_result": "Confirmation message appears AND password reset email is sent"
+          },
+          {
+            "id": "TC_014",
+            "title": "Reset password with new valid password",
+            "priority": "critical",
+            "preconditions": "User has valid password reset link",
+            "steps": [
+              "Click reset link",
+              "Enter new password",
+              "Confirm new password",
+              "Click save button"
+            ],
+            "expected_result": "Password is updated AND user is redirected to login"
+          }
+        ]
+      }
     },
     {
       "id": "US_007",
       "user_story": "As a customer, I want to view my order history so that I can track previous purchases",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_007",
+        "user_story": "As a customer, I want to view my order history so that I can track previous purchases",
+        "quality_score": 0.86,
+        "test_cases": [
+          {
+            "id": "TC_015",
+            "title": "View order history list",
+            "priority": "high",
+            "preconditions": "User is logged in AND has made purchases",
+            "steps": [
+              "Navigate to order history page",
+              "Observe list of orders"
+            ],
+            "expected_result": "All past orders are displayed with order number, date, AND total"
+          },
+          {
+            "id": "TC_016",
+            "title": "View order details",
+            "priority": "high",
+            "preconditions": "User is on order history page",
+            "steps": [
+              "Click on specific order",
+              "Observe order details"
+            ],
+            "expected_result": "Order details display items, quantities, prices, shipping address"
+          }
+        ]
+      }
     },
     {
       "id": "US_008",
       "user_story": "As a shopper, I want to apply discount codes so that I can receive discounts on my purchases",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_008",
+        "user_story": "As a shopper, I want to apply discount codes so that I can receive discounts on my purchases",
+        "quality_score": 0.87,
+        "test_cases": [
+          {
+            "id": "TC_017",
+            "title": "Apply valid discount code",
+            "priority": "high",
+            "preconditions": "User has items in cart AND valid code exists",
+            "steps": [
+              "Click 'Apply Coupon' button",
+              "Enter valid discount code",
+              "Click apply button"
+            ],
+            "expected_result": "Discount is applied AND cart total is reduced AND confirmation message shown"
+          },
+          {
+            "id": "TC_018",
+            "title": "Apply invalid discount code",
+            "priority": "medium",
+            "preconditions": "User is on checkout page",
+            "steps": [
+              "Enter non-existent code",
+              "Click apply button"
+            ],
+            "expected_result": "Error message 'Invalid coupon code' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_009",
       "user_story": "As a user, I want to manage my notification preferences so that I receive only relevant communications",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_009",
+        "user_story": "As a user, I want to manage my notification preferences so that I receive only relevant communications",
+        "quality_score": 0.85,
+        "test_cases": [
+          {
+            "id": "TC_019",
+            "title": "Enable email notifications",
+            "priority": "medium",
+            "preconditions": "User is on notification preferences page AND email is disabled",
+            "steps": [
+              "Toggle email notifications on",
+              "Click save button"
+            ],
+            "expected_result": "Email notifications are enabled AND confirmation message appears"
+          },
+          {
+            "id": "TC_020",
+            "title": "Disable SMS notifications",
+            "priority": "medium",
+            "preconditions": "User is on notification preferences page AND SMS is enabled",
+            "steps": [
+              "Toggle SMS notifications off",
+              "Click save button"
+            ],
+            "expected_result": "SMS notifications are disabled AND confirmation message appears"
+          }
+        ]
+      }
     },
     {
       "id": "US_010",
       "user_story": "As a vendor, I want to upload product images so that customers can see what they're buying",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_010",
+        "user_story": "As a vendor, I want to upload product images so that customers can see what they're buying",
+        "quality_score": 0.84,
+        "test_cases": [
+          {
+            "id": "TC_021",
+            "title": "Upload single product image",
+            "priority": "high",
+            "preconditions": "Vendor is on product upload page",
+            "steps": [
+              "Click 'Upload Image' button",
+              "Select image file",
+              "Click save"
+            ],
+            "expected_result": "Image is uploaded AND displayed in product gallery"
+          },
+          {
+            "id": "TC_022",
+            "title": "Upload image with oversized file",
+            "priority": "medium",
+            "preconditions": "Vendor is on product upload page",
+            "steps": [
+              "Attempt to upload image larger than 10MB"
+            ],
+            "expected_result": "Error message 'File size exceeds limit' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_011",
       "user_story": "As a customer, I want to filter products by price range so that I can find items within my budget",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_011",
+        "user_story": "As a customer, I want to filter products by price range so that I can find items within my budget",
+        "quality_score": 0.88,
+        "test_cases": [
+          {
+            "id": "TC_023",
+            "title": "Filter by minimum price",
+            "priority": "high",
+            "preconditions": "User is on product listing page",
+            "steps": [
+              "Set minimum price to $50",
+              "Click filter button"
+            ],
+            "expected_result": "Only products priced $50 or more are displayed"
+          },
+          {
+            "id": "TC_024",
+            "title": "Filter by maximum price",
+            "priority": "high",
+            "preconditions": "User is on product listing page",
+            "steps": [
+              "Set maximum price to $200",
+              "Click filter button"
+            ],
+            "expected_result": "Only products priced $200 or less are displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_012",
       "user_story": "As a customer, I want to leave product reviews so that I can share my experience with other buyers",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_012",
+        "user_story": "As a customer, I want to leave product reviews so that I can share my experience with other buyers",
+        "quality_score": 0.82,
+        "test_cases": [
+          {
+            "id": "TC_025",
+            "title": "Submit product review",
+            "priority": "high",
+            "preconditions": "User has purchased product AND is on product page",
+            "steps": [
+              "Click 'Write Review' button",
+              "Enter rating",
+              "Enter review text",
+              "Click submit"
+            ],
+            "expected_result": "Review is submitted AND displayed on product page"
+          },
+          {
+            "id": "TC_026",
+            "title": "Submit review with empty text",
+            "priority": "medium",
+            "preconditions": "User is on review submission page",
+            "steps": [
+              "Select rating",
+              "Leave review text empty",
+              "Click submit"
+            ],
+            "expected_result": "Error message 'Review text is required' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_013",
       "user_story": "As a customer, I want to save favorite products to my wishlist so that I can revisit them later",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_013",
+        "user_story": "As a customer, I want to save favorite products to my wishlist so that I can revisit them later",
+        "quality_score": 0.86,
+        "test_cases": [
+          {
+            "id": "TC_027",
+            "title": "Add product to wishlist",
+            "priority": "high",
+            "preconditions": "User is on product page",
+            "steps": [
+              "Click heart icon to add to wishlist"
+            ],
+            "expected_result": "Product is added to wishlist AND heart icon is highlighted"
+          },
+          {
+            "id": "TC_028",
+            "title": "View wishlist items",
+            "priority": "high",
+            "preconditions": "User has items in wishlist",
+            "steps": [
+              "Navigate to wishlist page"
+            ],
+            "expected_result": "All wishlist items are displayed with prices AND availability"
+          }
+        ]
+      }
     },
     {
       "id": "US_014",
       "user_story": "As a customer, I want to track my shipment so that I know when my order will arrive",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_014",
+        "user_story": "As a customer, I want to track my shipment so that I know when my order will arrive",
+        "quality_score": 0.89,
+        "test_cases": [
+          {
+            "id": "TC_029",
+            "title": "View tracking information",
+            "priority": "high",
+            "preconditions": "User has shipped order",
+            "steps": [
+              "Navigate to order page",
+              "Click 'Track Shipment' button"
+            ],
+            "expected_result": "Tracking number AND estimated delivery date are displayed"
+          },
+          {
+            "id": "TC_030",
+            "title": "Receive shipping notification",
+            "priority": "high",
+            "preconditions": "Order has been shipped",
+            "steps": [
+              "Check email for shipping notification"
+            ],
+            "expected_result": "Email is received with tracking link AND carrier information"
+          }
+        ]
+      }
     },
     {
       "id": "US_015",
       "user_story": "As a vendor, I want to manage product inventory so that I can track stock levels",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_015",
+        "user_story": "As a vendor, I want to manage product inventory so that I can track stock levels",
+        "quality_score": 0.87,
+        "test_cases": [
+          {
+            "id": "TC_031",
+            "title": "Update inventory quantity",
+            "priority": "high",
+            "preconditions": "Vendor is on inventory management page",
+            "steps": [
+              "Select product",
+              "Update quantity to 50",
+              "Click save"
+            ],
+            "expected_result": "Inventory is updated AND system reflects new quantity"
+          },
+          {
+            "id": "TC_032",
+            "title": "Receive low stock alert",
+            "priority": "high",
+            "preconditions": "Product inventory falls below threshold",
+            "steps": [
+              "Monitor inventory alerts"
+            ],
+            "expected_result": "Alert notification is sent to vendor"
+          }
+        ]
+      }
     },
     {
       "id": "US_016",
       "user_story": "As a customer, I want to checkout securely so that my payment information is protected",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_016",
+        "user_story": "As a customer, I want to checkout securely so that my payment information is protected",
+        "quality_score": 0.91,
+        "test_cases": [
+          {
+            "id": "TC_033",
+            "title": "Complete checkout with valid payment",
+            "priority": "critical",
+            "preconditions": "User has items in cart AND on checkout page",
+            "steps": [
+              "Enter payment details",
+              "Enter billing address",
+              "Click complete purchase"
+            ],
+            "expected_result": "Order is confirmed AND order number is displayed"
+          },
+          {
+            "id": "TC_034",
+            "title": "Checkout with declined card",
+            "priority": "high",
+            "preconditions": "User is on checkout page",
+            "steps": [
+              "Enter declined card details",
+              "Click complete purchase"
+            ],
+            "expected_result": "Error message 'Payment declined' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_017",
       "user_story": "As a customer, I want to change shipping address before checkout so that items are sent to correct location",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_017",
+        "user_story": "As a customer, I want to change shipping address before checkout so that items are sent to correct location",
+        "quality_score": 0.85,
+        "test_cases": [
+          {
+            "id": "TC_035",
+            "title": "Change shipping address",
+            "priority": "high",
+            "preconditions": "User is on checkout page",
+            "steps": [
+              "Click 'Change Address' button",
+              "Enter new address",
+              "Click confirm"
+            ],
+            "expected_result": "Shipping address is updated AND reflected on order summary"
+          },
+          {
+            "id": "TC_036",
+            "title": "Verify address validation",
+            "priority": "medium",
+            "preconditions": "User is entering shipping address",
+            "steps": [
+              "Enter incomplete address",
+              "Click confirm"
+            ],
+            "expected_result": "Error message 'Please complete address' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_018",
       "user_story": "As a customer, I want to apply gift cards to my purchase so that I can use promotional credits",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_018",
+        "user_story": "As a customer, I want to apply gift cards to my purchase so that I can use promotional credits",
+        "quality_score": 0.83,
+        "test_cases": [
+          {
+            "id": "TC_037",
+            "title": "Apply valid gift card",
+            "priority": "high",
+            "preconditions": "User has gift card AND items in cart",
+            "steps": [
+              "Click 'Apply Gift Card' button",
+              "Enter gift card code",
+              "Click apply"
+            ],
+            "expected_result": "Gift card balance is deducted AND cart total updated"
+          },
+          {
+            "id": "TC_038",
+            "title": "Apply expired gift card",
+            "priority": "medium",
+            "preconditions": "User has expired gift card",
+            "steps": [
+              "Enter expired gift card code",
+              "Click apply"
+            ],
+            "expected_result": "Error message 'Gift card expired' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_019",
       "user_story": "As an admin, I want to view customer analytics so that I can understand buying patterns",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_019",
+        "user_story": "As an admin, I want to view customer analytics so that I can understand buying patterns",
+        "quality_score": 0.84,
+        "test_cases": [
+          {
+            "id": "TC_039",
+            "title": "View sales dashboard",
+            "priority": "high",
+            "preconditions": "Admin is logged in",
+            "steps": [
+              "Navigate to analytics page",
+              "View sales dashboard"
+            ],
+            "expected_result": "Dashboard displays total sales, orders, AND revenue"
+          },
+          {
+            "id": "TC_040",
+            "title": "Filter analytics by date range",
+            "priority": "medium",
+            "preconditions": "Admin is on analytics page",
+            "steps": [
+              "Select date range",
+              "Click filter button"
+            ],
+            "expected_result": "Analytics update to show data for selected period"
+          }
+        ]
+      }
     },
     {
       "id": "US_020",
       "user_story": "As a customer, I want to contact customer support so that I can resolve issues quickly",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_020",
+        "user_story": "As a customer, I want to contact customer support so that I can resolve issues quickly",
+        "quality_score": 0.82,
+        "test_cases": [
+          {
+            "id": "TC_041",
+            "title": "Submit support ticket",
+            "priority": "high",
+            "preconditions": "User is on support page",
+            "steps": [
+              "Click 'Submit Ticket' button",
+              "Enter issue description",
+              "Click submit"
+            ],
+            "expected_result": "Ticket is created AND confirmation message shows ticket number"
+          },
+          {
+            "id": "TC_042",
+            "title": "View support ticket status",
+            "priority": "high",
+            "preconditions": "User has submitted support ticket",
+            "steps": [
+              "Navigate to support page",
+              "Click 'My Tickets'"
+            ],
+            "expected_result": "Ticket status AND history are displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_021",
       "user_story": "As a user, I want to export my account data so that I can backup my information",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_021",
+        "user_story": "As a user, I want to export my account data so that I can backup my information",
+        "quality_score": 0.78,
+        "test_cases": [
+          {
+            "id": "TC_043",
+            "title": "Export account data",
+            "priority": "medium",
+            "preconditions": "User is on account settings page",
+            "steps": [
+              "Click 'Export Data' button",
+              "Select data types",
+              "Click export"
+            ],
+            "expected_result": "CSV file is generated AND downloaded containing user data"
+          },
+          {
+            "id": "TC_044",
+            "title": "Export without selecting data types",
+            "priority": "low",
+            "preconditions": "User is on export page",
+            "steps": [
+              "Click export without selecting any data types"
+            ],
+            "expected_result": "Error message 'Please select data to export' is displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_022",
       "user_story": "As a user, I want to enable two-factor authentication so that my account is more secure",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_022",
+        "user_story": "As a user, I want to enable two-factor authentication so that my account is more secure",
+        "quality_score": 0.90,
+        "test_cases": [
+          {
+            "id": "TC_045",
+            "title": "Enable 2FA with authenticator app",
+            "priority": "high",
+            "preconditions": "User is on security settings page",
+            "steps": [
+              "Click 'Enable 2FA'",
+              "Scan QR code with authenticator app",
+              "Enter code",
+              "Click verify"
+            ],
+            "expected_result": "2FA is enabled AND backup codes are provided"
+          },
+          {
+            "id": "TC_046",
+            "title": "Disable 2FA",
+            "priority": "medium",
+            "preconditions": "User has 2FA enabled",
+            "steps": [
+              "Click 'Disable 2FA'",
+              "Enter password",
+              "Confirm"
+            ],
+            "expected_result": "2FA is disabled AND warning message shown"
+          }
+        ]
+      }
     },
     {
       "id": "US_023",
       "user_story": "As a customer, I want to set up subscription renewals so that I don't run out of products",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_023",
+        "user_story": "As a customer, I want to set up subscription renewals so that I don't run out of products",
+        "quality_score": 0.81,
+        "test_cases": [
+          {
+            "id": "TC_047",
+            "title": "Create subscription",
+            "priority": "high",
+            "preconditions": "User is on product page",
+            "steps": [
+              "Click 'Subscribe & Save'",
+              "Select frequency",
+              "Click confirm"
+            ],
+            "expected_result": "Subscription is created AND discount is applied"
+          },
+          {
+            "id": "TC_048",
+            "title": "Cancel subscription",
+            "priority": "high",
+            "preconditions": "User has active subscription",
+            "steps": [
+              "Navigate to subscriptions",
+              "Click 'Cancel' on subscription",
+              "Confirm"
+            ],
+            "expected_result": "Subscription is cancelled AND confirmation email sent"
+          }
+        ]
+      }
     },
     {
       "id": "US_024",
       "user_story": "As a vendor, I want to set promotional pricing so that I can run sales campaigns",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_024",
+        "user_story": "As a vendor, I want to set promotional pricing so that I can run sales campaigns",
+        "quality_score": 0.84,
+        "test_cases": [
+          {
+            "id": "TC_049",
+            "title": "Create promotional pricing",
+            "priority": "high",
+            "preconditions": "Vendor is on pricing page",
+            "steps": [
+              "Select product",
+              "Enter promotional price",
+              "Set start date",
+              "Set end date",
+              "Click save"
+            ],
+            "expected_result": "Promotion is created AND applied to product"
+          },
+          {
+            "id": "TC_050",
+            "title": "End promotion early",
+            "priority": "medium",
+            "preconditions": "Vendor has active promotion",
+            "steps": [
+              "Select promotion",
+              "Click 'End Early'",
+              "Confirm"
+            ],
+            "expected_result": "Promotion ends AND price reverts to regular"
+          }
+        ]
+      }
     },
     {
       "id": "US_025",
       "user_story": "As a customer, I want to compare products side by side so that I can make informed decisions",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_025",
+        "user_story": "As a customer, I want to compare products side by side so that I can make informed decisions",
+        "quality_score": 0.80,
+        "test_cases": [
+          {
+            "id": "TC_051",
+            "title": "Add products to comparison",
+            "priority": "high",
+            "preconditions": "User is on product listing page",
+            "steps": [
+              "Select product 1",
+              "Select product 2",
+              "Select product 3",
+              "Click 'Compare'"
+            ],
+            "expected_result": "Comparison view shows products side by side with specs"
+          },
+          {
+            "id": "TC_052",
+            "title": "Remove product from comparison",
+            "priority": "medium",
+            "preconditions": "User is in comparison view",
+            "steps": [
+              "Click remove button on product"
+            ],
+            "expected_result": "Product is removed AND comparison updates"
+          }
+        ]
+      }
     },
     {
       "id": "US_026",
       "user_story": "As a customer, I want to view product recommendations so that I can discover new items",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_026",
+        "user_story": "As a customer, I want to view product recommendations so that I can discover new items",
+        "quality_score": 0.79,
+        "test_cases": [
+          {
+            "id": "TC_053",
+            "title": "View personalized recommendations",
+            "priority": "high",
+            "preconditions": "User is logged in AND has purchase history",
+            "steps": [
+              "Navigate to home page",
+              "View recommended products section"
+            ],
+            "expected_result": "Recommendations based on browsing AND purchase history are shown"
+          },
+          {
+            "id": "TC_054",
+            "title": "View trending products",
+            "priority": "medium",
+            "preconditions": "User is on home page",
+            "steps": [
+              "Scroll to trending section"
+            ],
+            "expected_result": "Top trending products are displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_027",
       "user_story": "As a vendor, I want to respond to customer reviews so that I can address concerns",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_027",
+        "user_story": "As a vendor, I want to respond to customer reviews so that I can address concerns",
+        "quality_score": 0.81,
+        "test_cases": [
+          {
+            "id": "TC_055",
+            "title": "Reply to customer review",
+            "priority": "high",
+            "preconditions": "Vendor is on product reviews page",
+            "steps": [
+              "Click 'Reply' on review",
+              "Enter response text",
+              "Click submit"
+            ],
+            "expected_result": "Response is posted AND shown under review"
+          },
+          {
+            "id": "TC_056",
+            "title": "Edit vendor response",
+            "priority": "medium",
+            "preconditions": "Vendor has posted response",
+            "steps": [
+              "Click 'Edit' on response",
+              "Update text",
+              "Click save"
+            ],
+            "expected_result": "Response is updated AND edit timestamp shown"
+          }
+        ]
+      }
     },
     {
       "id": "US_028",
       "user_story": "As a customer, I want to create a profile picture so that other users can recognize me",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_028",
+        "user_story": "As a customer, I want to create a profile picture so that other users can recognize me",
+        "quality_score": 0.72,
+        "test_cases": [
+          {
+            "id": "TC_057",
+            "title": "Upload profile picture",
+            "priority": "medium",
+            "preconditions": "User is on profile page",
+            "steps": [
+              "Click 'Change Profile Picture'",
+              "Select image",
+              "Click upload"
+            ],
+            "expected_result": "Profile picture is updated AND displayed"
+          },
+          {
+            "id": "TC_058",
+            "title": "Crop profile picture",
+            "priority": "low",
+            "preconditions": "User is uploading profile picture",
+            "steps": [
+              "Use crop tool to adjust image"
+            ],
+            "expected_result": "Image is cropped AND preview shown"
+          }
+        ]
+      }
     },
     {
       "id": "US_029",
       "user_story": "As an admin, I want to manage product categories so that I can organize inventory",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_029",
+        "user_story": "As an admin, I want to manage product categories so that I can organize inventory",
+        "quality_score": 0.83,
+        "test_cases": [
+          {
+            "id": "TC_059",
+            "title": "Create new product category",
+            "priority": "high",
+            "preconditions": "Admin is on category management page",
+            "steps": [
+              "Click 'Create Category'",
+              "Enter category name",
+              "Enter description",
+              "Click save"
+            ],
+            "expected_result": "Category is created AND appears in category list"
+          },
+          {
+            "id": "TC_060",
+            "title": "Delete product category",
+            "priority": "high",
+            "preconditions": "Admin has empty category",
+            "steps": [
+              "Select category",
+              "Click 'Delete'",
+              "Confirm"
+            ],
+            "expected_result": "Category is deleted AND no longer available"
+          }
+        ]
+      }
     },
     {
       "id": "US_030",
       "user_story": "As a customer, I want to filter reviews by rating so that I can see specific feedback",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_030",
+        "user_story": "As a customer, I want to filter reviews by rating so that I can see specific feedback",
+        "quality_score": 0.77,
+        "test_cases": [
+          {
+            "id": "TC_061",
+            "title": "Filter reviews by star rating",
+            "priority": "high",
+            "preconditions": "User is on product reviews page",
+            "steps": [
+              "Click 5-star filter",
+              "View filtered reviews"
+            ],
+            "expected_result": "Only 5-star reviews are displayed"
+          },
+          {
+            "id": "TC_062",
+            "title": "Filter reviews with multiple ratings",
+            "priority": "medium",
+            "preconditions": "User is on reviews page",
+            "steps": [
+              "Select 4-star AND 5-star filters"
+            ],
+            "expected_result": "Reviews with 4 or 5 stars are displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_031",
       "user_story": "As a user, I want to link my social media accounts so that I can sign in easily",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_031",
+        "user_story": "As a user, I want to link my social media accounts so that I can sign in easily",
+        "quality_score": 0.80,
+        "test_cases": [
+          {
+            "id": "TC_063",
+            "title": "Link Facebook account",
+            "priority": "high",
+            "preconditions": "User is on account settings page",
+            "steps": [
+              "Click 'Link Facebook'",
+              "Authorize app",
+              "Confirm"
+            ],
+            "expected_result": "Facebook account is linked AND shown in connected accounts"
+          },
+          {
+            "id": "TC_064",
+            "title": "Unlink social account",
+            "priority": "medium",
+            "preconditions": "User has linked social account",
+            "steps": [
+              "Click 'Unlink' next to account"
+            ],
+            "expected_result": "Social account is unlinked"
+          }
+        ]
+      }
     },
     {
       "id": "US_032",
       "user_story": "As a vendor, I want to create product bundles so that I can increase sales",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_032",
+        "user_story": "As a vendor, I want to create product bundles so that I can increase sales",
+        "quality_score": 0.82,
+        "test_cases": [
+          {
+            "id": "TC_065",
+            "title": "Create product bundle",
+            "priority": "high",
+            "preconditions": "Vendor is on bundle management page",
+            "steps": [
+              "Click 'Create Bundle'",
+              "Select products",
+              "Set bundle price",
+              "Click save"
+            ],
+            "expected_result": "Bundle is created AND available for purchase"
+          },
+          {
+            "id": "TC_066",
+            "title": "Edit bundle contents",
+            "priority": "medium",
+            "preconditions": "Vendor has existing bundle",
+            "steps": [
+              "Select bundle",
+              "Add product",
+              "Remove product",
+              "Click save"
+            ],
+            "expected_result": "Bundle contents are updated"
+          }
+        ]
+      }
     },
     {
       "id": "US_033",
       "user_story": "As a customer, I want to receive personalized email campaigns so that I see relevant offers",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_033",
+        "user_story": "As a customer, I want to receive personalized email campaigns so that I see relevant offers",
+        "quality_score": 0.75,
+        "test_cases": [
+          {
+            "id": "TC_067",
+            "title": "Receive personalized email offer",
+            "priority": "medium",
+            "preconditions": "Customer has purchase history AND opted in",
+            "steps": [
+              "Check email for personalized offer"
+            ],
+            "expected_result": "Email is received with relevant product recommendations"
+          },
+          {
+            "id": "TC_068",
+            "title": "Unsubscribe from email campaign",
+            "priority": "medium",
+            "preconditions": "Customer has email subscription",
+            "steps": [
+              "Click 'Unsubscribe' in email"
+            ],
+            "expected_result": "Customer is unsubscribed AND receives confirmation"
+          }
+        ]
+      }
     },
     {
       "id": "US_034",
       "user_story": "As an admin, I want to generate sales reports so that I can analyze business performance",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_034",
+        "user_story": "As an admin, I want to generate sales reports so that I can analyze business performance",
+        "quality_score": 0.81,
+        "test_cases": [
+          {
+            "id": "TC_069",
+            "title": "Generate monthly sales report",
+            "priority": "high",
+            "preconditions": "Admin is on reports page",
+            "steps": [
+              "Select report type",
+              "Select date range",
+              "Click generate"
+            ],
+            "expected_result": "Report is generated AND available for download"
+          },
+          {
+            "id": "TC_070",
+            "title": "Export report as PDF",
+            "priority": "medium",
+            "preconditions": "Admin has generated report",
+            "steps": [
+              "Click 'Download PDF'"
+            ],
+            "expected_result": "PDF file is downloaded"
+          }
+        ]
+      }
     },
     {
       "id": "US_035",
       "user_story": "As a customer, I want to pay in installments so that I can afford larger purchases",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_035",
+        "user_story": "As a customer, I want to pay in installments so that I can afford larger purchases",
+        "quality_score": 0.79,
+        "test_cases": [
+          {
+            "id": "TC_071",
+            "title": "Select installment payment option",
+            "priority": "high",
+            "preconditions": "User is on checkout page",
+            "steps": [
+              "Select installment payment",
+              "Choose payment schedule",
+              "Proceed"
+            ],
+            "expected_result": "Installment plan is applied AND payment schedule shown"
+          },
+          {
+            "id": "TC_072",
+            "title": "View installment payment schedule",
+            "priority": "medium",
+            "preconditions": "User has active installment plan",
+            "steps": [
+              "Navigate to orders",
+              "View payment schedule"
+            ],
+            "expected_result": "All scheduled payments are displayed with due dates"
+          }
+        ]
+      }
     },
     {
       "id": "US_036",
       "user_story": "As a vendor, I want to manage shipping settings so that I can set accurate delivery times",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_036",
+        "user_story": "As a vendor, I want to manage shipping settings so that I can set accurate delivery times",
+        "quality_score": 0.80,
+        "test_cases": [
+          {
+            "id": "TC_073",
+            "title": "Set shipping rates by region",
+            "priority": "high",
+            "preconditions": "Vendor is on shipping settings page",
+            "steps": [
+              "Select region",
+              "Enter shipping rate",
+              "Click save"
+            ],
+            "expected_result": "Shipping rate is updated AND applied to products"
+          },
+          {
+            "id": "TC_074",
+            "title": "Set free shipping threshold",
+            "priority": "medium",
+            "preconditions": "Vendor is on shipping settings page",
+            "steps": [
+              "Set free shipping above $100",
+              "Click save"
+            ],
+            "expected_result": "Orders over $100 qualify for free shipping"
+          }
+        ]
+      }
     },
     {
       "id": "US_037",
       "user_story": "As a customer, I want to print my invoice so that I have a physical copy",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_037",
+        "user_story": "As a customer, I want to print my invoice so that I have a physical copy",
+        "quality_score": 0.74,
+        "test_cases": [
+          {
+            "id": "TC_075",
+            "title": "Print order invoice",
+            "priority": "medium",
+            "preconditions": "User is viewing order details",
+            "steps": [
+              "Click 'Print Invoice'",
+              "Select printer",
+              "Click print"
+            ],
+            "expected_result": "Invoice is printed with all order details"
+          },
+          {
+            "id": "TC_076",
+            "title": "Print invoice without browser print dialog",
+            "priority": "low",
+            "preconditions": "User is on invoice page",
+            "steps": [
+              "Use keyboard shortcut Ctrl+P"
+            ],
+            "expected_result": "Browser print dialog opens"
+          }
+        ]
+      }
     },
     {
       "id": "US_038",
       "user_story": "As an admin, I want to manage staff accounts so that I can control access levels",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_038",
+        "user_story": "As an admin, I want to manage staff accounts so that I can control access levels",
+        "quality_score": 0.82,
+        "test_cases": [
+          {
+            "id": "TC_077",
+            "title": "Create staff account",
+            "priority": "high",
+            "preconditions": "Admin is on staff management page",
+            "steps": [
+              "Click 'Create Staff'",
+              "Enter email",
+              "Set role",
+              "Click save"
+            ],
+            "expected_result": "Staff account is created AND invitation sent"
+          },
+          {
+            "id": "TC_078",
+            "title": "Change staff role",
+            "priority": "high",
+            "preconditions": "Admin is viewing staff list",
+            "steps": [
+              "Select staff member",
+              "Change role",
+              "Click save"
+            ],
+            "expected_result": "Staff role is updated AND access level changed"
+          }
+        ]
+      }
     },
     {
       "id": "US_039",
       "user_story": "As a customer, I want to view my account balance so that I know my store credit",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_039",
+        "user_story": "As a customer, I want to view my account balance so that I know my store credit",
+        "quality_score": 0.76,
+        "test_cases": [
+          {
+            "id": "TC_079",
+            "title": "View account balance",
+            "priority": "medium",
+            "preconditions": "User is on account page",
+            "steps": [
+              "Navigate to 'Account Balance' section"
+            ],
+            "expected_result": "Current balance is displayed"
+          },
+          {
+            "id": "TC_080",
+            "title": "View balance transaction history",
+            "priority": "medium",
+            "preconditions": "User is on balance page",
+            "steps": [
+              "Click 'Transaction History'"
+            ],
+            "expected_result": "All balance transactions are displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_040",
       "user_story": "As a vendor, I want to set product variants so that customers can choose options",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_040",
+        "user_story": "As a vendor, I want to set product variants so that customers can choose options",
+        "quality_score": 0.83,
+        "test_cases": [
+          {
+            "id": "TC_081",
+            "title": "Add product variants",
+            "priority": "high",
+            "preconditions": "Vendor is on product edit page",
+            "steps": [
+              "Click 'Add Variant'",
+              "Select option type (size, color)",
+              "Add values",
+              "Click save"
+            ],
+            "expected_result": "Product variants are created AND available for purchase"
+          },
+          {
+            "id": "TC_082",
+            "title": "Set variant-specific pricing",
+            "priority": "medium",
+            "preconditions": "Vendor has created variants",
+            "steps": [
+              "Select variant",
+              "Set specific price",
+              "Click save"
+            ],
+            "expected_result": "Variant has unique price"
+          }
+        ]
+      }
     },
     {
       "id": "US_041",
       "user_story": "As a customer, I want to see product availability in nearby stores so that I can pick up items",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_041",
+        "user_story": "As a customer, I want to see product availability in nearby stores so that I can pick up items",
+        "quality_score": 0.77,
+        "test_cases": [
+          {
+            "id": "TC_083",
+            "title": "Check store availability",
+            "priority": "high",
+            "preconditions": "User is on product page",
+            "steps": [
+              "Click 'Check Availability'",
+              "Enter location",
+              "View results"
+            ],
+            "expected_result": "Nearby stores with stock are displayed"
+          },
+          {
+            "id": "TC_084",
+            "title": "Reserve product at store",
+            "priority": "high",
+            "preconditions": "User has found item in store",
+            "steps": [
+              "Click 'Reserve at Store'",
+              "Select store",
+              "Confirm"
+            ],
+            "expected_result": "Product is reserved AND confirmation shown"
+          }
+        ]
+      }
     },
     {
       "id": "US_042",
       "user_story": "As a user, I want to manage my delivery addresses so that I can ship to multiple locations",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_042",
+        "user_story": "As a user, I want to manage my delivery addresses so that I can ship to multiple locations",
+        "quality_score": 0.81,
+        "test_cases": [
+          {
+            "id": "TC_085",
+            "title": "Add new delivery address",
+            "priority": "high",
+            "preconditions": "User is on address management page",
+            "steps": [
+              "Click 'Add Address'",
+              "Enter address details",
+              "Click save"
+            ],
+            "expected_result": "Address is added AND available for checkout"
+          },
+          {
+            "id": "TC_086",
+            "title": "Set default delivery address",
+            "priority": "medium",
+            "preconditions": "User has multiple addresses",
+            "steps": [
+              "Select address",
+              "Click 'Set as Default'"
+            ],
+            "expected_result": "Address is set as default for future orders"
+          }
+        ]
+      }
     },
     {
       "id": "US_043",
       "user_story": "As an admin, I want to view system logs so that I can monitor platform activity",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_043",
+        "user_story": "As an admin, I want to view system logs so that I can monitor platform activity",
+        "quality_score": 0.78,
+        "test_cases": [
+          {
+            "id": "TC_087",
+            "title": "View activity logs",
+            "priority": "high",
+            "preconditions": "Admin is on logs page",
+            "steps": [
+              "View activity log entries",
+              "Filter by action type"
+            ],
+            "expected_result": "Logs display all system activities with timestamps"
+          },
+          {
+            "id": "TC_088",
+            "title": "Export logs",
+            "priority": "medium",
+            "preconditions": "Admin is viewing logs",
+            "steps": [
+              "Select date range",
+              "Click 'Export'"
+            ],
+            "expected_result": "Log file is generated AND downloaded"
+          }
+        ]
+      }
     },
     {
       "id": "US_044",
       "user_story": "As a customer, I want to receive order alerts so that I'm informed about status changes",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_044",
+        "user_story": "As a customer, I want to receive order alerts so that I'm informed about status changes",
+        "quality_score": 0.79,
+        "test_cases": [
+          {
+            "id": "TC_089",
+            "title": "Receive order confirmation alert",
+            "priority": "high",
+            "preconditions": "Customer has placed order",
+            "steps": [
+              "Check notifications"
+            ],
+            "expected_result": "Order confirmation alert is received"
+          },
+          {
+            "id": "TC_090",
+            "title": "Receive shipping alert",
+            "priority": "high",
+            "preconditions": "Order has been shipped",
+            "steps": [
+              "Check notifications"
+            ],
+            "expected_result": "Shipping notification is received with tracking info"
+          }
+        ]
+      }
     },
     {
       "id": "US_045",
       "user_story": "As a vendor, I want to customize my storefront so that my brand stands out",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_045",
+        "user_story": "As a vendor, I want to customize my storefront so that my brand stands out",
+        "quality_score": 0.75,
+        "test_cases": [
+          {
+            "id": "TC_091",
+            "title": "Upload store banner",
+            "priority": "medium",
+            "preconditions": "Vendor is on store settings page",
+            "steps": [
+              "Click 'Upload Banner'",
+              "Select image",
+              "Click save"
+            ],
+            "expected_result": "Banner is displayed at top of storefront"
+          },
+          {
+            "id": "TC_092",
+            "title": "Customize store description",
+            "priority": "low",
+            "preconditions": "Vendor is on store settings page",
+            "steps": [
+              "Edit store description",
+              "Click save"
+            ],
+            "expected_result": "Description is updated AND displayed"
+          }
+        ]
+      }
     },
     {
       "id": "US_046",
       "user_story": "As a customer, I want to use voice search so that I can find products faster",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_046",
+        "user_story": "As a customer, I want to use voice search so that I can find products faster",
+        "quality_score": 0.71,
+        "test_cases": [
+          {
+            "id": "TC_093",
+            "title": "Search using voice command",
+            "priority": "medium",
+            "preconditions": "User is on search page AND microphone enabled",
+            "steps": [
+              "Click microphone icon",
+              "Say product name"
+            ],
+            "expected_result": "Voice input is converted to search AND results displayed"
+          },
+          {
+            "id": "TC_094",
+            "title": "Voice search with unclear audio",
+            "priority": "low",
+            "preconditions": "User is using voice search",
+            "steps": [
+              "Speak unclearly OR in noisy environment"
+            ],
+            "expected_result": "System asks for confirmation OR clarification"
+          }
+        ]
+      }
     },
     {
       "id": "US_047",
       "user_story": "As a user, I want to schedule purchases so that I can receive items on specific dates",
-      "difficulty": "medium"
+      "difficulty": "medium",
+      "expected_output": {
+        "id": "US_047",
+        "user_story": "As a user, I want to schedule purchases so that I can receive items on specific dates",
+        "quality_score": 0.73,
+        "test_cases": [
+          {
+            "id": "TC_095",
+            "title": "Schedule order delivery",
+            "priority": "high",
+            "preconditions": "User is on checkout page",
+            "steps": [
+              "Click 'Schedule Delivery'",
+              "Select delivery date",
+              "Click confirm"
+            ],
+            "expected_result": "Order is scheduled for selected date"
+          },
+          {
+            "id": "TC_096",
+            "title": "Reschedule order",
+            "priority": "medium",
+            "preconditions": "User has scheduled order",
+            "steps": [
+              "Navigate to order",
+              "Click 'Reschedule'",
+              "Select new date"
+            ],
+            "expected_result": "Delivery date is updated"
+          }
+        ]
+      }
     },
     {
       "id": "US_048",
       "user_story": "As an admin, I want to manage banner promotions so that I can highlight offers",
-      "difficulty": "easy"
+      "difficulty": "easy",
+      "expected_output": {
+        "id": "US_048",
+        "user_story": "As an admin, I want to manage banner promotions so that I can highlight offers",
+        "quality_score": 0.80,
+        "test_cases": [
+          {
+            "id": "TC_097",
+            "title": "Create promotional banner",
+            "priority": "high",
+            "preconditions": "Admin is on banner management page",
+            "steps": [
+              "Click 'Create Banner'",
+              "Upload image",
+              "Set duration",
+              "Click save"
+            ],
+            "expected_result": "Banner is created AND displayed on homepage"
+          },
+          {
+            "id": "TC_098",
+            "title": "Schedule banner display",
+            "priority": "medium",
+            "preconditions": "Admin is creating banner",
+            "steps": [
+              "Set start AND end dates",
+              "Click save"
+            ],
+            "expected_result": "Banner displays during scheduled period"
+          }
+        ]
+      }
     },
     {
       "id": "US_049",
       "user_story": "As a customer, I want to join loyalty program so that I can earn rewards",
-      "difficulty": "hard"
+      "difficulty": "hard",
+      "expected_output": {
+        "id": "US_049",
+        "user_story": "As a customer, I want to join loyalty program so that I can earn rewards",
+        "quality_score": 0.82,
+        "test_cases": [
+          {
+            "id": "TC_099",
+            "title": "Enroll in loyalty program",
+            "priority": "high",
+            "preconditions": "User is on account page",
+            "steps": [
+              "Click 'Join Loyalty Program'",
+              "Accept terms",
+              "Click enroll"
+            ],
+            "expected_result": "User is enrolled AND receives welcome bonus points"
+          },
+          {
+            "id": "TC_100",
+            "title": "View loyalty points balance",
+            "priority": "high",
+            "preconditions": "User is enrolled in loyalty program",
+            "steps": [
+              "Navigate to loyalty section",
+              "View points balance"
+            ],
+            "expected_result": "Current points AND redemption options are displayed"
+          }
+        ]
+      }
     }
   ]
 }

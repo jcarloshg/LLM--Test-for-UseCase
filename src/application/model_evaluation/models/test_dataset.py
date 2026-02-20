@@ -3,8 +3,12 @@ from abc import ABC, abstractmethod
 from typing import List
 import json
 import random
+import logging
+import traceback
 
 from .test_case import TestCase
+
+logger = logging.getLogger(__name__)
 
 
 class EvaluationDataset(ABC):
@@ -106,7 +110,7 @@ class EvaluationDataset(ABC):
                 test_cases.append(TestCase(
                     id=story['id'],
                     input=story['user_story'],
-                    expected_output="test_generated",
+                    expected_output=json.dumps(story['expected_output']),
                     category="test_generation",
                     difficulty="easy",
                     metadata={"source": "user_stories"}
@@ -116,7 +120,7 @@ class EvaluationDataset(ABC):
                 test_cases.append(TestCase(
                     id=story['id'],
                     input=story['user_story'],
-                    expected_output="test_generated",
+                    expected_output=json.dumps(story['expected_output']),
                     category="test_generation",
                     difficulty="medium",
                     metadata={"source": "user_stories"}
@@ -126,16 +130,25 @@ class EvaluationDataset(ABC):
                 test_cases.append(TestCase(
                     id=story['id'],
                     input=story['user_story'],
-                    expected_output="test_generated",
+                    expected_output=json.dumps(story['expected_output']),
                     category="test_generation",
                     difficulty="hard",
                     metadata={"source": "user_stories"}
                 ))
 
             return test_cases
-        except FileNotFoundError:
+        except FileNotFoundError as e:
+            print(f"="*60)
+            print(f"FileNotFoundError {str(e)}")
+            print(f"="*60)
             return []
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, KeyError) as e:
+            print(f"="*60)
+            print(f"json.JSONDecodeError, KeyError {str(e)}")
+            print(f"="*60)
             return []
-        except Exception:
+        except Exception as e:
+            print(f"="*60)
+            print(f"Exception {str(e)}")
+            print(f"="*60)
             return []

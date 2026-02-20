@@ -85,15 +85,8 @@ class ModelRegistry:
 
     @classmethod
     def get_models_to_compare(cls) -> List[ModelConfig]:
-        """
-        Best Practice: Always compare at least 3 models:
-        - 1 high-end (Claude)
-        - 2 open-source (Llama, Qwen)
-
-        Only includes Anthropic and Ollama providers.
-        """
         return [
-            cls.MODELS["claude-haiku"],
-            cls.MODELS["llama-3.2-3b"],
-            cls.MODELS["qwen3-vl-8b"]
+            cls.MODELS["llama-3.2-1b"],
+            # cls.MODELS["llama-3.2-3b"],
+            # cls.MODELS["qwen3-vl-8b"]
         ]
