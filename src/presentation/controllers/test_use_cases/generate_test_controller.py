@@ -1,6 +1,8 @@
 from fastapi import Request
 from pydantic import ValidationError
+from src.application.generate_test.models.llm_config import LLMConfig
 from src.application.generate_test.application.generate_test_cases_use_case import GenerateTestCasesUseCase
+from src.application.generate_test.infrastructure.llm_client_ollama import LLMClientOllama
 from src.application.generate_test.infrastructure.prompt_builder import PromptBuilder
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.shared.models.custom_response import CustomResponse
@@ -22,10 +24,13 @@ async def generate_test_controller(request: Request) -> CustomResponse:
 
         # Initialize dependencies
         prompt_builder = PromptBuilder()
+        llm_config = LLMConfig()
+        llm_client_ollama = LLMClientOllama(config=llm_config)
 
-        # Initialize and run use case
+        # Initialize && run use case
         generate_test_cases = GenerateTestCasesUseCase(
-            prompt_builder=prompt_builder
+            prompt_builder=prompt_builder,
+            llm_client=llm_client_ollama
         )
         tests_cases_response = generate_test_cases.run(
             generate_request=generate_request
