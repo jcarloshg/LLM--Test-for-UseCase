@@ -1,3 +1,6 @@
+import json
+
+from src.application.generate_test.models.structure import StructureValidator
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.generate_test.models.llm_client import LlmClient
 from src.application.generate_test.models.prompt_builder import IPromptBuilder
@@ -24,13 +27,24 @@ class GenerateTestCasesUseCase():
                 system_prompt=prompts.get("system", "")
             )
 
+            # valid the json
+            output_json = json.loads(response.text)
+            output_json_validated = StructureValidator.validate(output_json)
+            print(f"="*60)
+            print(output_json_validated)
+            print(f"="*60)
+            if not output_json_validated["valid"]:
+                raise Exception("invalid json format")
+
+            test_cases = output_json_validated['test_cases']
+
             # ─────────────────────────────────────
             # TODO: add this a logging
             # ─────────────────────────────────────
 
             return CustomResponse.created(
                 message="Test cases generated from use case",
-                data=response
+                data=test_cases
             )
 
         except Exception as e:
