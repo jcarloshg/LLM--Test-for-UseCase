@@ -1,121 +1,86 @@
 {
-  "message": "Test cases generated from use case",
-  "is_success": true,
-  "data": [
-    {
-      "id": "TC-001",
-      "title": "Reset Password with Valid Credentials",
-      "priority": "high",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "positive",
-      "preconditions": [
-        "User is logged in",
-        "Account is enabled"
-      ],
-      "steps": [
-        "1. Enter current password",
-        "2. Enter new password",
-        "3. Confirm new password"
-      ],
-      "gherkin": {
-        "given": "User is logged in with valid credentials",
-        "when": "User clicks reset password button",
-        "then": "Password reset form appears with fields to enter new password"
-      },
-      "expected_result": "Password reset successful, user receives confirmation email",
-      "quality_score": 8,
-      "tags": [
-        "Authentication",
-        "Password Reset"
-      ]
-    },
+  "test_cases": [
     {
       "id": "TC-002",
-      "title": "Reset Password with Invalid Credentials",
+      "title": "View product recommendations",
       "priority": "high",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "negative",
+      "type": "positive",
       "preconditions": [
-        "User is logged in",
-        "Account is enabled"
+        "Setup requirement 1",
+        "Setup requirement 2"
       ],
       "steps": [
-        "1. Enter incorrect current password",
-        "2. Enter new password",
-        "3. Confirm new password"
+        {
+          "number": 1,
+          "step": "The application displays a list of recommended products"
+        },
+        {
+          "number": 2,
+          "step": "Each product has a link to view its details"
+        }
       ],
       "gherkin": {
-        "given": "User is logged in with invalid credentials",
-        "when": "User clicks reset password button",
-        "then": "Error message appears indicating invalid credentials"
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
       },
-      "expected_result": "Password reset failed, error message displayed",
+      "expected_result": "Detailed expected result",
       "quality_score": 8,
       "tags": [
-        "Authentication",
-        "Password Reset"
+        "tag1",
+        "tag2"
       ]
     },
     {
       "id": "TC-003",
-      "title": "Reset Password with Empty Fields",
-      "priority": "medium",
-      "given": null,
-      "when": null,
-      "then": null,
-      "type": "negative",
-      "preconditions": [
-        "User is logged in",
-        "Account is enabled"
-      ],
+      "title": "Edge case: No recommendations available",
+      "priority": "high",
+      "type": "positive",
+      "preconditions": [],
       "steps": [
-        "1. Leave current password field blank",
-        "2. Enter new password",
-        "3. Confirm new password"
+        {
+          "number": 1,
+          "step": "The application displays a message indicating no recommendations"
+        }
       ],
       "gherkin": {
-        "given": "User is logged in with valid credentials",
-        "when": "User clicks reset password button",
-        "then": "Error message appears indicating required fields are missing"
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
       },
-      "expected_result": "Password reset failed, error message displayed",
-      "quality_score": 7,
+      "expected_result": "Detailed expected result",
+      "quality_score": 8,
       "tags": [
-        "Authentication",
-        "Password Reset"
+        "tag1",
+        "tag2"
       ]
     },
     {
-      "id": "TC-004",
-      "title": "Reset Password with Special Characters",
-      "priority": "medium",
-      "given": null,
-      "when": null,
-      "then": null,
+      "id": "TC-001",
+      "title": "Positive scenario: Successful recommendation",
+      "priority": "high",
       "type": "positive",
-      "preconditions": [
-        "User is logged in",
-        "Account is enabled"
-      ],
+      "preconditions": [],
       "steps": [
-        "1. Enter special character in current password field",
-        "2. Enter new password",
-        "3. Confirm new password"
+        {
+          "number": 1,
+          "step": "The application displays a list of recommended products"
+        },
+        {
+          "number": 2,
+          "step": "Each product has a link to view its details"
+        }
       ],
       "gherkin": {
-        "given": "User is logged in with valid credentials",
-        "when": "User clicks reset password button",
-        "then": "Password reset form accepts special characters"
+        "given": "Initial state",
+        "when": "Action taken",
+        "then": "Expected outcome"
       },
-      "expected_result": "Password reset successful, user receives confirmation email",
+      "expected_result": "Detailed expected result",
       "quality_score": 8,
       "tags": [
-        "Authentication",
-        "Password Reset"
+        "tag1",
+        "tag2"
       ]
     }
   ]

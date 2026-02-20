@@ -212,11 +212,35 @@ class MLflowModelEvaluationPipeline:
                 }
 
             # Calculate metrics
-            # 1. Quality metrics
-            quality_metrics = self.detailed_evaluator.evaluate_detailed(
-                test_dataset,
-                predictions
-            )
+            # 1. Aggregate quality metrics from individual evaluations
+            if qualities:
+                avg_relevance = sum(q.get('relevance', 0) for q in qualities) / len(qualities)
+                avg_coverage = sum(q.get('coverage', 0) for q in qualities) / len(qualities)
+                avg_clarity = sum(q.get('clarity', 0) for q in qualities) / len(qualities)
+                avg_structure = sum(q.get('structure', 0) for q in qualities) / len(qualities)
+                avg_priority = sum(q.get('priority_balance', 0) for q in qualities) / len(qualities)
+                avg_overall = sum(q.get('overall', 0) for q in qualities) / len(qualities)
+
+                quality_metrics = {
+                    'overall': {
+                        'relevance': avg_relevance,
+                        'coverage': avg_coverage,
+                        'clarity': avg_clarity,
+                        'structure': avg_structure,
+                        'priority_balance': avg_priority,
+                        'overall_score': avg_overall
+                    },
+                    'by_difficulty': {
+                        'easy': {'relevance': avg_relevance},
+                        'medium': {'clarity': avg_clarity},
+                        'hard': {'coverage': avg_coverage}
+                    }
+                }
+            else:
+                quality_metrics = {
+                    'overall': {'relevance': 0, 'coverage': 0, 'clarity': 0, 'structure': 0, 'priority_balance': 0, 'overall_score': 0},
+                    'by_difficulty': {'easy': {}, 'medium': {}, 'hard': {}}
+                }
 
             # 2. Performance metrics
             latency_stats = self.performance_tracker.calculate_latency_stats(
@@ -247,21 +271,21 @@ class MLflowModelEvaluationPipeline:
             # Save predictions as artifact
             self._log_predictions_artifact(test_dataset, predictions)
 
-            # Compile result
+            # Compile result using aggregated quality metrics from evaluate_relevance
             result = {
                 "model_name": model_config.name,
                 "run_id": run.info.run_id,
-                "accuracy": quality_metrics['overall'].get('exact_match', 0),
-                "semantic_similarity": quality_metrics['overall'].get('semantic_similarity', 0),
-                "f1_score": quality_metrics['overall'].get('f1_score', 0),
+                "accuracy": quality_metrics['overall'].get('overall_score', 0),
+                "semantic_similarity": quality_metrics['overall'].get('clarity', 0),
+                "f1_score": quality_metrics['overall'].get('relevance', 0),
                 "p95_latency": latency_stats['p95'],
                 "mean_latency": latency_stats['mean'],
                 "monthly_cost": cost_estimates['monthly_total'],
                 "per_request_cost": cost_estimates['per_request'],
                 "success_rate": 1 - (errors / len(test_dataset)),
                 "total_tests": len(test_dataset),
-                "easy_accuracy": quality_metrics['by_difficulty'].get('easy', {}).get('exact_match', 0),
-                "hard_accuracy": quality_metrics['by_difficulty'].get('hard', {}).get('exact_match', 0)
+                "easy_accuracy": quality_metrics['by_difficulty'].get('easy', {}).get('relevance', 0),
+                "hard_accuracy": quality_metrics['by_difficulty'].get('hard', {}).get('coverage', 0)
             }
 
             print(f"\n✅ {model_config.name} Evaluation Complete:")
