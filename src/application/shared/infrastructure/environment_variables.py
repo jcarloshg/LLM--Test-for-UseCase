@@ -17,7 +17,7 @@ class EnvironmentConfig(BaseModel):
     # ─────────────────────────────────────
     OLLAMA_SERVICE_HOST: str = Field(
         default="http://localhost:11435",
-        alias="OLLAMA-SERVICE-HOST",
+        alias="OLLAMA_SERVICE_HOST",
         description="The base URL of the Ollama service"
     )
     OLLAMA_SERVICE_MODEL_LLAMA3_2_1B: str = Field(
@@ -99,9 +99,9 @@ class EnvironmentConfig(BaseModel):
 # // ─────────────────────────────────────
 ENVIRONMENT_CONFIG = EnvironmentConfig(
     **{
-        "OLLAMA-SERVICE-HOST": os.getenv(
-            "OLLAMA-SERVICE-HOST",
-            "http://localhost:11435"
+        "OLLAMA_SERVICE_HOST": os.getenv(
+            "OLLAMA_HOST",
+            os.getenv("OLLAMA_SERVICE_HOST", "http://localhost:11435")
         ),
         "OLLAMA_SERVICE_MODEL_LLAMA3-2-1B": os.getenv(
             "OLLAMA_SERVICE_MODEL_LLAMA3-2-1B",
