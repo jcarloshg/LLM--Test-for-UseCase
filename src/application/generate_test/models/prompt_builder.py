@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 
 
-class IPromptBuilder(ABC):
+class PromptBuilder(ABC):
     """Abstract base class for prompt builders.
 
     Defines the interface for building prompts for LLM interactions.

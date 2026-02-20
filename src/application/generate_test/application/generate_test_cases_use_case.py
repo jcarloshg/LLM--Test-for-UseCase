@@ -3,14 +3,14 @@ import json
 from src.application.generate_test.models.structure import StructureValidator
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.generate_test.models.llm_client import LlmClient
-from src.application.generate_test.models.prompt_builder import IPromptBuilder
+from src.application.generate_test.models.prompt_builder import PromptBuilder
 from src.application.shared.models.custom_response import CustomResponse
 
 
 class GenerateTestCasesUseCase():
     def __init__(
         self,
-        prompt_builder: IPromptBuilder,
+        prompt_builder: PromptBuilder,
         llm_client: LlmClient
     ):
         self.prompt_builder = prompt_builder

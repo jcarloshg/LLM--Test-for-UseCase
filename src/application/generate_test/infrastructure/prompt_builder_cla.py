@@ -2,10 +2,10 @@ from jinja2 import Template
 import json
 from typing import List, Dict, Any
 
-from src.application.generate_test.models.prompt_builder import IPromptBuilder
+from src.application.generate_test.models.prompt_builder import PromptBuilder
 
 
-class PromptBuilderCla(IPromptBuilder):
+class PromptBuilderCla(PromptBuilder):
     """Comprehensive prompt builder for test case generation with detailed structure.
 
     Generates test cases with extended fields including type, tags, gherkin format,
