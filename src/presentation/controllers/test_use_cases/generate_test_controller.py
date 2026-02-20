@@ -1,10 +1,12 @@
 from fastapi import Request
 from pydantic import ValidationError
-from src.application.generate_test.models.llm_config import LLMConfig
+
+# from src.application.generate_test.infrastructure.prompt_builder import PromptBuilder
 from src.application.generate_test.application.generate_test_cases_use_case import GenerateTestCasesUseCase
 from src.application.generate_test.infrastructure.llm_client_ollama import LLMClientOllama
-from src.application.generate_test.infrastructure.prompt_builder import PromptBuilder
+from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
+from src.application.generate_test.models.llm_config import LLMConfig
 from src.application.shared.models.custom_response import CustomResponse
 
 
@@ -23,7 +25,8 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         generate_request = GenerateRequest(**body)
 
         # Initialize dependencies
-        prompt_builder = PromptBuilder()
+        # prompt_builder = PromptBuilder()
+        prompt_builder = PromptBuilderCla()
         llm_config = LLMConfig()
         llm_client_ollama = LLMClientOllama(config=llm_config)
 
@@ -37,13 +40,7 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         )
 
         # TODO: Implement actual test case generation logic
-        return CustomResponse.created(
-            message="Test cases generated successfully",
-            data={
-                "user_story": generate_request.user_story,
-                "test_cases": tests_cases_response.data
-            }
-        )
+        return tests_cases_response
 
     except ValidationError as e:
         return CustomResponse.error(

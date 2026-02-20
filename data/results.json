@@ -1,0 +1,114 @@
+{
+    "message": "Test cases generated from use case",
+    "is_success": true,
+    "data": {
+        "text": {
+            "test_cases": [
+                {
+                    "id": "TC_001",
+                    "title": "Successful password reset",
+                    "priority": "high",
+                    "type": "positive",
+                    "preconditions": [
+                        "User is on the login page AND has a registered account"
+                    ],
+                    "steps": [
+                        "Click forgot password link",
+                        "Enter valid email address",
+                        "Submit password reset request"
+                    ],
+                    "gherkin": {
+                        "given": "User is on the login page",
+                        "when": "Forgot password link is clicked and email address is entered",
+                        "then": "Password reset email is sent to user's email"
+                    },
+                    "expected_result": "Password reset email is sent to user's email AND user receives confirmation message",
+                    "quality_score": 8,
+                    "tags": [
+                        "password_reset",
+                        "login"
+                    ]
+                },
+                {
+                    "id": "TC_002",
+                    "title": "Invalid password reset attempt",
+                    "priority": "high",
+                    "type": "negative",
+                    "preconditions": [
+                        "User is on the login page AND has a registered account"
+                    ],
+                    "steps": [
+                        "Click forgot password link",
+                        "Enter invalid email address",
+                        "Submit password reset request"
+                    ],
+                    "gherkin": {
+                        "given": "User is on the login page",
+                        "when": "Forgot password link is clicked and invalid email address is entered",
+                        "then": "Invalid email address error message is displayed"
+                    },
+                    "expected_result": "Invalid email address error message is displayed AND user remains on login page",
+                    "quality_score": 9,
+                    "tags": [
+                        "password_reset",
+                        "login"
+                    ]
+                },
+                {
+                    "id": "TC_003",
+                    "title": "Non-existent email password reset attempt",
+                    "priority": "medium",
+                    "type": "negative",
+                    "preconditions": [
+                        "User is on the login page"
+                    ],
+                    "steps": [
+                        "Click forgot password link",
+                        "Enter non-existent email address",
+                        "Submit password reset request"
+                    ],
+                    "gherkin": {
+                        "given": "User is on the login page",
+                        "when": "Forgot password link is clicked and non-existent email address is entered",
+                        "then": "Account not found error message is displayed"
+                    },
+                    "expected_result": "Account not found error message is displayed AND user remains on login page",
+                    "quality_score": 8,
+                    "tags": [
+                        "password_reset",
+                        "login"
+                    ]
+                },
+                {
+                    "id": "TC_004",
+                    "title": "Empty fields password reset attempt",
+                    "priority": "medium",
+                    "type": "negative",
+                    "preconditions": [
+                        "User is on the login page"
+                    ],
+                    "steps": [
+                        "Click forgot password link",
+                        "Leave email field empty",
+                        "Submit password reset request"
+                    ],
+                    "gherkin": {
+                        "given": "User is on the login page",
+                        "when": "Forgot password link is clicked and email field is left empty",
+                        "then": "Validation error message is displayed"
+                    },
+                    "expected_result": "Validation error message is displayed AND user remains on login page",
+                    "quality_score": 7,
+                    "tags": [
+                        "password_reset",
+                        "login"
+                    ]
+                }
+            ]
+        },
+        "latency": 65.59716987609863,
+        "tokens": 2078,
+        "model": "llama3.2:3b",
+        "provider": "ollama"
+    }
+}

@@ -69,18 +69,7 @@ async def root():
     return {
         "service": "Test Case Generator",
         "version": "1.0.0",
-        "endpoints": {
-            "generate": "/generate-test-cases",
-            "health": "/health",
-            "metrics": "/metrics"
-        },
-        "environment_config": {
-            "ollama_service_host": ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
-            "ollama_model": ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL4B,
-            "max_retries": ENVIRONMENT_CONFIG.MAX_RETRIES,
-            "max_retries_user_msg": ENVIRONMENT_CONFIG.MAX_RETRIES_USER_MSG,
-            "max_retries_dev_msg": ENVIRONMENT_CONFIG.MAX_RETRIES_DEV_MSG
-        }
+        "working": True
     }
 
 
