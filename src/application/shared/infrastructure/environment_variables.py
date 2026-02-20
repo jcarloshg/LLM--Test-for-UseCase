@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 # Load environment variables from .env.dev
-load_dotenv(".env.dev")
+load_dotenv(".env")
 
 
 # ─────────────────────────────────────
@@ -21,9 +21,23 @@ class EnvironmentConfig(BaseModel):
         description="The base URL of the Ollama service"
     )
     OLLAMA_SERVICE_MODEL_QWEN3VL4B: str = Field(
-        default="qwen3-vl:4b",
+        default="llama3.2:3b",
         alias="OLLAMA_SERVICE_MODEL_QWEN3VL4B",
         description="The Qwen3-VL:4B model name"
+    )
+
+    # // ─────────────────────────────────────
+    # Anthopic Configuration
+    # // ─────────────────────────────────────
+    ANTHOPIC_KEY: str = Field(
+        default="ANTHOPIC_KEY",
+        alias="ANTHOPIC_KEY",
+        description="API key for Anthopic service"
+    )
+    ANTHOPIC_MODEL: str = Field(
+        default="ANTHOPIC_MODEL",
+        alias="ANTHOPIC_MODEL",
+        description="Model name for Anthopic service"
     )
 
     # // ─────────────────────────────────────
@@ -40,7 +54,7 @@ class EnvironmentConfig(BaseModel):
         description="User-friendly error message for retry failures"
     )
     MAX_RETRIES_DEV_MSG: str = Field(
-        default="Failed to call Ollama. Attempt # ",
+        default="Failed to call Ollama. Attemp # ",
         alias="MAX_RETRIES_DEV_MSG",
         description="Developer error message template for retry failures"
     )
@@ -51,6 +65,8 @@ class EnvironmentConfig(BaseModel):
             f"EnvironmentConfig(\n"
             f"  OLLAMA_SERVICE_HOST: {self.OLLAMA_SERVICE_HOST}\n"
             f"  OLLAMA_SERVICE_MODEL_QWEN3VL4B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL4B}\n"
+            f"  ANTHOPIC_KEY: {self.ANTHOPIC_KEY}\n"
+            f"  ANTHOPIC_MODEL: {self.ANTHOPIC_MODEL}\n"
             f"  MAX_RETRIES: {self.MAX_RETRIES}\n"
             f"  MAX_RETRIES_USER_MSG: {self.MAX_RETRIES_USER_MSG}\n"
             f"  MAX_RETRIES_DEV_MSG: {self.MAX_RETRIES_DEV_MSG}\n"
@@ -77,7 +93,15 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
         ),
         "OLLAMA_SERVICE_MODEL_QWEN3VL4B": os.getenv(
             "OLLAMA_SERVICE_MODEL_QWEN3VL4B",
-            "qwen3-vl:4b"
+            "llama3.2:3b"
+        ),
+        "ANTHOPIC_KEY": os.getenv(
+            "ANTHOPIC_KEY",
+            "ANTHOPIC_KEY"
+        ),
+        "ANTHOPIC_MODEL": os.getenv(
+            "ANTHOPIC_MODEL",
+            "ANTHOPIC_MODEL"
         ),
         "MAX_RETRIES": os.getenv(
             "MAX_RETRIES",
@@ -89,7 +113,7 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
         ),
         "MAX_RETRIES_DEV_MSG": os.getenv(
             "MAX_RETRIES_DEV_MSG",
-            "Failed to call Ollama. Attempt # "
+            "Failed to call Ollama. Attemp # "
         ),
     }
 )
