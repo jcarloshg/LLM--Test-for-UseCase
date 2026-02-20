@@ -33,21 +33,21 @@ async def generate_test_controller(request: Request) -> CustomResponse:
 
         # TODO: Implement actual test case generation logic
         return CustomResponse.created(
+            message="Test cases generated successfully",
             data={
                 "user_story": generate_request.user_story,
                 "test_cases": tests_cases_response.model_dump()
-            },
-            msg="Test cases generated successfully"
+            }
         )
 
     except ValidationError as e:
         return CustomResponse.error(
-            msg=f"Validation error: {e.errors()[0]}"
+            message=f"Validation error: {e.errors()[0]}"
         )
     except Exception as e:
         print(f"={'='*60}")
         print(f"Controller error: {e}")
         print(f"{'='*60}")
         return CustomResponse.error(
-            msg=f"Failed to generate test cases: {str(e)}"
+            message=f"Failed to generate test cases: {str(e)}"
         )

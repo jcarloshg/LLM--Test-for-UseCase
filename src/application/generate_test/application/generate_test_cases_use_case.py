@@ -14,13 +14,13 @@ class GenerateTestCasesUseCase():
             print(prompts)
 
             return CustomResponse.created(
+                message="Test cases generated from use case",
                 data={
                     "generate_request": generate_request.model_dump(),
                     "prompts": prompts
-                },
-                msg="Test cases generated from use case",
+                }
             )
         except Exception as e:
             return CustomResponse.error(
-                msg=f"Failed to generate test cases: {str(e)}"
+                message=f"Failed to generate test cases: {str(e)}"
             )

@@ -32,7 +32,7 @@ async def create_test(request: Request):
         print(f"Error type: {type(e)}")
         print(f"="*60)
 
-        error_response = CustomResponse.error(msg=str(e))
+        error_response = CustomResponse.error(message=str(e))
         return JSONResponse(
             content=error_response.model_dump(),
             status_code=error_response.status_code
