@@ -20,10 +20,20 @@ class EnvironmentConfig(BaseModel):
         alias="OLLAMA-SERVICE-HOST",
         description="The base URL of the Ollama service"
     )
+    OLLAMA_SERVICE_MODEL_LLAMA3_2_1B: str = Field(
+        default="llama3.2:1b",
+        alias="OLLAMA_SERVICE_MODEL_LLAMA3-2-1B",
+        description="The Llama3.2:1B model name"
+    )
     OLLAMA_SERVICE_MODEL_QWEN3VL4B: str = Field(
         default="llama3.2:3b",
         alias="OLLAMA_SERVICE_MODEL_QWEN3VL4B",
         description="The Qwen3-VL:4B model name"
+    )
+    OLLAMA_SERVICE_MODEL_QWEN3VL8B: str = Field(
+        default="qwen3-vl:8b",
+        alias="OLLAMA_SERVICE_MODEL_QWEN3VL8B",
+        description="The Qwen3-VL:8B model name"
     )
 
     # // ─────────────────────────────────────
@@ -64,7 +74,9 @@ class EnvironmentConfig(BaseModel):
         return (
             f"EnvironmentConfig(\n"
             f"  OLLAMA_SERVICE_HOST: {self.OLLAMA_SERVICE_HOST}\n"
+            f"  OLLAMA_SERVICE_MODEL_LLAMA3_2_1B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B}\n"
             f"  OLLAMA_SERVICE_MODEL_QWEN3VL4B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL4B}\n"
+            f"  OLLAMA_SERVICE_MODEL_QWEN3VL8B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL8B}\n"
             f"  ANTHOPIC_KEY: {self.ANTHOPIC_KEY}\n"
             f"  ANTHOPIC_MODEL: {self.ANTHOPIC_MODEL}\n"
             f"  MAX_RETRIES: {self.MAX_RETRIES}\n"
@@ -91,9 +103,17 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "OLLAMA-SERVICE-HOST",
             "http://localhost:11435"
         ),
+        "OLLAMA_SERVICE_MODEL_LLAMA3-2-1B": os.getenv(
+            "OLLAMA_SERVICE_MODEL_LLAMA3-2-1B",
+            "llama3.2:1b"
+        ),
         "OLLAMA_SERVICE_MODEL_QWEN3VL4B": os.getenv(
             "OLLAMA_SERVICE_MODEL_QWEN3VL4B",
             "llama3.2:3b"
+        ),
+        "OLLAMA_SERVICE_MODEL_QWEN3VL8B": os.getenv(
+            "OLLAMA_SERVICE_MODEL_QWEN3VL8B",
+            "qwen3-vl:8b"
         ),
         "ANTHOPIC_KEY": os.getenv(
             "ANTHOPIC_KEY",
