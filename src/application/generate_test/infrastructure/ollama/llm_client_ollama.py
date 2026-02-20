@@ -1,8 +1,10 @@
 import time
 import ollama
+import os
 
 from src.application.generate_test.models.llm_config import LLMConfig
 from src.application.generate_test.models.llm_client import LlmClient, ILlmClientResponse
+from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
 
 
 class LLMClientOllama(LlmClient):
@@ -18,6 +20,8 @@ class LLMClientOllama(LlmClient):
             config: LLMConfig instance.
         """
         self.config = config
+        # Set Ollama host from environment config
+        os.environ["OLLAMA_HOST"] = ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST
 
     def generate(self, prompt: str, system_prompt: str = "") -> ILlmClientResponse:
         """Generate text using Ollama.
