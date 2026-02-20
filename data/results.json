@@ -1,16 +1,107 @@
 {
-  "model": "llama3.2:1b",
-  "created_at": "2026-02-20T19:28:11.601913845Z",
-  "message": {
-    "role": "assistant",
-    "content": "A positive expression of agreement or approval."
-  },
-  "done": true,
-  "done_reason": "stop",
-  "total_duration": 427757880,
-  "load_duration": 91172255,
-  "prompt_eval_count": 36,
-  "prompt_eval_duration": 82078123,
-  "eval_count": 9,
-  "eval_duration": 247467505
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Print Invoice Test Case",
+      "priority": "high",
+      "type": "positive",
+      "preconditions": [
+        "Setup requirement 1",
+        "Setup requirement 2"
+      ],
+      "steps": [
+        {
+          "name": "Step 1: Log in as customer",
+          "description": "Log in to the application using valid credentials",
+          "action": "Open the login page and enter valid username and password"
+        },
+        {
+          "name": "Step 2: Navigate to invoice page",
+          "description": "Navigate to the invoice page after logging in",
+          "action": "Click on the 'Invoices' tab"
+        },
+        {
+          "name": "Step 3: Print invoice",
+          "description": "Print the invoice by clicking on the 'Print Invoice' button",
+          "action": "Click on the 'Print Invoice' button"
+        }
+      ],
+      "gherkin": {
+        "given": "Login as customer with valid username and password",
+        "when": "Navigate to invoices page",
+        "then": "Print invoice"
+      },
+      "expected_result": "Invoice printed successfully",
+      "quality_score": 9,
+      "tags": ["tag1", "tag2"]
+    },
+    {
+      "id": "TC-002",
+      "title": "Error Handling Test Case",
+      "priority": "high",
+      "type": "negative",
+      "preconditions": [
+        "Setup requirement 3"
+      ],
+      "steps": [
+        {
+          "name": "Step 1: Log in as customer with invalid username and password",
+          "description": "Log in to the application using invalid credentials",
+          "action": "Open the login page and enter invalid username and password"
+        },
+        {
+          "name": "Step 2: Navigate to invoice page",
+          "description": "Navigate to the invoice page after logging in",
+          "action": "Click on the 'Invoices' tab"
+        },
+        {
+          "name": "Step 3: Print invoice",
+          "description": "Print the invoice by clicking on the 'Print Invoice' button",
+          "action": "Click on the 'Print Invoice' button"
+        }
+      ],
+      "gherkin": {
+        "given": "Login as customer with invalid username and password",
+        "when": "Navigate to invoices page",
+        "then": "Error message displayed: Invalid credentials"
+      },
+      "expected_result": "Error message displayed: Invalid credentials",
+      "quality_score": 7,
+      "tags": ["tag1", "tag2"]
+    },
+    {
+      "id": "TC-003",
+      "title": "Edge Case Test Case",
+      "priority": "high",
+      "type": "edge_case",
+      "preconditions": [
+        "Setup requirement 4"
+      ],
+      "steps": [
+        {
+          "name": "Step 1: Log in as customer with empty username and password",
+          "description": "Log in to the application using empty credentials",
+          "action": "Open the login page and enter empty username and password"
+        },
+        {
+          "name": "Step 2: Navigate to invoice page",
+          "description": "Navigate to the invoice page after logging in",
+          "action": "Click on the 'Invoices' tab"
+        },
+        {
+          "name": "Step 3: Print invoice",
+          "description": "Print the invoice by clicking on the 'Print Invoice' button",
+          "action": "Click on the 'Print Invoice' button"
+        }
+      ],
+      "gherkin": {
+        "given": "Login as customer with empty username and password",
+        "when": "Navigate to invoices page",
+        "then": "Error message displayed: Invalid credentials"
+      },
+      "expected_result": "Error message displayed: Invalid credentials",
+      "quality_score": 8,
+      "tags": ["tag1", "tag2"]
+    }
+  ]
 }
