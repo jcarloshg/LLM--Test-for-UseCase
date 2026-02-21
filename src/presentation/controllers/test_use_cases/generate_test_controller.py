@@ -5,7 +5,6 @@ from pydantic import ValidationError
 from src.application.generate_test.application.generate_test_cases_use_case import GenerateTestCasesUseCase
 # from src.application.generate_test.infrastructure.anthropic.llm_client_anthropic import LLMClientAnthropic
 from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
-from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.generate_test.models.llm_config import LLMConfig
 # from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
@@ -32,8 +31,6 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         # ─────────────────────────────────────
         # Initialize dependencies
         # ─────────────────────────────────────
-        # prompt_builder = PromptBuilder()
-        prompt_builder = PromptBuilderCla()
         # llm_config = LLMConfig(
         #     provider="anthropic",
         #     api_key=ENVIRONMENT_CONFIG.ANTHOPIC_KEY,

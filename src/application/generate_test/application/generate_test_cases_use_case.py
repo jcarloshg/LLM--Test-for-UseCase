@@ -1,26 +1,25 @@
+""""""
+
 import json
 
 from src.application.shared.models.llm_exceptions import LLMClientException
 from src.application.generate_test.models.structure import StructureValidator
 from src.application.generate_test.models.generate_test_cases_request import GenerateRequest
 from src.application.generate_test.models.llm_client import LlmClient
-from src.application.generate_test.models.prompt_builder import PromptBuilder
 from src.application.shared.models.custom_response import CustomResponse
 
 
 class GenerateTestCasesUseCase():
     def __init__(
         self,
-        prompt_builder: PromptBuilder,
         llm_client: LlmClient
     ):
-        self.prompt_builder = prompt_builder
         self.llm_client = llm_client
 
     def run(self, generate_request: GenerateRequest) -> CustomResponse:
         try:
             # create prompt
-            prompts = self.prompt_builder.build(generate_request.user_story)
+            # prompts = self.prompt_builder.build(generate_request.user_story)
 
             # generate test cases using LLM
             response = self.llm_client.generate(

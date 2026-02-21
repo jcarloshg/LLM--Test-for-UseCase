@@ -1,3 +1,11 @@
+"""
+asfasd
+"""
+
+# ─────────────────────────────────────
+# TODO delete this
+# ─────────────────────────────────────
+
 from abc import ABC, abstractmethod
 from typing import Dict, List, Any
 
@@ -10,12 +18,13 @@ class PromptBuilder(ABC):
     """
 
     @abstractmethod
-    def build(self, user_story: str, include_examples: bool = True) -> Dict[str, str]:
+    def build(self, user_story: str, include_examples: bool = True, context: str = "") -> Dict[str, str]:
         """Build complete prompt with system and user components.
 
         Args:
             user_story: The user story or input to create prompts for
             include_examples: Whether to include few-shot examples (default: True)
+            context: Optional context or documentation to include in the prompt (default: "")
 
         Returns:
             Dict with keys:

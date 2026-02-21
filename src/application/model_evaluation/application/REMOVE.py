@@ -7,7 +7,7 @@ import mlflow
 from src.application.generate_test.models.llm_client import ILlmClientResponse
 from src.application.generate_test.infrastructure.anthropic.llm_client_anthropic import LLMClientAnthropic
 from src.application.generate_test.infrastructure.ollama.llm_client_ollama import LLMClientOllama
-from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
+# from src.application.generate_test.infrastructure.prompt_builder_cla import PromptBuilderCla
 from src.application.generate_test.models.prompt_builder import PromptBuilder
 from src.application.generate_test.models.structure import StructureValidator
 
