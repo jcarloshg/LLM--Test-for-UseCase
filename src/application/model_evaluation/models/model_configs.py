@@ -17,7 +17,7 @@ class ModelConfig:
     model_id: str
     llm_config: LLMConfig
     temperature: float = 0.0  # Deterministic for evaluation
-    max_tokens: int = 500
+    max_tokens: int = 3500
     cost_per_1k_input: float = 0.0
     cost_per_1k_output: float = 0.0
     api_key: Optional[str] = None
@@ -87,6 +87,6 @@ class ModelRegistry:
     def get_models_to_compare(cls) -> List[ModelConfig]:
         return [
             cls.MODELS["llama-3.2-1b"],
-            # cls.MODELS["llama-3.2-3b"],
-            # cls.MODELS["qwen3-vl-8b"]
+            cls.MODELS["llama-3.2-3b"],
+            cls.MODELS["qwen3-vl-8b"]
         ]

@@ -62,8 +62,8 @@ class MLflowModelEvaluationPipeline:
         if test_dataset is None:
             test_dataset = EvaluationDataset.load_stories_for_test(
                 num_easy=1,
-                num_hard=0,
-                num_medium=0
+                num_medium=0,
+                num_hard=0
             )
 
         # Start parent run
@@ -182,6 +182,9 @@ class MLflowModelEvaluationPipeline:
                         output_json_validated['test_cases']
                     )
 
+                    print("\nquality")
+                    print(quality)
+
                     qualities.append(quality)
                     predictions.append(output_text)
                     latencies.append(result.latency)
@@ -214,12 +217,18 @@ class MLflowModelEvaluationPipeline:
             # Calculate metrics
             # 1. Aggregate quality metrics from individual evaluations
             if qualities:
-                avg_relevance = sum(q.get('relevance', 0) for q in qualities) / len(qualities)
-                avg_coverage = sum(q.get('coverage', 0) for q in qualities) / len(qualities)
-                avg_clarity = sum(q.get('clarity', 0) for q in qualities) / len(qualities)
-                avg_structure = sum(q.get('structure', 0) for q in qualities) / len(qualities)
-                avg_priority = sum(q.get('priority_balance', 0) for q in qualities) / len(qualities)
-                avg_overall = sum(q.get('overall', 0) for q in qualities) / len(qualities)
+                avg_relevance = sum(q.get('relevance', 0)
+                                    for q in qualities) / len(qualities)
+                avg_coverage = sum(q.get('coverage', 0)
+                                   for q in qualities) / len(qualities)
+                avg_clarity = sum(q.get('clarity', 0)
+                                  for q in qualities) / len(qualities)
+                avg_structure = sum(q.get('structure', 0)
+                                    for q in qualities) / len(qualities)
+                avg_priority = sum(q.get('priority_balance', 0)
+                                   for q in qualities) / len(qualities)
+                avg_overall = sum(q.get('overall', 0)
+                                  for q in qualities) / len(qualities)
 
                 quality_metrics = {
                     'overall': {
@@ -303,30 +312,39 @@ class MLflowModelEvaluationPipeline:
         errors: int,
         total: int
     ):
-        """Log all metrics to MLflow"""
+        """Log core metrics to MLflow: Accuracy & Quality, Latency, and Cost"""
 
-        # Quality metrics
+        # ============================================================
+        # 1. ACCURACY & QUALITY METRICS
+        # ============================================================
+        # Overall quality scores
         for key, value in quality_metrics['overall'].items():
             if isinstance(value, (int, float)):
                 mlflow.log_metric(f"quality_{key}", value)
 
-        # By difficulty
-        for difficulty, metrics in quality_metrics.get('by_difficulty', {}).items():
-            for key, value in metrics.items():
-                if isinstance(value, (int, float)):
-                    mlflow.log_metric(f"{difficulty}_{key}", value)
+        # # By difficulty breakdown (commented out)
+        # for difficulty, metrics in quality_metrics.get('by_difficulty', {}).items():
+        #     for key, value in metrics.items():
+        #         if isinstance(value, (int, float)):
+        #             mlflow.log_metric(f"{difficulty}_{key}", value)
 
-        # Latency metrics
+        # ============================================================
+        # 2. LATENCY METRICS
+        # ============================================================
         for key, value in latency_stats.items():
             mlflow.log_metric(f"latency_{key}", value)
 
-        # Cost metrics
+        # ============================================================
+        # 3. COST METRICS
+        # ============================================================
         for key, value in cost_estimates.items():
             mlflow.log_metric(f"cost_{key}", value)
 
-        # Reliability
-        mlflow.log_metric("error_rate", errors / total)
-        mlflow.log_metric("success_rate", 1 - (errors / total))
+        # # ============================================================
+        # # 4. RELIABILITY METRICS (commented out)
+        # # ============================================================
+        # mlflow.log_metric("error_rate", errors / total)
+        # mlflow.log_metric("success_rate", 1 - (errors / total))
 
     def _log_predictions_artifact(self, test_dataset: List[TestCase], predictions: list):
         """Save predictions as MLflow artifact"""
