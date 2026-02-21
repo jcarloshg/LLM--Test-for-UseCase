@@ -22,11 +22,16 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         CustomResponse: Response with generated test cases or error message
     """
     try:
+
+        # ─────────────────────────────────────
         # Extract JSON body from request and validate it
+        # ─────────────────────────────────────
         body = await request.json()
         generate_request = GenerateRequest(**body)
 
+        # ─────────────────────────────────────
         # Initialize dependencies
+        # ─────────────────────────────────────
         # prompt_builder = PromptBuilder()
         prompt_builder = PromptBuilderCla()
         # llm_config = LLMConfig(
@@ -38,7 +43,9 @@ async def generate_test_controller(request: Request) -> CustomResponse:
         llm_config = LLMConfig()
         llm_client = LLMClientOllama(config=llm_config)
 
+        # ─────────────────────────────────────
         # Initialize && run use case
+        # ─────────────────────────────────────
         generate_test_cases = GenerateTestCasesUseCase(
             prompt_builder=prompt_builder,
             llm_client=llm_client
