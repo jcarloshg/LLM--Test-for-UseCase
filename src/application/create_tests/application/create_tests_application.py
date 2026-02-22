@@ -16,8 +16,10 @@ class CreateTestsApplication:
                 prompt=generate_request.user_story
             )
 
-            print("\nexecutable_chain_response")
-            print(executable_chain_response)
+            return CustomResponse.created(
+                message="Test for use case",
+                data=executable_chain_response,
+            )
 
         except Exception as e:
             print("="*60)

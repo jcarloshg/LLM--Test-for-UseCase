@@ -77,4 +77,7 @@ class ExecutableChainV1(ExecutableChain):
             )
 
         except Exception as e:
+            print(f"="*60)
+            print(f"[ExecutableChainV1] - Exception: {str(e)}")
+            print(f"="*60)
             raise Exception(f"Failed to execute chain: {str(e)}")
