@@ -1,3 +1,3 @@
-from .generate_test_controller import generate_test_controller
+from .creaet_test_controller import creaet_test_controller
 
-__all__ = ["generate_test_controller"]
+__all__ = ["creaet_test_controller"]

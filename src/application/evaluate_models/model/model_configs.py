@@ -1,9 +1,15 @@
-# model_configs.py
+"""Model configurations for evaluation.
+
+This module defines model configurations for evaluating different LLM models
+including Ollama-based models (Llama, Qwen, ChatQA) and other providers.
+"""
 from dataclasses import dataclass
 from typing import Optional
 from typing import List
 
-from src.application.generate_test.models.llm_config import LLMConfig
+from langchain_ollama import OllamaLLM
+# from langchain_anthropic import AnthropicLLM
+
 from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
 
 
@@ -15,34 +21,19 @@ class ModelConfig:
     name: str
     provider: str  # "openai", "anthropic", "ollama"
     model_id: str
-    llm_config: LLMConfig
-    temperature: float = 0.0  # Deterministic for evaluation
-    max_tokens: int = 1500
+    llm: any
+    base_url: Optional[str] = None  # For self-hosted
     cost_per_1k_input: float = 0.0
     cost_per_1k_output: float = 0.0
+    max_tokens: int = 1500
+    temperature: float = 0.0  # Deterministic for evaluation
     api_key: Optional[str] = None
-    base_url: Optional[str] = None  # For self-hosted
 
 
 class ModelRegistry:
     """Predefined model configurations"""
 
     MODELS = {
-
-        "claude-haiku": ModelConfig(
-            name="Claude Haiku 4.5",
-            provider="anthropic",
-            model_id=ENVIRONMENT_CONFIG.ANTHOPIC_MODEL,
-            api_key=ENVIRONMENT_CONFIG.ANTHOPIC_KEY,
-            cost_per_1k_input=0.0008,
-            cost_per_1k_output=0.004,
-            llm_config=LLMConfig(
-                provider="anthropic",
-                api_key=ENVIRONMENT_CONFIG.ANTHOPIC_KEY,
-                model=ENVIRONMENT_CONFIG.ANTHOPIC_MODEL
-            )
-        ),
-
         "llama-3.2-1b": ModelConfig(
             name="Llama 3.2 1B",
             provider="ollama",
@@ -50,9 +41,12 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            llm_config=LLMConfig(
-                provider="ollama",
-                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B
+            max_tokens=1500,
+            temperature=0.0,
+            llm=OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B,
+                temperature=0.0,
             )
         ),
 
@@ -63,9 +57,12 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            llm_config=LLMConfig(
-                provider="ollama",
-                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B
+            max_tokens=1500,
+            temperature=0.0,
+            llm=OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B,
+                temperature=0.0
             )
         ),
 
@@ -76,9 +73,12 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            llm_config=LLMConfig(
-                provider="ollama",
-                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL8B
+            max_tokens=1500,
+            temperature=0.0,
+            llm=OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL8B,
+                temperature=0.0
             )
         ),
 
@@ -89,17 +89,25 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            llm_config=LLMConfig(
-                provider="ollama",
-                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B
+            max_tokens=1500,
+            temperature=0.0,
+            llm=OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
+                temperature=0.0
             )
         )
     }
 
-    @classmethod
-    def get_models_to_compare(cls) -> List[ModelConfig]:
+    def get_models_to_compare(self) -> List[ModelConfig]:
+        """Get list of models to compare in evaluation.
+
+        Returns:
+            List of ModelConfig objects for models to evaluate
+        """
         return [
-            cls.MODELS["llama-3.2-1b"],
-            cls.MODELS["llama-3.2-3b"],
-            cls.MODELS["qwen3-vl-8b"]
+            self.MODELS["llama-3.2-1b"],
+            self.MODELS["llama-3.2-3b"],
+            # self.MODELS["llama3-chatqa-8b"],
+            # self.MODELS["qwen3-vl-8b"]
         ]

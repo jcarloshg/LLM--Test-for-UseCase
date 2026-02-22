@@ -1,87 +1,104 @@
 {
-  "test_cases": [
-    {
-      "id": "TC-002",
-      "title": "View product recommendations",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [
-        "Setup requirement 1",
-        "Setup requirement 2"
-      ],
-      "steps": [
-        {
-          "number": 1,
-          "step": "The application displays a list of recommended products"
-        },
-        {
-          "number": 2,
-          "step": "Each product has a link to view its details"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
+  "message": "Test for use case",
+  "is_success": true,
+  "data": {
+    "test_cases": [
+      {
+        "id": "TC-001",
+        "title": "Secure checkout for payment information protection",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "I enter my login credentials.",
+          "I click on the login button.",
+          "I select a payment method."
+        ],
+        "expected_result": "The checkout process is completed successfully. My payment information is protected.",
+        "quality_score": 8
       },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
-    },
-    {
-      "id": "TC-003",
-      "title": "Edge case: No recommendations available",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [],
-      "steps": [
-        {
-          "number": 1,
-          "step": "The application displays a message indicating no recommendations"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
+      {
+        "id": "TC-002",
+        "title": "Edge case: Empty payment method selection",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "I select an empty payment method.",
+          "I try to complete the checkout process."
+        ],
+        "expected_result": "The checkout process fails due to insufficient payment information. Please provide valid payment details.",
+        "quality_score": 7
       },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
-    },
-    {
-      "id": "TC-001",
-      "title": "Positive scenario: Successful recommendation",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [],
-      "steps": [
-        {
-          "number": 1,
-          "step": "The application displays a list of recommended products"
-        },
-        {
-          "number": 2,
-          "step": "Each product has a link to view its details"
-        }
-      ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
+      {
+        "id": "TC-003",
+        "title": "Error scenario: Invalid input validation",
+        "priority": "medium",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "I enter an invalid login credential.",
+          "I click on the login button."
+        ],
+        "expected_result": "The checkout process fails due to insufficient validation. Please try again with valid credentials.",
+        "quality_score": 6
       },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
-    }
-  ]
+      {
+        "id": "TC-004",
+        "title": "Error scenario: Network connection issue",
+        "priority": "medium",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "I experience a network connection failure during the checkout process.",
+          "I try to complete the checkout again."
+        ],
+        "expected_result": "The checkout process fails due to network connectivity issues. Please reconnect and retry.",
+        "quality_score": 5
+      },
+      {
+        "id": "TC-005",
+        "title": "Positive scenario: Successful payment confirmation",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "I complete the checkout process.",
+          "I confirm my payment details."
+        ],
+        "expected_result": "The checkout process is completed successfully. My payment information is protected.",
+        "quality_score": 8
+      },
+      {
+        "id": "TC-006",
+        "title": "Positive scenario: Multiple payment methods available",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "I select multiple payment methods.",
+          "I complete the checkout process."
+        ],
+        "expected_result": "The checkout process is completed successfully. My payment information is protected.",
+        "quality_score": 8
+      }
+    ]
+  }
 }

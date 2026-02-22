@@ -25,15 +25,25 @@ class EnvironmentConfig(BaseModel):
         alias="OLLAMA_SERVICE_MODEL_LLAMA3-2-1B",
         description="The Llama3.2:1B model name"
     )
-    OLLAMA_SERVICE_MODEL_QWEN3VL4B: str = Field(
+    OLLAMA_SERVICE_MODEL_LLAMA3_2_3B: str = Field(
         default="llama3.2:3b",
-        alias="OLLAMA_SERVICE_MODEL_QWEN3VL4B",
-        description="The Qwen3-VL:4B model name"
+        alias="OLLAMA_SERVICE_MODEL_LLAMA3-2-3B",
+        description="The Llama3.2:3B model name"
     )
     OLLAMA_SERVICE_MODEL_QWEN3VL8B: str = Field(
         default="qwen3-vl:8b",
         alias="OLLAMA_SERVICE_MODEL_QWEN3VL8B",
         description="The Qwen3-VL:8B model name"
+    )
+    OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B: str = Field(
+        default="llama3-chatqa:8b",
+        alias="OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B",
+        description="The Llama3-ChatQA:8B model name"
+    )
+    OLLAMA_SERVICE_MODEL_EMBEDDING: str = Field(
+        default="nomic-embed-text",
+        alias="OLLAMA_SERVICE_MODEL_EMBEDDING",
+        description="The embedding model name"
     )
 
     # // ─────────────────────────────────────
@@ -69,19 +79,37 @@ class EnvironmentConfig(BaseModel):
         description="Developer error message template for retry failures"
     )
 
+    # // ─────────────────────────────────────
+    # DATA & VECTORSTORE
+    # // ─────────────────────────────────────
+    JSON_FILE_PATH: str = Field(
+        default="data/examples/user_stories_with_test_cases.json",
+        alias="JSON_FILE_PATH",
+        description="Path to the JSON file with user stories and test cases"
+    )
+    VECTORSTORE_PATH: str = Field(
+        default="data/vectorstore_faiss",
+        alias="VECTORSTORE_PATH",
+        description="Path to the FAISS vectorstore directory"
+    )
+
     def __str__(self) -> str:
         """String representation of environment configuration."""
         return (
             f"EnvironmentConfig(\n"
             f"  OLLAMA_SERVICE_HOST: {self.OLLAMA_SERVICE_HOST}\n"
             f"  OLLAMA_SERVICE_MODEL_LLAMA3_2_1B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B}\n"
-            f"  OLLAMA_SERVICE_MODEL_QWEN3VL4B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL4B}\n"
+            f"  OLLAMA_SERVICE_MODEL_LLAMA3_2_3B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B}\n"
             f"  OLLAMA_SERVICE_MODEL_QWEN3VL8B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL8B}\n"
+            f"  OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B}\n"
+            f"  OLLAMA_SERVICE_MODEL_EMBEDDING: {self.OLLAMA_SERVICE_MODEL_EMBEDDING}\n"
             f"  ANTHOPIC_KEY: {self.ANTHOPIC_KEY}\n"
             f"  ANTHOPIC_MODEL: {self.ANTHOPIC_MODEL}\n"
             f"  MAX_RETRIES: {self.MAX_RETRIES}\n"
             f"  MAX_RETRIES_USER_MSG: {self.MAX_RETRIES_USER_MSG}\n"
             f"  MAX_RETRIES_DEV_MSG: {self.MAX_RETRIES_DEV_MSG}\n"
+            f"  JSON_FILE_PATH: {self.JSON_FILE_PATH}\n"
+            f"  VECTORSTORE_PATH: {self.VECTORSTORE_PATH}\n"
             f")"
         )
 
@@ -107,13 +135,21 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "OLLAMA_SERVICE_MODEL_LLAMA3-2-1B",
             "llama3.2:1b"
         ),
-        "OLLAMA_SERVICE_MODEL_QWEN3VL4B": os.getenv(
-            "OLLAMA_SERVICE_MODEL_QWEN3VL4B",
+        "OLLAMA_SERVICE_MODEL_LLAMA3-2-3B": os.getenv(
+            "OLLAMA_SERVICE_MODEL_LLAMA3-2-3B",
             "llama3.2:3b"
         ),
         "OLLAMA_SERVICE_MODEL_QWEN3VL8B": os.getenv(
             "OLLAMA_SERVICE_MODEL_QWEN3VL8B",
             "qwen3-vl:8b"
+        ),
+        "OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B": os.getenv(
+            "OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B",
+            "llama3-chatqa:8b"
+        ),
+        "OLLAMA_SERVICE_MODEL_EMBEDDING": os.getenv(
+            "OLLAMA_SERVICE_MODEL_EMBEDDING",
+            "nomic-embed-text"
         ),
         "ANTHOPIC_KEY": os.getenv(
             "ANTHOPIC_KEY",
@@ -135,7 +171,15 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "MAX_RETRIES_DEV_MSG",
             "Failed to call Ollama. Attemp # "
         ),
+        "JSON_FILE_PATH": os.getenv(
+            "JSON_FILE_PATH",
+            "data/user_stories_with_test_cases.json"
+        ),
+        "VECTORSTORE_PATH": os.getenv(
+            "VECTORSTORE_PATH",
+            "data/vectorstore_faiss"
+        ),
     }
 )
 
-print(f"ENVIRONMENT_CONFIG {ENVIRONMENT_CONFIG.__str__}")
+print(f"ENVIRONMENT_CONFIG {ENVIRONMENT_CONFIG.__str__()}")
