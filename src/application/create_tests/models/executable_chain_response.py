@@ -6,7 +6,7 @@ class ExecutableChainResponse(BaseModel):
     """"
     executable_chain_response
     """
-    json: Any = Field(..., description="Generated JSON response")
+    result: Any = Field(..., description="Generated result from the chain")
     latency: float = Field(..., description="Response latency in seconds")
     tokens: int = Field(default=0, description="Number of tokens used")
     model: str = Field(..., description="Model identifier")

@@ -69,7 +69,7 @@ class ExecutableChainV1(ExecutableChain):
             # Return as ExecutableChainResponse
             # ─────────────────────────────────────
             return ExecutableChainResponse(
-                json=result,
+                result=result,
                 latency=latency,
                 tokens=0,
                 model=getattr(self.llm, 'model_name', 'unknown'),
