@@ -56,7 +56,8 @@ class ExecutableChainV1(ExecutableChain):
     """
 
     def __init__(self, prompt_emplate: PromptTemplate, retriever: VectorStoreRetriever, llm: Optional[any] = None):
-        super().__init__(prompt_emplate, retriever, llm)
+        super().__init__(prompt_emplate, llm)
+        self.retriever = retriever
         self._rag_cache = RAGCache(max_cache_size=100)
 
     def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:

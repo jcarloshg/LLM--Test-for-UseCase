@@ -39,9 +39,9 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
             return CustomResponse.error(message=str(e))
 
         executable_chain_v1 = ExecutableChainV1(
-            llm=llm,
             prompt_emplate=RAG_PROMPT,
-            retriever=retriever
+            retriever=retriever,
+            llm=llm,
         )
 
         # ─────────────────────────────────────
