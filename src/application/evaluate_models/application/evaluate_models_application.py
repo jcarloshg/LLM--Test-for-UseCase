@@ -50,7 +50,7 @@ class EvaluateModelsApplication:
 
         # Start parent run
         with mlflow.start_run(
-            run_name=f"evaluation-{datetime.now().strftime('%Y%m%d-%H%M')}"
+            run_name=f"{self.experiment_name}-evaluation-{datetime.now().strftime('%Y%m%d-%H%M')}"
         ):
             # ─────────────────────────────────────
             # Log global evaluation parameters
@@ -492,39 +492,27 @@ class EvaluateModelsApplication:
 # USAGE EXAMPLE
 # ============================================================================
 if __name__ == "__main__":
+
+    # ─────────────────────────────────────
+    # RAG
+    # ─────────────────────────────────────
     # Initialize pipeline
-    pipeline = EvaluateModelsApplication("prompting-model-evaluation")
+    pipeline = EvaluateModelsApplication("RAG-LLAMA")
+    # Load FAISS vectorstore
+    try:
+        retriever = load_faiss_vectorstore()
+    except FileNotFoundError as e:
+        print("="*60)
+        print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
+        print("="*60)
+        raise Exception("Something was wriong")
 
-#     # ─────────────────────────────────────
-#     # Load FAISS vectorstore
-#     # ─────────────────────────────────────
-#     try:
-#         retriever = load_faiss_vectorstore()
-#     except FileNotFoundError as e:
-#         print("="*60)
-#         print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
-#         print("="*60)
-#         raise Exception("Something was wriong")
-#
-#     # ─────────────────────────────────────
-#     # Initialize the executable chain
-#     # ─────────────────────────────────────
-#     executable_chain_rag = ExecutableChainRAG(
-#         prompt_emplate=RAG_PROMPT,
-#         retriever=retriever,
-#     )
-#
-#     test_cases = EvaluationDataset.load_stories_for_test(
-#         num_easy=1,
-#         num_medium=0,
-#         num_hard=0,
-#     )
-#
-#     model_registry = ModelRegistry()
-#     models_for_evaluation = model_registry.get_models_to_compare()
-
-    executable_chain_prompting = ExecutableChainPrompting(
-        prompt_emplate=IMPROVED_PROMPT_V1
+    # ─────────────────────────────────────
+    # Initialize the executable chain
+    # ─────────────────────────────────────
+    executable_chain_rag = ExecutableChainRAG(
+        prompt_emplate=RAG_PROMPT,
+        retriever=retriever,
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
@@ -541,8 +529,33 @@ if __name__ == "__main__":
         expected_requests_per_day=5000,  # Adjust based on expected traffic
         test_dataset=test_cases,
         models_to_test=models_for_evaluation,
-        executable_chain=executable_chain_prompting
+        executable_chain=executable_chain_rag
     )
+
+#     # ─────────────────────────────────────
+#     # prompting
+#     # ─────────────────────────────────────
+#     pipeline = EvaluateModelsApplication("prompting-model-evaluation")
+#     executable_chain_prompting = ExecutableChainPrompting(
+#         prompt_emplate=IMPROVED_PROMPT_V1
+#     )
+#
+#     test_cases = EvaluationDataset.load_stories_for_test(
+#         num_easy=2,
+#         num_medium=2,
+#         num_hard=2
+#     )
+#
+#     model_registry = ModelRegistry()
+#     models_for_evaluation = model_registry.get_models_to_compare()
+#
+#     # Run evaluation
+#     results = pipeline.run_complete_evaluation(
+#         expected_requests_per_day=5000,  # Adjust based on expected traffic
+#         test_dataset=test_cases,
+#         models_to_test=models_for_evaluation,
+#         executable_chain=executable_chain_prompting
+#     )
 
     # # Generate report
     # pipeline.generate_report()
