@@ -1,48 +1,15 @@
 """Executable chain implementation with direct prompting (no RAG)."""
 
 import time
-import json
-import re
 from typing import Optional, Dict, Any
 
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import BaseOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from pydantic import ValidationError
 
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
 from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
-
-# ─────────────────────────────────────
-# TODO: create a file called RobustJsonOutputParser
-# TODO create a class for PromptTemplate to save metadata
-# ─────────────────────────────────────
-
-
-class RobustJsonOutputParser(BaseOutputParser):
-    """JSON parser that handles markdown-wrapped JSON output from LLMs."""
-
-    def parse(self, text: str) -> Dict[str, Any]:
-        """Parse JSON from text, handling markdown code blocks.
-
-        Handles cases where LLM wraps JSON in markdown:
-        ```json
-        {...}
-        ```
-        """
-        text = text.strip()
-        if text.startswith("```"):
-            # Remove opening markdown block
-            text = re.sub(r'^```(?:json)?\s*\n', '', text)
-            # Remove closing markdown block
-            text = re.sub(r'\n```\s*$', '', text)
-
-        # Try to extract JSON object if there's extra text
-        json_match = re.search(r'\{.*\}', text, re.DOTALL)
-        if json_match:
-            text = json_match.group(0)
-
-        return json.loads(text)
 
 
 class ExecutableChainPrompting(ExecutableChain):
@@ -131,7 +98,7 @@ class ExecutableChainPrompting(ExecutableChain):
         chain = (
             self.prompt_emplate
             | self.llm
-            | RobustJsonOutputParser()
+            | JsonOutputParser()
         )
 
         # ─────────────────────────────────────

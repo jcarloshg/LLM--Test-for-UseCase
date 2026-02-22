@@ -60,18 +60,18 @@ class EvaluationDataset(ABC):
             return test_cases
 
         except FileNotFoundError as e:
-            print(f"="*60)
+            print("="*60)
             print(f"[EvaluationDataset] - FileNotFoundError {str(e)}")
-            print(f"="*60)
+            print("="*60)
             return []
         except (json.JSONDecodeError, KeyError) as e:
-            print(f"="*60)
+            print("="*60)
             print(
                 f"[EvaluationDataset] - json.JSONDecodeError, KeyError {str(e)}")
-            print(f"="*60)
+            print("="*60)
             return []
         except Exception as e:
-            print(f"="*60)
+            print("="*60)
             print(f"[EvaluationDataset] - Exception {str(e)}")
-            print(f"="*60)
+            print("="*60)
             return []

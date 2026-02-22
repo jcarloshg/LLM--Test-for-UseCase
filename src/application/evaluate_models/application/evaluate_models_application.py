@@ -10,7 +10,7 @@ import mlflow
 from src.application.create_tests.infra.executable_chain.executable_chain_prompting import ExecutableChainPrompting
 from src.application.create_tests.infra.executable_chain.executable_chain_rag import ExecutableChainRAG
 from src.application.create_tests.infra.vectorstores.faiss_vectorstore import load_faiss_vectorstore
-from src.application.create_tests.models import RAG_PROMPT
+from src.application.create_tests.models import RAG_PROMPT, PROMPT, IMPROVED_PROMPT_V1
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
 from src.application.evaluate_models.infra.mlflow_config import MLflowConfig
@@ -493,7 +493,7 @@ class EvaluateModelsApplication:
 # ============================================================================
 if __name__ == "__main__":
     # Initialize pipeline
-    pipeline = EvaluateModelsApplication("RAG-model-evaluation")
+    pipeline = EvaluateModelsApplication("prompting-model-evaluation")
 
 #     # ─────────────────────────────────────
 #     # Load FAISS vectorstore
@@ -524,13 +524,13 @@ if __name__ == "__main__":
 #     models_for_evaluation = model_registry.get_models_to_compare()
 
     executable_chain_prompting = ExecutableChainPrompting(
-        RAG_PROMPT
+        prompt_emplate=IMPROVED_PROMPT_V1
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
         num_easy=1,
         num_medium=0,
-        num_hard=0,
+        num_hard=0
     )
 
     model_registry = ModelRegistry()
