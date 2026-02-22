@@ -25,7 +25,7 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         # ─────────────────────────────────────
         # init dependencies
         # ─────────────────────────────────────
-        llm = ModelsConfig().get_qwen3vl_8b()
+        llm = ModelsConfig().get_llama3_2_1b()
 
         # ─────────────────────────────────────
         # Load FAISS vectorstore
@@ -33,6 +33,9 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         try:
             retriever = load_faiss_vectorstore()
         except FileNotFoundError as e:
+            print(f"="*60)
+            print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
+            print(f"="*60)
             return CustomResponse.error(message=str(e))
 
         executable_chain_v1 = ExecutableChainV1(
