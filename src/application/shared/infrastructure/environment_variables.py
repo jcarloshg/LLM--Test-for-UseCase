@@ -69,6 +69,20 @@ class EnvironmentConfig(BaseModel):
         description="Developer error message template for retry failures"
     )
 
+    # // ─────────────────────────────────────
+    # DATA & VECTORSTORE
+    # // ─────────────────────────────────────
+    JSON_FILE_PATH: str = Field(
+        default="data/examples/user_stories_with_test_cases.json",
+        alias="JSON_FILE_PATH",
+        description="Path to the JSON file with user stories and test cases"
+    )
+    VECTORSTORE_PATH: str = Field(
+        default="data/vectorstore_faiss",
+        alias="VECTORSTORE_PATH",
+        description="Path to the FAISS vectorstore directory"
+    )
+
     def __str__(self) -> str:
         """String representation of environment configuration."""
         return (
@@ -82,6 +96,8 @@ class EnvironmentConfig(BaseModel):
             f"  MAX_RETRIES: {self.MAX_RETRIES}\n"
             f"  MAX_RETRIES_USER_MSG: {self.MAX_RETRIES_USER_MSG}\n"
             f"  MAX_RETRIES_DEV_MSG: {self.MAX_RETRIES_DEV_MSG}\n"
+            f"  JSON_FILE_PATH: {self.JSON_FILE_PATH}\n"
+            f"  VECTORSTORE_PATH: {self.VECTORSTORE_PATH}\n"
             f")"
         )
 
@@ -135,7 +151,15 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "MAX_RETRIES_DEV_MSG",
             "Failed to call Ollama. Attemp # "
         ),
+        "JSON_FILE_PATH": os.getenv(
+            "JSON_FILE_PATH",
+            "data/user_stories_with_test_cases.json"
+        ),
+        "VECTORSTORE_PATH": os.getenv(
+            "VECTORSTORE_PATH",
+            "data/vectorstore_faiss"
+        ),
     }
 )
 
-print(f"ENVIRONMENT_CONFIG {ENVIRONMENT_CONFIG.__str__}")
+print(f"ENVIRONMENT_CONFIG {ENVIRONMENT_CONFIG.__str__()}")
