@@ -194,7 +194,8 @@ class QualityTracker:
 
                 # Evaluate preconditions
                 preconditions = test_case.get("preconditions")
-                precond_score = QualityTracker.evaluate_preconditions(preconditions)
+                precond_score = QualityTracker.evaluate_preconditions(
+                    preconditions)
 
                 # Evaluate structure
                 struct_score = QualityTracker.evaluate_test_case_structure(
@@ -213,7 +214,8 @@ class QualityTracker:
                 structure_scores.append(struct_score)
 
         # Calculate averages
-        avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else 0.0
+        avg_quality = sum(quality_scores) / \
+            len(quality_scores) if quality_scores else 0.0
         avg_precondition = (
             sum(precondition_scores) / len(precondition_scores)
             if precondition_scores else 0.0
@@ -224,8 +226,10 @@ class QualityTracker:
         )
 
         # Count passing tests based on configurable threshold
-        passing_tests = sum(1 for score in quality_scores if score >= passing_threshold)
-        passing_rate = passing_tests / len(quality_scores) if quality_scores else 0.0
+        passing_tests = sum(
+            1 for score in quality_scores if score >= passing_threshold)
+        passing_rate = passing_tests / \
+            len(quality_scores) if quality_scores else 0.0
 
         return {
             "quality_score": avg_quality,
