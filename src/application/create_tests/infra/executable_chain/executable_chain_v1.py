@@ -1,5 +1,5 @@
-
 import time
+from typing import Optional
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -22,10 +22,8 @@ class ExecutableChainV1(ExecutableChain):
     that executes a prompt using a language model with JSON output parsing.
     """
 
-    def __init__(self, prompt_emplate: PromptTemplate, llm: any, retriever: VectorStoreRetriever):
-        self.prompt_emplate = prompt_emplate
-        self.llm: any = llm
-        self.retriever: VectorStoreRetriever = retriever
+    def __init__(self, prompt_emplate: PromptTemplate, retriever: VectorStoreRetriever, llm: Optional[any] = None):
+        super().__init__(prompt_emplate, retriever, llm)
 
     def execute(self, prompt: str) -> ExecutableChainResponse:
         """Execute the RAG chain with the given prompt.
@@ -39,9 +37,15 @@ class ExecutableChainV1(ExecutableChain):
             ExecutableChainResponse: Response containing generated JSON, latency, tokens, model, and provider
 
         Raises:
-            Exception: If chain execution fails
+            Exception: If chain execution fails or LLM is not configured
         """
         try:
+            # ─────────────────────────────────────
+            # Validate LLM is configured
+            # ─────────────────────────────────────
+            if self.llm is None:
+                raise ValueError(
+                    "LLM is not configured. Use update_llm() to set an LLM instance.")
 
             # ─────────────────────────────────────
             # create chain
