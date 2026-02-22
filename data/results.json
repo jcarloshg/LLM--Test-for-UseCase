@@ -1,87 +1,67 @@
 {
   "test_cases": [
     {
-      "id": "TC-002",
-      "title": "View product recommendations",
+      "id": "TC-001",
+      "title": "Verify accurate summary of research papers",
       "priority": "high",
       "type": "positive",
       "preconditions": [
-        "Setup requirement 1",
-        "Setup requirement 2"
+        "User has access to relevant research papers"
       ],
       "steps": [
         {
-          "number": 1,
-          "step": "The application displays a list of recommended products"
+          "description": "Research the main findings of a study.",
+          "action": "Open the research paper and copy-paste the main findings."
         },
         {
-          "number": 2,
-          "step": "Each product has a link to view its details"
+          "description": "Summarize the key points in a concise manner.",
+          "action": "Write a clear and concise summary using the copied text as reference."
         }
       ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
+      "expected_result": "A well-structured, easy-to-understand summary of the research papers.",
+      "quality_score": 9
+    },
+    {
+      "id": "TC-002",
+      "title": "Test edge cases: Handling missing or outdated information",
+      "priority": "high",
+      "type": "positive",
+      "preconditions": [
+        "User has access to relevant research papers"
+      ],
+      "steps": [
+        {
+          "description": "Research a study with incomplete data.",
+          "action": "Try to find the main findings of the study, but notice missing information."
+        },
+        {
+          "description": "Identify and report on any errors or inconsistencies in the summary.",
+          "action": "Highlight any mistakes in the summary, such as incorrect or misleading information."
+        }
+      ],
+      "expected_result": "A clear identification of errors or inconsistencies in the summary.",
+      "quality_score": 8
     },
     {
       "id": "TC-003",
-      "title": "Edge case: No recommendations available",
+      "title": "Test negative scenarios: Handling missing data or out-of-date information",
       "priority": "high",
-      "type": "positive",
-      "preconditions": [],
-      "steps": [
-        {
-          "number": 1,
-          "step": "The application displays a message indicating no recommendations"
-        }
+      "type": "negative",
+      "preconditions": [
+        "User has access to relevant research papers"
       ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
-    },
-    {
-      "id": "TC-001",
-      "title": "Positive scenario: Successful recommendation",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [],
       "steps": [
         {
-          "number": 1,
-          "step": "The application displays a list of recommended products"
+          "description": "Research a study with outdated or incomplete data.",
+          "action": "Realize that the summary is inaccurate due to missing information."
         },
         {
-          "number": 2,
-          "step": "Each product has a link to view its details"
+          "description": "Report on any errors or inconsistencies in the summary.",
+          "action": "Explain why the summary is incorrect and suggest improvements."
         }
       ],
-      "gherkin": {
-        "given": "Initial state",
-        "when": "Action taken",
-        "then": "Expected outcome"
-      },
-      "expected_result": "Detailed expected result",
-      "quality_score": 8,
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
+      "expected_result": "A clear explanation of why the summary is incorrect.",
+      "quality_score": 9
     }
   ]
 }
