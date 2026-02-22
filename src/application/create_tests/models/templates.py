@@ -20,6 +20,7 @@ Each test case MUST include the following fields (exact field names required):
 | `preconditions`   | Required setup before test | Array of strings (non-empty)                       |
 | `steps`           | Execution steps            | Array of strings (minimum 3 steps)                 |
 | `expected_result` | What should happen         | String (detailed and specific)                     |
+| `quality_score`   | Test case quality rating   | Integer 0-10 (higher is better)                    |
 
 RULES:
 1. Generate 3-8 test cases covering happy path, edge cases, and error scenarios

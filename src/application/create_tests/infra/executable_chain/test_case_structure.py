@@ -19,7 +19,7 @@ class TestCaseStructure(BaseModel):
     preconditions: List[str] = Field(..., description="List of preconditions required before test execution")
     steps: List[str] = Field(..., description="List of step-by-step instructions for test execution")
     expected_result: str = Field(..., description="Expected outcome or result of the test")
-    quality_score: int = Field(..., description="Quality score for the test case (0-10)")
+    quality_score: int = Field(default=5, description="Quality score for the test case (0-10), defaults to 5 if not provided")
 
     class Config:
         """Pydantic configuration."""

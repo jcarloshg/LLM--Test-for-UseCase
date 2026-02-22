@@ -81,7 +81,7 @@ class ModelRegistry:
 
     def get_models_to_compare(self) -> List[ModelConfig]:
         return [
-            self.MODELS["llama-3.2-1b"],
-            self.MODELS["llama-3.2-3b"],
-            # self.MODELS["qwen3-vl-8b"]
+            # self.MODELS["llama-3.2-1b"],
+            # self.MODELS["llama-3.2-3b"],
+            self.MODELS["qwen3-vl-8b"]
         ]
