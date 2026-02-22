@@ -4,12 +4,14 @@ from typing import List, Dict, Any
 import json
 import mlflow
 
-from application.evaluate_models.model.latency_tracker import LatencyTracker
-from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
 from src.application.create_tests.infra.vectorstores.faiss_vectorstore import load_faiss_vectorstore
 from src.application.create_tests.models import RAG_PROMPT
+from src.application.create_tests.models.executable_chain import ExecutableChain
+from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
+from src.application.evaluate_models.model.latency_tracker import LatencyTracker
 from src.application.evaluate_models.model.model_configs import ModelConfig, ModelRegistry
+from src.application.evaluate_models.model.quality_tracker import QualityTracker
 from src.application.evaluate_models.model.test_case import TestCase
 from src.application.evaluate_models.model.test_dataset import EvaluationDataset
 
@@ -83,7 +85,8 @@ class EvaluateModelsApplication:
         # ─────────────────────────────────────
         # metrics for single model
         # ─────────────────────────────────────
-        latencies = []
+        responses: list[ExecutableChainResponse] = []
+        # latencies = []
 
         print(f"Running {len(test_dataset)} test cases...")
 
@@ -100,12 +103,24 @@ class EvaluateModelsApplication:
             executable_chain_response = executable_chain.execute(
                 prompt=user_story
             )
-
-            latencies.append(executable_chain_response.latency)
+            responses.append(executable_chain_response)
+            print(f"="*60)
+            print("\n")
+            print(f"\n {i} - executable_chain_response")
+            print(executable_chain_response)
+            print(f"="*60)
 
         # 2. Latencia y Rendimiento (Latency)
+        latencies = [res.latency for res in responses]
         latency_stats = LatencyTracker.calculate_latency_stats(
             latencies=latencies)
+
+        quality = QualityTracker.calculate_quality_score(
+            execution_responses=responses
+        )
+        print(f"="*60)
+        print(quality)
+        print(f"="*60)
 
         return {}
 

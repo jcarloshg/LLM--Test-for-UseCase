@@ -1,108 +1,159 @@
 {
-  "message": "Test for use case",
-  "is_success": true,
-  "data": {
-    "test_cases": [
-      {
-        "id": "TC-001",
-        "title": "Login successful with valid credentials",
-        "priority": "high",
-        "type": "positive",
-        "preconditions": [
-          "Setup requirement 1",
-          "Setup requirement 2"
-        ],
-        "steps": [
-          {
-            "number": 1,
-            "description": "Open the application and navigate to the login page"
-          },
-          {
-            "number": 2,
-            "description": "Enter valid email address and password"
-          },
-          {
-            "number": 3,
-            "description": "Click on the login button"
-          },
-          {
-            "number": 4,
-            "description": "Verify that you are logged in to your account successfully"
-          }
-        ],
-        "expected_result": "You are now logged in to your account and can access it",
-        "quality_score": 9
-      },
-      {
-        "id": "TC-002",
-        "title": "Login failed due to invalid credentials",
-        "priority": "high",
-        "type": "negative",
-        "preconditions": [
-          "Setup requirement 1",
-          "Setup requirement 2"
-        ],
-        "steps": [
-          {
-            "number": 1,
-            "description": "Open the application and navigate to the login page"
-          },
-          {
-            "number": 2,
-            "description": "Enter invalid email address and password"
-          },
-          {
-            "number": 3,
-            "description": "Click on the login button"
-          }
-        ],
-        "expected_result": "You are not logged in to your account due to invalid credentials",
-        "quality_score": 6
-      },
-      {
-        "id": "TC-003",
-        "title": "Login failed due to empty fields",
-        "priority": "high",
-        "type": "negative",
-        "preconditions": [
-          "Setup requirement 1",
-          "Setup requirement 2"
-        ],
-        "steps": [
-          {
-            "number": 1,
-            "description": "Open the application and navigate to the login page"
-          },
-          {
-            "number": 2,
-            "description": "Enter an empty email address and password"
-          }
-        ],
-        "expected_result": "You are not logged in to your account due to missing required fields",
-        "quality_score": 6
-      },
-      {
-        "id": "TC-004",
-        "title": "Login failed due to wrong password",
-        "priority": "high",
-        "type": "negative",
-        "preconditions": [
-          "Setup requirement 1",
-          "Setup requirement 2"
-        ],
-        "steps": [
-          {
-            "number": 1,
-            "description": "Open the application and navigate to the login page"
-          },
-          {
-            "number": 2,
-            "description": "Enter a valid email address and wrong password"
-          }
-        ],
-        "expected_result": "You are not logged in to your account due to an incorrect password",
-        "quality_score": 6
-      }
-    ]
-  }
+  "quality_score": 0.20000000000000007,
+  "precondition_score": 0.5,
+  "structure_score": 0.0,
+  "total_tests": 18,
+  "passing_tests": 0,
+  "passing_rate": 0.0,
+  "passing_threshold": 0.7,
+  "weights": {
+    "structure": 0.6,
+    "precondition": 0.4
+  },
+  "details": [
+    {
+      "test_id": "TC-001",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 3,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-002",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-003",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-004",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-005",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-006",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-007",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-008",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-009",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-010",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-011",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-012",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-013",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-014",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-015",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-016",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-017",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    },
+    {
+      "test_id": "TC-018",
+      "precondition_score": 0.5,
+      "structure_score": 0.0,
+      "quality_score": 0.2,
+      "logical_steps": 2,
+      "meets_threshold": False
+    }
+  ]
 }
