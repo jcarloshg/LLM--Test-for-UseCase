@@ -48,14 +48,11 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         create_tests_application = CreateTestsApplication(
             executable_chain=executable_chain_v1)
 
-        create_tests_application.run(
+        create_tests_application_responde = create_tests_application.run(
             generate_request=generate_request
         )
 
-        return CustomResponse.created(
-            message="jej",
-            data="hols"
-        )
+        return create_tests_application_responde
 
     except ValidationError as e:
         return CustomResponse.error(
