@@ -61,8 +61,6 @@ class ExecutableChainV1(ExecutableChain):
             # ─────────────────────────────────────
             start_time = time.time()
             result = rag_chain.invoke({"question": prompt})
-            print("\nresult")
-            print(result)
             latency = time.time() - start_time
 
             # ─────────────────────────────────────

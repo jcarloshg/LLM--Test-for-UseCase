@@ -18,7 +18,7 @@ class CreateTestsApplication:
 
             return CustomResponse.created(
                 message="Test for use case",
-                data=executable_chain_response,
+                data=executable_chain_response.result,
             )
 
         except Exception as e:

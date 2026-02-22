@@ -474,3 +474,62 @@ Contributions welcome! Areas for improvement:
 - **Questions**: Review examples in `examples/` directory
 - **Metrics**: Check MLflow UI for detailed tracking
 - **Documentation**: See `docs/decisions.md` for architecture
+
+# Recomendation for slowly
+
+why $ docker compose up --build is so late?
+
+● Searched for 1 pattern, read 3 files (ctrl+o to expand)
+
+● The slowness is primarily due to heavy dependencies being installed. Here are the main culprits:
+
+Performance Bottlenecks:
+
+1. sentence-transformers>=2.2.0 ⚠️ SLOWEST ─
+
+
+    - Downloads large pre-trained embedding models
+    - Can take several minutes on first install
+
+2. faiss-cpu>=1.7.0
+
+
+    - Requires compilation during pip install
+    - Memory-intensive
+
+3. Multiple LangChain packages
+
+
+    - langchain, langchain-community, langchain-core, langchain-ollama
+    - Creates deep dependency trees
+
+4. mlflow==2.9.0 + fastapi==0.104.1
+
+
+    - Additional transitive dependencies
+
+
+Optimization Tips:
+
+Option 1: Use Docker layer caching (fastest for rebuild)  
+ docker compose build --no-cache  
+ Each layer should cache after first build.
+
+Option 2: Reduce dependencies (if sentence-transformers isn't critical)
+
+- If you're using Ollama embeddings, you may not need sentence-transformers
+- Check if it's actually being used in your code  
+
+
+Option 3: Use a heavier base image with pre-compiled wheels
+
+- Change python:3.10-slim → python:3.10 (includes build tools)
+- Pre-compiled wheels install faster than building from source  
+
+
+Option 4: Multi-stage build (smallest final image)  
+ FROM python:3.10 as builder  
+ RUN pip install --user -r requirements.txt
+
+FROM python:3.10-slim  
+ COPY --from=builder /root/.local /root/.local

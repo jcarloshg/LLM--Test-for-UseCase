@@ -25,7 +25,7 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         # ─────────────────────────────────────
         # init dependencies
         # ─────────────────────────────────────
-        llm = ModelsConfig().get_llama3_2_1b()
+        llm = ModelsConfig().get_qwen3vl_8b()
 
         # ─────────────────────────────────────
         # Load FAISS vectorstore

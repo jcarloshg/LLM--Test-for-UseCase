@@ -9,8 +9,8 @@ langchain-ollama>=0.1.0
 # Vector Store
 faiss-cpu>=1.7.0
 
-# Embeddings
-sentence-transformers>=2.2.0
+# # Embeddings
+# sentence-transformers>=2.2.0
 
 # Utilities
 python-dotenv>=1.0.0
