@@ -1,7 +1,7 @@
 # evaluate_models_application.py
 from datetime import datetime
 from typing import List, Dict, Any
-import json
+
 import mlflow
 
 from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
@@ -12,6 +12,7 @@ from src.application.create_tests.models.executable_chain_response import Execut
 from src.application.evaluate_models.model.latency_tracker import LatencyTracker
 from src.application.evaluate_models.model.model_configs import ModelConfig, ModelRegistry
 from src.application.evaluate_models.model.quality_tracker import QualityTracker
+from src.application.evaluate_models.model.cost_tracker import CostTracker
 from src.application.evaluate_models.model.test_case import TestCase
 from src.application.evaluate_models.model.test_dataset import EvaluationDataset
 
@@ -122,6 +123,19 @@ class EvaluateModelsApplication:
         latencies = [res.latency for res in responses]
         latency_stats = LatencyTracker.calculate_latency_stats(
             latencies=latencies)
+        print(f"="*60)
+        print(latency_stats)
+        print(f"="*60)
+
+        # 3. Coste por Solicitud y Eficiencia (Cost per Request)
+        cost_analysis = CostTracker.calculate_cost_analysis(
+            execution_responses=responses,
+            monthly_server_cost=100.0,  # Example: $100/month for server
+            max_requests_per_day=expected_requests_per_day
+        )
+        print(f"="*60)
+        print(cost_analysis)
+        print(f"="*60)
 
         return {}
 
