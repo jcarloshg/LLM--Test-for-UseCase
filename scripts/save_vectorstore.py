@@ -1,17 +1,15 @@
 """Script to create and save FAISS vectorstore"""
 
+from dotenv import load_dotenv
+from langchain_community.vectorstores import FAISS
+from langchain_ollama import OllamaEmbeddings
+from utils.helpers import load_documents, setup_logging
+from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
 import sys
 from pathlib import Path
 
 # Add parent directory to path so we can import utils
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
-from utils.helpers import load_documents, setup_logging
-from langchain_ollama import OllamaEmbeddings
-from langchain_community.vectorstores import FAISS
-
-from dotenv import load_dotenv
 
 
 load_dotenv()
@@ -78,13 +76,13 @@ def create_and_save_vectorstore():
         )
 
         # Save vectorstore
-        logger.info("Saving vectorstore to '%s'...", ENVIRONMENT_CONFIG.VECTORSTORE_PATH)
+        logger.info("Saving vectorstore to '%s'...",
+                    ENVIRONMENT_CONFIG.VECTORSTORE_PATH)
         vectorstore.save_local(ENVIRONMENT_CONFIG.VECTORSTORE_PATH)
 
         logger.info("=" * 60)
         logger.info("✅ FAISS Vectorstore created successfully!")
         logger.info("=" * 60)
-        print("\n✅ Ready to use! Run: python main.py")
 
     except Exception as e:
         logger.error("Error creating vectorstore: %s", str(e))
