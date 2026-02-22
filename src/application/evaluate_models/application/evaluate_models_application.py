@@ -110,17 +110,18 @@ class EvaluateModelsApplication:
             print(executable_chain_response)
             print(f"="*60)
 
-        # 2. Latencia y Rendimiento (Latency)
-        latencies = [res.latency for res in responses]
-        latency_stats = LatencyTracker.calculate_latency_stats(
-            latencies=latencies)
-
+        # 1. Precisión y Calidad de la Salida (Accuracy & Quality)
         quality = QualityTracker.calculate_quality_score(
             execution_responses=responses
         )
         print(f"="*60)
         print(quality)
         print(f"="*60)
+
+        # 2. Latencia y Rendimiento (Latency)
+        latencies = [res.latency for res in responses]
+        latency_stats = LatencyTracker.calculate_latency_stats(
+            latencies=latencies)
 
         return {}
 
@@ -152,9 +153,9 @@ if __name__ == "__main__":
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
-        num_easy=1,
+        num_easy=0,
         num_medium=0,
-        num_hard=0,
+        num_hard=1,
     )
 
     model_registry = ModelRegistry()

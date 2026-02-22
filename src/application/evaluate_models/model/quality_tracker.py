@@ -152,6 +152,10 @@ class QualityTracker:
                 - total_tests: Number of tests evaluated
                 - passing_tests: Number of tests meeting quality threshold
                 - passing_rate: Percentage of tests meeting threshold
+                - json_parsing_success_rate: Percentage of responses successfully parsed on first attempt (target >95%)
+                - avg_quality_score: Average quality_score from generated test cases
+                - retry_rate: Percentage of responses requiring retries
+                - total_responses: Total number of responses evaluated
         """
         # Validate weights
         if abs((structure_weight + precondition_weight) - 1.0) > 0.001:
@@ -166,12 +170,19 @@ class QualityTracker:
                 "structure_score": 0.0,
                 "total_tests": 0,
                 "passing_tests": 0,
-                "passing_rate": 0.0
+                "passing_rate": 0.0,
+                "json_parsing_success_rate": 0.0,
+                "avg_quality_score": 0.0,
+                "retry_rate": 0.0,
+                "total_responses": 0
             }
 
         quality_scores = []
         precondition_scores = []
         structure_scores = []
+        quality_score_values = []
+        first_attempt_count = 0
+        retry_count = 0
 
         for response in execution_responses:
             if not hasattr(response, "result"):
@@ -180,6 +191,13 @@ class QualityTracker:
             result = response.result
             if not isinstance(result, dict):
                 continue
+
+            # Track parsing success and retry metrics
+            attempt = getattr(response, "attempt", 1)
+            if attempt == 1:
+                first_attempt_count += 1
+            else:
+                retry_count += 1
 
             # Extract test cases from result with validation
             test_cases = result.get("test_cases", [])
@@ -213,6 +231,10 @@ class QualityTracker:
                 precondition_scores.append(precond_score)
                 structure_scores.append(struct_score)
 
+                # Extract quality_score from test case
+                if "quality_score" in test_case:
+                    quality_score_values.append(test_case["quality_score"])
+
         # Calculate averages
         avg_quality = sum(quality_scores) / \
             len(quality_scores) if quality_scores else 0.0
@@ -231,11 +253,34 @@ class QualityTracker:
         passing_rate = passing_tests / \
             len(quality_scores) if quality_scores else 0.0
 
+        # Calculate JSON parsing success rate (Tasa de Cumplimiento Estructural)
+        total_responses = first_attempt_count + retry_count
+        json_parsing_success_rate = (
+            first_attempt_count / total_responses * 100
+            if total_responses > 0 else 0.0
+        )
+
+        # Calculate average quality_score (Promedio del quality_score)
+        avg_quality_score = (
+            sum(quality_score_values) / len(quality_score_values)
+            if quality_score_values else 0.0
+        )
+
+        # Calculate retry rate (Tasa de Reintentos)
+        retry_rate = (
+            retry_count / total_responses * 100
+            if total_responses > 0 else 0.0
+        )
+
         return {
             "quality_score": avg_quality,
             "precondition_score": avg_precondition,
             "structure_score": avg_structure,
             "total_tests": len(quality_scores),
             "passing_tests": passing_tests,
-            "passing_rate": passing_rate
+            "passing_rate": passing_rate,
+            "json_parsing_success_rate": json_parsing_success_rate,
+            "avg_quality_score": avg_quality_score,
+            "retry_rate": retry_rate,
+            "total_responses": total_responses
         }

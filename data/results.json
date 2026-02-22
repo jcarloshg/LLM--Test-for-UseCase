@@ -1,26 +1,70 @@
 {
-  "message": "Test for use case",
-  "is_success": true,
-  "data": {
-    "test_cases": [
-      {
-        "id": "TC-001",
-        "title": "Update Profile Information with Correct Details",
-        "priority": "high",
-        "type": "positive",
-        "preconditions": [
-          "Setup requirement 1",
-          "Setup requirement 2"
-        ],
-        "steps": [
-          "As a user, I want to update my profile information so that my account details are current and accurate",
-          "I navigate to the profile page",
-          "I select 'Update Profile' from the top right corner of the page",
-          "I confirm that the update is successful"
-        ],
-        "expected_result": "The updated profile information is successfully saved with correct details.",
-        "quality_score": 9
-      }
-    ]
-  }
+  "test_cases": [
+    {
+      "id": "TC-001",
+      "title": "Enable Two-Factor Authentication for a New Account",
+      "priority": "high",
+      "type": "positive",
+      "preconditions": [
+        "Setup requirement 1",
+        "Setup requirement 2"
+      ],
+      "steps": [
+        "Log in to the application with an existing account.",
+        "Click on the "Account" menu and select "Edit Profile".",
+        "Add a new phone number or email address for two-factor authentication."
+      ],
+      "expected_result": "The user is redirected to the Two-Factor Authentication page with a verification code sent via SMS or authenticator app.",
+      "quality_score": 8
+    },
+    {
+      "id": "TC-002",
+      "title": "Enable Two-Factor Authentication for an Existing Account",
+      "priority": "medium",
+      "type": "positive",
+      "preconditions": [
+        "Setup requirement 1"
+      ],
+      "steps": [
+        "Log in to the application with an existing account.",
+        "Click on the "Account" menu and select "Edit Profile".",
+        "Add a new phone number or email address for two-factor authentication."
+      ],
+      "expected_result": "The user is redirected to the Two-Factor Authentication page with a verification code sent via SMS or authenticator app.",
+      "quality_score": 7
+    },
+    {
+      "id": "TC-003",
+      "title": "Enable Two-Factor Authentication for an Existing Account (Error Scenario)",
+      "priority": "medium",
+      "type": "negative",
+      "preconditions": [
+        "Setup requirement 1"
+      ],
+      "steps": [
+        "Log in to the application with an existing account.",
+        "Click on the "Account" menu and select "Edit Profile".",
+        "Add a new phone number or email address for two-factor authentication."
+      ],
+      "expected_result": "The user is redirected to the Two-Factor Authentication page with an error message indicating that the verification code was not sent correctly.",
+      "quality_score": 6
+    },
+    {
+      "id": "TC-004",
+      "title": "Enable Two-Factor Authentication for a New Account (Boundary Scenario)",
+      "priority": "high",
+      "type": "boundary",
+      "preconditions": [
+        "Setup requirement 1",
+        "Setup requirement 2"
+      ],
+      "steps": [
+        "Log in to the application with an existing account.",
+        "Click on the "Account" menu and select "Edit Profile".",
+        "Add a new phone number or email address for two-factor authentication."
+      ],
+      "expected_result": "The user is redirected to the Two-Factor Authentication page with a verification code sent via SMS or authenticator app, but the account creation process is blocked due to an error.",
+      "quality_score": 8
+    }
+  ]
 }
