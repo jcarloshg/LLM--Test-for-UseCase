@@ -1,7 +1,8 @@
 import time
 import json
 import re
-from typing import Optional, Dict, Any
+import asyncio
+from typing import Optional, Dict, Any, List
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import BaseOutputParser
@@ -220,3 +221,49 @@ class ExecutableChainV1(ExecutableChain):
         """Clear RAG cache."""
         self._rag_cache.clear()
         print("[ExecutableChainV1] - RAG cache cleared")
+
+    async def execute_async(
+        self, prompts: List[str], max_concurrent: int = 3, max_retries: int = 3
+    ) -> List[ExecutableChainResponse]:
+        """Execute multiple prompts concurrently with rate limiting.
+
+        Args:
+            prompts: List of prompts to execute
+            max_concurrent: Maximum concurrent requests (default: 3)
+            max_retries: Maximum retries per prompt (default: 3)
+
+        Returns:
+            List of ExecutableChainResponse objects in the same order as input
+        """
+        semaphore = asyncio.Semaphore(max_concurrent)
+
+        async def execute_with_semaphore(prompt: str) -> ExecutableChainResponse:
+            async with semaphore:
+                return await self._execute_async_internal(prompt, max_retries)
+
+        # Execute all prompts concurrently
+        results = await asyncio.gather(
+            *[execute_with_semaphore(prompt) for prompt in prompts],
+            return_exceptions=False
+        )
+
+        return results
+
+    async def _execute_async_internal(
+        self, prompt: str, max_retries: int
+    ) -> ExecutableChainResponse:
+        """Internal async execution wrapper.
+
+        Args:
+            prompt: The prompt to execute
+            max_retries: Maximum retries on validation failure
+
+        Returns:
+            ExecutableChainResponse with results and metrics
+        """
+        loop = asyncio.get_event_loop()
+
+        # Run synchronous execute in thread pool to avoid blocking
+        return await loop.run_in_executor(
+            None, lambda: self.execute(prompt, max_retries)
+        )
