@@ -7,19 +7,19 @@ from typing import List, Dict, Any
 
 import mlflow
 
-from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
+from src.application.create_tests.infra.executable_chain.executable_chain_prompting import ExecutableChainPrompting
+from src.application.create_tests.infra.executable_chain.executable_chain_rag import ExecutableChainRAG
 from src.application.create_tests.infra.vectorstores.faiss_vectorstore import load_faiss_vectorstore
 from src.application.create_tests.models import RAG_PROMPT
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
+from src.application.evaluate_models.infra.mlflow_config import MLflowConfig
+from src.application.evaluate_models.model.cost_tracker import CostTracker
 from src.application.evaluate_models.model.latency_tracker import LatencyTracker
 from src.application.evaluate_models.model.model_configs import ModelConfig, ModelRegistry
 from src.application.evaluate_models.model.quality_tracker import QualityTracker
-from src.application.evaluate_models.model.cost_tracker import CostTracker
 from src.application.evaluate_models.model.test_case import TestCase
 from src.application.evaluate_models.model.test_dataset import EvaluationDataset
-
-from src.application.evaluate_models.infra.mlflow_config import MLflowConfig
 
 
 class EvaluateModelsApplication:
@@ -221,10 +221,10 @@ class EvaluateModelsApplication:
             latency_stats = LatencyTracker.calculate_latency_stats(
                 latencies=latencies
             )
-            print(f"="*60)
+            print("="*60)
             print("Latency Metrics:")
             print(latency_stats)
-            print(f"="*60)
+            print("="*60)
 
             # Log latency metrics to MLflow
             mlflow.log_metrics({
@@ -493,25 +493,38 @@ class EvaluateModelsApplication:
 # ============================================================================
 if __name__ == "__main__":
     # Initialize pipeline
-    pipeline = EvaluateModelsApplication("model-evaluation")
+    pipeline = EvaluateModelsApplication("RAG-model-evaluation")
 
-    # ─────────────────────────────────────
-    # Load FAISS vectorstore
-    # ─────────────────────────────────────
-    try:
-        retriever = load_faiss_vectorstore()
-    except FileNotFoundError as e:
-        print(f"="*60)
-        print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
-        print(f"="*60)
-        raise Exception("Something was wriong")
+#     # ─────────────────────────────────────
+#     # Load FAISS vectorstore
+#     # ─────────────────────────────────────
+#     try:
+#         retriever = load_faiss_vectorstore()
+#     except FileNotFoundError as e:
+#         print("="*60)
+#         print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
+#         print("="*60)
+#         raise Exception("Something was wriong")
+#
+#     # ─────────────────────────────────────
+#     # Initialize the executable chain
+#     # ─────────────────────────────────────
+#     executable_chain_rag = ExecutableChainRAG(
+#         prompt_emplate=RAG_PROMPT,
+#         retriever=retriever,
+#     )
+#
+#     test_cases = EvaluationDataset.load_stories_for_test(
+#         num_easy=1,
+#         num_medium=0,
+#         num_hard=0,
+#     )
+#
+#     model_registry = ModelRegistry()
+#     models_for_evaluation = model_registry.get_models_to_compare()
 
-    # ─────────────────────────────────────
-    # update the chain events
-    # ─────────────────────────────────────
-    executable_chain_v1 = ExecutableChainV1(
-        retriever=retriever,
-        prompt_emplate=RAG_PROMPT
+    executable_chain_prompting = ExecutableChainPrompting(
+        RAG_PROMPT
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
@@ -528,7 +541,7 @@ if __name__ == "__main__":
         expected_requests_per_day=5000,  # Adjust based on expected traffic
         test_dataset=test_cases,
         models_to_test=models_for_evaluation,
-        executable_chain=executable_chain_v1
+        executable_chain=executable_chain_prompting
     )
 
     # # Generate report

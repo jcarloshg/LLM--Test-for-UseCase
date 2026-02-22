@@ -107,7 +107,7 @@ class ModelRegistry:
         """
         return [
             self.MODELS["llama-3.2-1b"],
-            self.MODELS["llama-3.2-3b"],
+            # self.MODELS["llama-3.2-3b"],
             # self.MODELS["llama3-chatqa-8b"],
             # self.MODELS["qwen3-vl-8b"]
         ]

@@ -3,7 +3,7 @@ from fastapi import Request
 from pydantic import ValidationError
 
 from src.application.create_tests.application.create_tests_application import CreateTestsApplication
-from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
+from src.application.create_tests.infra.executable_chain.executable_chain_rag import ExecutableChainRAG
 from src.application.create_tests.infra.vectorstores import load_faiss_vectorstore
 from src.application.create_tests.models import RAG_PROMPT
 from src.application.create_tests.models.generate_test_cases_request import GenerateRequest
@@ -38,7 +38,7 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
             print(f"="*60)
             return CustomResponse.error(message=str(e))
 
-        executable_chain_v1 = ExecutableChainV1(
+        executable_chain_v1 = ExecutableChainRAG(
             prompt_emplate=RAG_PROMPT,
             retriever=retriever,
             llm=llm,

@@ -21,7 +21,6 @@ class ExecutableChain(ABC):
         """
         self.prompt_emplate = prompt_emplate
         self.llm: any = llm
-        self.retriever = None
 
     def update_llm(self, llm: any) -> None:
         """Update the LLM instance.
@@ -30,14 +29,6 @@ class ExecutableChain(ABC):
             llm: Language model instance to use for chain execution
         """
         self.llm = llm
-
-    def update_retriever(self, retriever) -> None:
-        """Update the retriever instance.
-
-        Args:
-            retriever: VectorStoreRetriever instance for RAG operations
-        """
-        self.retriever = retriever
 
     @abstractmethod
     def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
@@ -51,7 +42,6 @@ class ExecutableChain(ABC):
             ExecutableChainResponse containing the chain execution result
 
         Raises:
-            ValueError: If required components (LLM, retriever) are not configured
             Exception: If chain execution fails
         """
         pass
