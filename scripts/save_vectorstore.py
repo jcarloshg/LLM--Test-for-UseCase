@@ -37,7 +37,7 @@ def create_and_save_vectorstore():
         logger.info("Initializing embeddings...")
         embeddings = OllamaEmbeddings(
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
-            model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B
+            model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_EMBEDDING
         )
 
         # Process user stories into texts and metadatas

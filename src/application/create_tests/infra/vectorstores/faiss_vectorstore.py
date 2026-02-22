@@ -29,12 +29,13 @@ def load_faiss_vectorstore() -> VectorStoreRetriever:
     # Check if vectorstore exists
     # ─────────────────────────────────────
     if os.path.exists(vectorstore_path):
-        logger.info("Loading existing FAISS vectorstore from %s...", vectorstore_path)
+        logger.info("Loading existing FAISS vectorstore from %s...",
+                    vectorstore_path)
 
         # Initialize embeddings
         embeddings = OllamaEmbeddings(
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
-            model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B
+            model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_EMBEDDING
         )
 
         # Load vectorstore
@@ -52,7 +53,8 @@ def load_faiss_vectorstore() -> VectorStoreRetriever:
 
     else:
         logger.error("FAISS vectorstore not found!")
-        logger.error("Please create it first by running: python scripts/save_vectorstore.py")
+        logger.error(
+            "Please create it first by running: python scripts/save_vectorstore.py")
         raise FileNotFoundError(
             "Vectorstore not found. Create it by running: python scripts/save_vectorstore.py"
         )
