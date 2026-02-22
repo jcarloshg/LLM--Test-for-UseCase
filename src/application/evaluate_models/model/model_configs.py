@@ -49,7 +49,7 @@ class ModelRegistry:
         "llama-3.2-3b": ModelConfig(
             name="Llama 3.2 3B",
             provider="ollama",
-            model_id=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL4B,
+            model_id=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B,
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
@@ -57,7 +57,7 @@ class ModelRegistry:
             temperature=0.0,
             llm=OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
-                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL4B,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B,
                 temperature=0.0
             )
         ),
@@ -81,7 +81,7 @@ class ModelRegistry:
 
     def get_models_to_compare(self) -> List[ModelConfig]:
         return [
-            # self.MODELS["llama-3.2-1b"],
-            # self.MODELS["llama-3.2-3b"],
-            self.MODELS["qwen3-vl-8b"]
+            self.MODELS["llama-3.2-1b"],
+            self.MODELS["llama-3.2-3b"],
+            # self.MODELS["qwen3-vl-8b"]
         ]
