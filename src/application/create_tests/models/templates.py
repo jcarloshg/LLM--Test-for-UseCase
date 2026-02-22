@@ -39,7 +39,7 @@ Context (Documentation/References):
 User Story/Question:
 {question}
 
-OUTPUT FORMAT - Respond with ONLY valid JSON (no markdown, no explanations):
+OUTPUT FORMAT - Respond with ONLY valid JSON (no markdown code blocks, no triple backticks, no explanations):
 {{
   "test_cases": [
     {{

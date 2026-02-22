@@ -180,7 +180,7 @@ class EvaluateModelsApplication:
                 if i % 10 == 0:
                     print(f"  Progress: {i}/{len(test_dataset)}")
 
-                print("\n")
+                print(f"\n{i}")
                 print(test_case.user_story)
 
                 user_story = test_case.user_story
@@ -526,7 +526,7 @@ if __name__ == "__main__":
     test_cases = EvaluationDataset.load_stories_for_test(
         num_easy=1,
         num_medium=2,
-        num_hard=1,
+        num_hard=2,
     )
 
     model_registry = ModelRegistry()

@@ -1,9 +1,10 @@
 import time
 import json
+import re
 from typing import Optional, Dict, Any
 
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.output_parsers import BaseOutputParser
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.runnables import RunnableLambda
 from pydantic import ValidationError
@@ -11,11 +12,39 @@ from pydantic import ValidationError
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
 from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
+from src.application.create_tests.infra.executable_chain.rag_cache import RAGCache
 
 
 def format_docs(docs):
     """Format retrieved documents for the prompt"""
     return "\n\n".join(doc.page_content for doc in docs)
+
+
+class RobustJsonOutputParser(BaseOutputParser):
+    """JSON parser that handles markdown-wrapped JSON output from LLMs."""
+
+    def parse(self, text: str) -> Dict[str, Any]:
+        """Parse JSON from text, handling markdown code blocks.
+
+        Handles cases where LLM wraps JSON in markdown:
+        ```json
+        {...}
+        ```
+        """
+        # Strip markdown code blocks
+        text = text.strip()
+        if text.startswith("```"):
+            # Remove opening markdown block
+            text = re.sub(r'^```(?:json)?\s*\n', '', text)
+            # Remove closing markdown block
+            text = re.sub(r'\n```\s*$', '', text)
+
+        # Try to extract JSON object if there's extra text
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if json_match:
+            text = json_match.group(0)
+
+        return json.loads(text)
 
 
 class ExecutableChainV1(ExecutableChain):
@@ -27,6 +56,7 @@ class ExecutableChainV1(ExecutableChain):
 
     def __init__(self, prompt_emplate: PromptTemplate, retriever: VectorStoreRetriever, llm: Optional[any] = None):
         super().__init__(prompt_emplate, retriever, llm)
+        self._rag_cache = RAGCache(max_cache_size=100)
 
     def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
         """Execute the RAG chain with the given prompt.
@@ -76,6 +106,25 @@ class ExecutableChainV1(ExecutableChain):
             print(f"="*60)
             raise Exception(f"Failed to execute chain: {str(e)}")
 
+    def _cached_retrieve(self, question: str) -> str:
+        """Retrieve context with caching.
+
+        Args:
+            question: The user question/prompt
+
+        Returns:
+            Formatted context string
+        """
+        # Try to get from cache first
+        cached_docs = self._rag_cache.get(question)
+        if cached_docs is not None:
+            return format_docs(cached_docs)
+
+        # If not cached, retrieve and cache
+        docs = self.retriever.invoke(question)
+        self._rag_cache.set(question, docs)
+        return format_docs(docs)
+
     def _execute_with_validation(
         self,
         prompt: str,
@@ -94,16 +143,16 @@ class ExecutableChainV1(ExecutableChain):
             ExecutableChainResponse with validated test case structure
         """
         # ─────────────────────────────────────
-        # Create RAG chain with JSON output parser
+        # Create RAG chain with caching and robust JSON output parser
         # ─────────────────────────────────────
         rag_chain = (
             {
-                "context": RunnableLambda(lambda x: x["question"]) | self.retriever | format_docs,
+                "context": RunnableLambda(lambda x: self._cached_retrieve(x["question"])),
                 "question": RunnableLambda(lambda x: x["question"])
             }
             | self.prompt_emplate
             | self.llm
-            | JsonOutputParser()
+            | RobustJsonOutputParser()
         )
 
         # ─────────────────────────────────────
@@ -142,6 +191,12 @@ class ExecutableChainV1(ExecutableChain):
             )
 
         # ─────────────────────────────────────
+        # Log cache statistics
+        # ─────────────────────────────────────
+        cache_stats = self._rag_cache.get_stats()
+        print(f"[ExecutableChainV1] - RAG Cache Stats: {cache_stats}")
+
+        # ─────────────────────────────────────
         # Return as ExecutableChainResponse
         # ─────────────────────────────────────
         return ExecutableChainResponse(
@@ -152,3 +207,16 @@ class ExecutableChainV1(ExecutableChain):
             provider=getattr(self.llm, '__class__', 'unknown').__name__,
             attempt=attempt,
         )
+
+    def get_cache_stats(self) -> dict:
+        """Get RAG cache statistics.
+
+        Returns:
+            Dict with cache_size, max_size, and total_accesses
+        """
+        return self._rag_cache.get_stats()
+
+    def clear_cache(self) -> None:
+        """Clear RAG cache."""
+        self._rag_cache.clear()
+        print("[ExecutableChainV1] - RAG cache cleared")
