@@ -1,159 +1,26 @@
 {
-  "quality_score": 0.20000000000000007,
-  "precondition_score": 0.5,
-  "structure_score": 0.0,
-  "total_tests": 18,
-  "passing_tests": 0,
-  "passing_rate": 0.0,
-  "passing_threshold": 0.7,
-  "weights": {
-    "structure": 0.6,
-    "precondition": 0.4
-  },
-  "details": [
-    {
-      "test_id": "TC-001",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 3,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-002",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-003",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-004",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-005",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-006",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-007",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-008",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-009",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-010",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-011",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-012",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-013",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-014",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-015",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-016",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-017",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    },
-    {
-      "test_id": "TC-018",
-      "precondition_score": 0.5,
-      "structure_score": 0.0,
-      "quality_score": 0.2,
-      "logical_steps": 2,
-      "meets_threshold": False
-    }
-  ]
+  "message": "Test for use case",
+  "is_success": true,
+  "data": {
+    "test_cases": [
+      {
+        "id": "TC-001",
+        "title": "Update Profile Information with Correct Details",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "As a user, I want to update my profile information so that my account details are current and accurate",
+          "I navigate to the profile page",
+          "I select 'Update Profile' from the top right corner of the page",
+          "I confirm that the update is successful"
+        ],
+        "expected_result": "The updated profile information is successfully saved with correct details.",
+        "quality_score": 9
+      }
+    ]
+  }
 }

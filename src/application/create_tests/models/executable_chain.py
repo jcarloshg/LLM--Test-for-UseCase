@@ -18,7 +18,7 @@ class ExecutableChain(ABC):
         self.llm = llm
 
     @abstractmethod
-    def execute(self, prompt: str) -> ExecutableChainResponse:
+    def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
         """
         rag_chain = (
             {
