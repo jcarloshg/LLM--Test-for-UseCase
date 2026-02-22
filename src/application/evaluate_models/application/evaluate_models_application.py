@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 import json
 import mlflow
 
+from application.evaluate_models.model.latency_tracker import LatencyTracker
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
 from src.application.create_tests.infra.vectorstores.faiss_vectorstore import load_faiss_vectorstore
@@ -79,6 +80,11 @@ class EvaluateModelsApplication:
             "max_tokens": model_config.max_tokens
         })
 
+        # ─────────────────────────────────────
+        # metrics for single model
+        # ─────────────────────────────────────
+        latencies = []
+
         print(f"Running {len(test_dataset)} test cases...")
 
         for i, test_case in enumerate(test_dataset, 1):
@@ -87,13 +93,19 @@ class EvaluateModelsApplication:
 
             print("\n")
             print(test_case.user_story)
+
             user_story = test_case.user_story
             current_llm = model_config.llm
             executable_chain.update_llm(current_llm)
             executable_chain_response = executable_chain.execute(
                 prompt=user_story
             )
-            print(executable_chain_response)
+
+            latencies.append(executable_chain_response.latency)
+
+        # 2. Latencia y Rendimiento (Latency)
+        latency_stats = LatencyTracker.calculate_latency_stats(
+            latencies=latencies)
 
         return {}
 

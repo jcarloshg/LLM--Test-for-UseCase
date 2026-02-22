@@ -70,9 +70,6 @@ class ExecutableChainV1(ExecutableChain):
             result = rag_chain.invoke({"question": prompt})
             latency = time.time() - start_time
 
-            print("\nresult")
-            print(result)
-
             # ─────────────────────────────────────
             # Validate JSON response
             # ─────────────────────────────────────
