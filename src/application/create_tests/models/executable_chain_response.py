@@ -11,6 +11,7 @@ class ExecutableChainResponse(BaseModel):
     tokens: int = Field(default=0, description="Number of tokens used")
     model: str = Field(..., description="Model identifier")
     provider: str = Field(..., description="LLM service provider")
+    attempt: int = Field(default=1, description="Attempt number (for retries)")
 
     class Config:
         """Pydantic configuration."""

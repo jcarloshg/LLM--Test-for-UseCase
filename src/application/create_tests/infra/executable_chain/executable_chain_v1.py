@@ -150,4 +150,5 @@ class ExecutableChainV1(ExecutableChain):
             tokens=0,
             model=getattr(self.llm, 'model_name', 'unknown'),
             provider=getattr(self.llm, '__class__', 'unknown').__name__,
+            attempt=attempt,
         )
