@@ -6,6 +6,7 @@ not traditional classification metrics.
 from typing import List, Dict, Any
 
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
+from src.application.evaluate_models.model.quality_tracker_response import QualityTrackerResponse
 
 
 class QualityTracker:
@@ -133,7 +134,7 @@ class QualityTracker:
         passing_threshold: float = 0.7,
         structure_weight: float = 0.6,
         precondition_weight: float = 0.4
-    ) -> Dict[str, Any]:
+    ) -> QualityTrackerResponse:
         """
         Calculate quality score for a batch of test case generation executions.
 
@@ -145,7 +146,7 @@ class QualityTracker:
             precondition_weight: Weight for precondition quality (default: 0.4)
 
         Returns:
-            Dict containing:
+            QualityTrackerResponse: Contains:
                 - quality_score: Average weighted quality score (0.0 to 1.0)
                 - precondition_score: Average precondition quality
                 - structure_score: Average structure quality
@@ -164,18 +165,18 @@ class QualityTracker:
             )
 
         if not execution_responses:
-            return {
-                "quality_score": 0.0,
-                "precondition_score": 0.0,
-                "structure_score": 0.0,
-                "total_tests": 0,
-                "passing_tests": 0,
-                "passing_rate": 0.0,
-                "json_parsing_success_rate": 0.0,
-                "avg_quality_score": 0.0,
-                "retry_rate": 0.0,
-                "total_responses": 0
-            }
+            return QualityTrackerResponse(
+                quality_score=0.0,
+                precondition_score=0.0,
+                structure_score=0.0,
+                total_tests=0,
+                passing_tests=0,
+                passing_rate=0.0,
+                json_parsing_success_rate=0.0,
+                avg_quality_score=0.0,
+                retry_rate=0.0,
+                total_responses=0
+            )
 
         quality_scores = []
         precondition_scores = []
@@ -272,15 +273,15 @@ class QualityTracker:
             if total_responses > 0 else 0.0
         )
 
-        return {
-            "quality_score": avg_quality,
-            "precondition_score": avg_precondition,
-            "structure_score": avg_structure,
-            "total_tests": len(quality_scores),
-            "passing_tests": passing_tests,
-            "passing_rate": passing_rate,
-            "json_parsing_success_rate": json_parsing_success_rate,
-            "avg_quality_score": avg_quality_score,
-            "retry_rate": retry_rate,
-            "total_responses": total_responses
-        }
+        return QualityTrackerResponse(
+            quality_score=avg_quality,
+            precondition_score=avg_precondition,
+            structure_score=avg_structure,
+            total_tests=len(quality_scores),
+            passing_tests=passing_tests,
+            passing_rate=passing_rate,
+            json_parsing_success_rate=json_parsing_success_rate,
+            avg_quality_score=avg_quality_score,
+            retry_rate=retry_rate,
+            total_responses=total_responses
+        )
