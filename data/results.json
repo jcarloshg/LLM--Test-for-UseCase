@@ -1,67 +1,108 @@
 {
-  "test_cases": [
-    {
-      "id": "TC-001",
-      "title": "Verify accurate summary of research papers",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [
-        "User has access to relevant research papers"
-      ],
-      "steps": [
-        {
-          "description": "Research the main findings of a study.",
-          "action": "Open the research paper and copy-paste the main findings."
-        },
-        {
-          "description": "Summarize the key points in a concise manner.",
-          "action": "Write a clear and concise summary using the copied text as reference."
-        }
-      ],
-      "expected_result": "A well-structured, easy-to-understand summary of the research papers.",
-      "quality_score": 9
-    },
-    {
-      "id": "TC-002",
-      "title": "Test edge cases: Handling missing or outdated information",
-      "priority": "high",
-      "type": "positive",
-      "preconditions": [
-        "User has access to relevant research papers"
-      ],
-      "steps": [
-        {
-          "description": "Research a study with incomplete data.",
-          "action": "Try to find the main findings of the study, but notice missing information."
-        },
-        {
-          "description": "Identify and report on any errors or inconsistencies in the summary.",
-          "action": "Highlight any mistakes in the summary, such as incorrect or misleading information."
-        }
-      ],
-      "expected_result": "A clear identification of errors or inconsistencies in the summary.",
-      "quality_score": 8
-    },
-    {
-      "id": "TC-003",
-      "title": "Test negative scenarios: Handling missing data or out-of-date information",
-      "priority": "high",
-      "type": "negative",
-      "preconditions": [
-        "User has access to relevant research papers"
-      ],
-      "steps": [
-        {
-          "description": "Research a study with outdated or incomplete data.",
-          "action": "Realize that the summary is inaccurate due to missing information."
-        },
-        {
-          "description": "Report on any errors or inconsistencies in the summary.",
-          "action": "Explain why the summary is incorrect and suggest improvements."
-        }
-      ],
-      "expected_result": "A clear explanation of why the summary is incorrect.",
-      "quality_score": 9
-    }
-  ]
+  "message": "Test for use case",
+  "is_success": true,
+  "data": {
+    "test_cases": [
+      {
+        "id": "TC-001",
+        "title": "Login successful with valid credentials",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          {
+            "number": 1,
+            "description": "Open the application and navigate to the login page"
+          },
+          {
+            "number": 2,
+            "description": "Enter valid email address and password"
+          },
+          {
+            "number": 3,
+            "description": "Click on the login button"
+          },
+          {
+            "number": 4,
+            "description": "Verify that you are logged in to your account successfully"
+          }
+        ],
+        "expected_result": "You are now logged in to your account and can access it",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-002",
+        "title": "Login failed due to invalid credentials",
+        "priority": "high",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          {
+            "number": 1,
+            "description": "Open the application and navigate to the login page"
+          },
+          {
+            "number": 2,
+            "description": "Enter invalid email address and password"
+          },
+          {
+            "number": 3,
+            "description": "Click on the login button"
+          }
+        ],
+        "expected_result": "You are not logged in to your account due to invalid credentials",
+        "quality_score": 6
+      },
+      {
+        "id": "TC-003",
+        "title": "Login failed due to empty fields",
+        "priority": "high",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          {
+            "number": 1,
+            "description": "Open the application and navigate to the login page"
+          },
+          {
+            "number": 2,
+            "description": "Enter an empty email address and password"
+          }
+        ],
+        "expected_result": "You are not logged in to your account due to missing required fields",
+        "quality_score": 6
+      },
+      {
+        "id": "TC-004",
+        "title": "Login failed due to wrong password",
+        "priority": "high",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          {
+            "number": 1,
+            "description": "Open the application and navigate to the login page"
+          },
+          {
+            "number": 2,
+            "description": "Enter a valid email address and wrong password"
+          }
+        ],
+        "expected_result": "You are not logged in to your account due to an incorrect password",
+        "quality_score": 6
+      }
+    ]
+  }
 }
