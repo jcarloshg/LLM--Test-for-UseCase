@@ -47,7 +47,16 @@ User Story:
 Respond with ONLY valid JSON (no markdown, no explanations):
 {{
   "test_cases": [
-    {{"id": "TC-001", "type": "positive", "title": "...", "priority": "high", "preconditions": ["..."], "steps": ["...", "...", "..."], "expected_result": "...", "quality_score": 8}}
+    {{
+      "id": "TC-001",
+      "type": "positive",
+      "title": "...",
+      "priority": "high", 
+      "preconditions": ["..."],
+      "steps": ["...", "...", "..."],
+      "expected_result": "...",
+      "quality_score": 8
+    }}
   ]
 }}""",
     input_variables=["question"]
@@ -66,11 +75,11 @@ Each test case must include the following fields:
 | Field             | Description                | Format/Values                                      |
 | ----------------- | -------------------------- | -------------------------------------------------- |
 | `id`              | Unique identifier          | `TC-XXX` (e.g., TC-001, TC-002)                    |
+| `type`            | Test category              | `positive` / `negative` / `edge_case` / `boundary` |
 | `title`           | Clear, descriptive title   | String                                             |
 | `priority`        | Test importance            | `critical` / `high` / `medium` / `low`             |
-| `type`            | Test category              | `positive` / `negative` / `edge_case` / `boundary` |
 | `preconditions`   | Required setup before test | Array of strings                                   |
-| `steps`           | Execution steps            | Array of numbered steps                            |
+| `steps`           | Execution steps            | Array of strings ONLY (e.g., ["Step 1: Do X", "Step 2: Do Y"])  |
 | `expected_result` | What should happen         | String                                             |
 | `quality_score`   | Test coverage quality      | `1-10` (10 = comprehensive)                        |
 
@@ -81,6 +90,8 @@ RULES:
 4. Priority distribution: 1-2 critical, 2-3 high, 1-2 medium, 0-1 low
 5. Quality score should reflect test comprehensiveness (6-9 range typical)
 6. Be specific and actionable in each step
+7. IMPORTANT: "steps" MUST be an array of strings ONLY - NOT objects with "number" or "step" keys
+8. IMPORTANT: "preconditions" MUST be an array of strings ONLY - NOT objects
 
 User Story/Question:
 {question}

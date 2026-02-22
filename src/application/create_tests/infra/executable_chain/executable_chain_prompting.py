@@ -1,7 +1,8 @@
 """Executable chain implementation with direct prompting (no RAG)."""
 
 import time
-from typing import Optional, Dict, Any
+import logging
+from typing import Optional
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -9,7 +10,12 @@ from pydantic import ValidationError
 
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
-from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
+from src.application.create_tests.infra.executable_chain.test_case_structure import (
+    TestCaseStructure,
+    TestCasesResponse,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class ExecutableChainPrompting(ExecutableChain):
@@ -60,21 +66,14 @@ class ExecutableChainPrompting(ExecutableChain):
             return self._execute_with_validation(prompt, max_retries, attempt=1)
 
         except ValueError as e:
-            print("=" * 60)
-            print(f"[ExecutableChainPrompting] - ValueError: {str(e)}")
-            print("=" * 60)
+            logger.error("ValueError: %s", str(e))
             raise
         except TypeError as e:
-            print("=" * 60)
-            print(
-                f"[ExecutableChainPrompting] - TypeError (Invalid JSON response): {str(e)}")
-            print("=" * 60)
+            logger.error("TypeError (Invalid JSON response): %s", str(e))
             raise
         except Exception as e:
-            print("=" * 60)
-            print(f"[ExecutableChainPrompting] - Exception: {str(e)}")
-            print("=" * 60)
-            raise Exception(f"Failed to execute chain: {str(e)}")
+            logger.error("Exception: %s", str(e))
+            raise RuntimeError(f"Failed to execute chain: {str(e)}") from e
 
     def _execute_with_validation(
         self,
@@ -105,7 +104,9 @@ class ExecutableChainPrompting(ExecutableChain):
         # Invoke the chain with the prompt
         # ─────────────────────────────────────
         start_time = time.time()
-        result = chain.invoke({"question": prompt})
+        # Get the first input variable name from the template
+        input_var = self.prompt_emplate.input_variables[0]
+        result = chain.invoke({input_var: prompt})
         latency = time.time() - start_time
 
         # ─────────────────────────────────────
@@ -123,18 +124,24 @@ class ExecutableChainPrompting(ExecutableChain):
             TestCasesResponse(**result)
         except ValidationError as e:
             if attempt < max_retries:
-                print(
-                    f"[ExecutableChainPrompting] - Structure validation failed on attempt {attempt}/{max_retries}")
-                print(f"[ExecutableChainPrompting] - Validation errors: {e}")
-                print(f"[ExecutableChainPrompting] - Re-invoking LLM...")
+                logger.warning(
+                    "Structure validation failed on attempt %d/%d",
+                    attempt,
+                    max_retries,
+                )
+                logger.debug("Validation errors: %s", e)
+                logger.info("Re-invoking LLM...")
                 return self._execute_with_validation(prompt, max_retries, attempt + 1)
-            raise ValueError(
+            error_msg = (
                 f"Test case structure validation failed after {max_retries} attempts. "
                 f"Response must contain 'test_cases' key with list of test cases. "
-                f"Each test case must have: {', '.join(TestCaseStructure.model_fields.keys())}. "
+                f"Each test case must have: "
+                f"{', '.join(TestCaseStructure.model_fields.keys())}. "
                 f"Got fields: {list(result.keys())}. "
                 f"Validation errors: {str(e)}"
             )
+            logger.error(error_msg)
+            raise ValueError(error_msg) from e
 
         # ─────────────────────────────────────
         # Return as ExecutableChainResponse
