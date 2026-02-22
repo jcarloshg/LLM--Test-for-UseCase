@@ -1,5 +1,4 @@
 # evaluate_models_application.py
-import asyncio
 import json
 import os
 import tempfile
@@ -9,7 +8,6 @@ from typing import List, Dict, Any
 import mlflow
 
 from src.application.create_tests.infra.executable_chain.executable_chain_v1 import ExecutableChainV1
-from src.application.create_tests.infra.executable_chain.batch_processor import BatchProcessor
 from src.application.create_tests.infra.vectorstores.faiss_vectorstore import load_faiss_vectorstore
 from src.application.create_tests.models import RAG_PROMPT
 from src.application.create_tests.models.executable_chain import ExecutableChain
@@ -172,67 +170,21 @@ class EvaluateModelsApplication:
             })
 
             # ─────────────────────────────────────
-            # Execute test cases and collect responses (with async batching)
+            # Execute test cases and collect responses
             # ─────────────────────────────────────
             responses: list[ExecutableChainResponse] = []
 
-            print(f"Running {len(test_dataset)} test cases with parallel processing...")
-            print(f"Max concurrent: 3 requests")
+            print(f"Running {len(test_dataset)} test cases...")
 
-            # Define synchronous execution function
-            def execute_test_case(test_case: TestCase) -> ExecutableChainResponse:
+            for i, test_case in enumerate(test_dataset, 1):
                 user_story = test_case.user_story
                 current_llm = model_config.llm
                 executable_chain.update_llm(current_llm)
-                return executable_chain.execute(prompt=user_story)
+                response = executable_chain.execute(prompt=user_story)
+                responses.append(response)
 
-            def progress_callback(current: int, total: int) -> None:
-                if current % 5 == 0 or current == total:
-                    print(f"  Progress: {current}/{total} completed")
-
-            # Create async wrapper for synchronous function
-            async def async_wrapper(test_case: TestCase) -> ExecutableChainResponse:
-                loop = asyncio.get_event_loop()
-                return await loop.run_in_executor(
-                    None, lambda tc=test_case: execute_test_case(tc)
-                )
-
-            # Run batch processor with async execution
-            try:
-                # Check if we're already in an event loop
-                try:
-                    loop = asyncio.get_running_loop()
-                    # If we get here, we're already in an event loop
-                    print("Running in sequential mode (event loop already active)...")
-                    responses = []
-                    for i, test_case in enumerate(test_dataset, 1):
-                        if i % 5 == 0:
-                            print(f"  Progress: {i}/{len(test_dataset)}")
-                        response = execute_test_case(test_case)
-                        responses.append(response)
-                except RuntimeError:
-                    # No event loop running, safe to use asyncio.run()
-                    batch_processor = BatchProcessor(max_concurrent=3)
-                    responses = asyncio.run(
-                        batch_processor.process(
-                            test_dataset,
-                            async_wrapper,
-                            progress_callback=progress_callback
-                        )
-                    )
-
-                    batch_stats = batch_processor.get_stats()
-                    print(f"Batch Processing Stats: {batch_stats}")
-                    mlflow.log_params({"batch_processing_stats": str(batch_stats)})
-
-            except Exception as e:
-                print(f"Batch processing failed, falling back to sequential: {str(e)}")
-                responses = []
-                for i, test_case in enumerate(test_dataset, 1):
-                    if i % 5 == 0:
-                        print(f"  Progress: {i}/{len(test_dataset)}")
-                    response = execute_test_case(test_case)
-                    responses.append(response)
+                if i % 5 == 0 or i == len(test_dataset):
+                    print(f"  Progress: {i}/{len(test_dataset)} completed")
 
             # ─────────────────────────────────────
             # 1. Quality Metrics (Accuracy & Quality)
@@ -563,9 +515,9 @@ if __name__ == "__main__":
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
-        num_easy=2,
-        num_medium=2,
-        num_hard=2,
+        num_easy=1,
+        num_medium=0,
+        num_hard=0,
     )
 
     model_registry = ModelRegistry()
