@@ -10,7 +10,8 @@ class SingletonMeta(type):
     def __call__(cls, *args, **kwargs):
         """Ensure only one instance of the class exists."""
         if cls not in cls._instances:
-            cls._instances[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super(
+                SingletonMeta, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
@@ -38,7 +39,7 @@ class ModelsConfig(metaclass=SingletonMeta):
             self._llama3_2_1b = OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B,
-                temperature=0.7
+                temperature=0.0
             )
         return self._llama3_2_1b
 
@@ -52,7 +53,7 @@ class ModelsConfig(metaclass=SingletonMeta):
             self._llama3_2_3b = OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B,
-                temperature=0.7
+                temperature=0.0
             )
         return self._llama3_2_3b
 
@@ -66,7 +67,7 @@ class ModelsConfig(metaclass=SingletonMeta):
             self._qwen3vl_8b = OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL8B,
-                temperature=0.7
+                temperature=0.0
             )
         return self._qwen3vl_8b
 
@@ -80,6 +81,6 @@ class ModelsConfig(metaclass=SingletonMeta):
             self._llama3_chatqa_8b = OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
-                temperature=0.7
+                temperature=0.0
             )
         return self._llama3_chatqa_8b
