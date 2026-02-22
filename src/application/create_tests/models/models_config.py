@@ -26,6 +26,7 @@ class ModelsConfig(metaclass=SingletonMeta):
         self._llama3_2_1b = None
         self._llama3_2_3b = None
         self._qwen3vl_8b = None
+        self._llama3_chatqa_8b = None
 
     def get_llama3_2_1b(self) -> OllamaLLM:
         """Get or create the Llama3.2:1B model instance.
@@ -68,3 +69,17 @@ class ModelsConfig(metaclass=SingletonMeta):
                 temperature=0.7
             )
         return self._qwen3vl_8b
+
+    def get_llama3_chatqa_8b(self) -> OllamaLLM:
+        """Get or create the Llama3-ChatQA:8B model instance.
+
+        Returns:
+            OllamaLLM: Cached instance of Llama3-ChatQA:8B model
+        """
+        if self._llama3_chatqa_8b is None:
+            self._llama3_chatqa_8b = OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
+                temperature=0.7
+            )
+        return self._llama3_chatqa_8b

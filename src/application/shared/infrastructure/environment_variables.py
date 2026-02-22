@@ -35,6 +35,11 @@ class EnvironmentConfig(BaseModel):
         alias="OLLAMA_SERVICE_MODEL_QWEN3VL8B",
         description="The Qwen3-VL:8B model name"
     )
+    OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B: str = Field(
+        default="llama3-chatqa:8b",
+        alias="OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B",
+        description="The Llama3-ChatQA:8B model name"
+    )
     OLLAMA_SERVICE_MODEL_EMBEDDING: str = Field(
         default="nomic-embed-text",
         alias="OLLAMA_SERVICE_MODEL_EMBEDDING",
@@ -96,6 +101,7 @@ class EnvironmentConfig(BaseModel):
             f"  OLLAMA_SERVICE_MODEL_LLAMA3_2_1B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_2_1B}\n"
             f"  OLLAMA_SERVICE_MODEL_LLAMA3_2_3B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_2_3B}\n"
             f"  OLLAMA_SERVICE_MODEL_QWEN3VL8B: {self.OLLAMA_SERVICE_MODEL_QWEN3VL8B}\n"
+            f"  OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B: {self.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B}\n"
             f"  OLLAMA_SERVICE_MODEL_EMBEDDING: {self.OLLAMA_SERVICE_MODEL_EMBEDDING}\n"
             f"  ANTHOPIC_KEY: {self.ANTHOPIC_KEY}\n"
             f"  ANTHOPIC_MODEL: {self.ANTHOPIC_MODEL}\n"
@@ -136,6 +142,10 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
         "OLLAMA_SERVICE_MODEL_QWEN3VL8B": os.getenv(
             "OLLAMA_SERVICE_MODEL_QWEN3VL8B",
             "qwen3-vl:8b"
+        ),
+        "OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B": os.getenv(
+            "OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B",
+            "llama3-chatqa:8b"
         ),
         "OLLAMA_SERVICE_MODEL_EMBEDDING": os.getenv(
             "OLLAMA_SERVICE_MODEL_EMBEDDING",

@@ -1,4 +1,8 @@
-# model_configs.py
+"""Model configurations for evaluation.
+
+This module defines model configurations for evaluating different LLM models
+including Ollama-based models (Llama, Qwen, ChatQA) and other providers.
+"""
 from dataclasses import dataclass
 from typing import Optional
 from typing import List
@@ -21,7 +25,7 @@ class ModelConfig:
     base_url: Optional[str] = None  # For self-hosted
     cost_per_1k_input: float = 0.0
     cost_per_1k_output: float = 0.0
-    max_tokens: int = 3500
+    max_tokens: int = 1500
     temperature: float = 0.0  # Deterministic for evaluation
     api_key: Optional[str] = None
 
@@ -37,7 +41,7 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            max_tokens=3500,
+            max_tokens=1500,
             temperature=0.0,
             llm=OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
@@ -53,7 +57,7 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            max_tokens=3500,
+            max_tokens=1500,
             temperature=0.0,
             llm=OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
@@ -69,19 +73,41 @@ class ModelRegistry:
             base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
             cost_per_1k_input=0.0,
             cost_per_1k_output=0.0,
-            max_tokens=3500,
+            max_tokens=1500,
             temperature=0.0,
             llm=OllamaLLM(
                 base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL8B,
                 temperature=0.0
             )
+        ),
+
+        "llama3-chatqa-8b": ModelConfig(
+            name="Llama3-ChatQA 8B",
+            provider="ollama",
+            model_id=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
+            base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+            cost_per_1k_input=0.0,
+            cost_per_1k_output=0.0,
+            max_tokens=1500,
+            temperature=0.0,
+            llm=OllamaLLM(
+                base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
+                temperature=0.0
+            )
         )
     }
 
     def get_models_to_compare(self) -> List[ModelConfig]:
+        """Get list of models to compare in evaluation.
+
+        Returns:
+            List of ModelConfig objects for models to evaluate
+        """
         return [
             self.MODELS["llama-3.2-1b"],
             self.MODELS["llama-3.2-3b"],
+            self.MODELS["llama3-chatqa-8b"],
             # self.MODELS["qwen3-vl-8b"]
         ]

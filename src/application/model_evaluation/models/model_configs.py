@@ -17,7 +17,7 @@ class ModelConfig:
     model_id: str
     llm_config: LLMConfig
     temperature: float = 0.0  # Deterministic for evaluation
-    max_tokens: int = 3500
+    max_tokens: int = 1500
     cost_per_1k_input: float = 0.0
     cost_per_1k_output: float = 0.0
     api_key: Optional[str] = None
@@ -79,6 +79,19 @@ class ModelRegistry:
             llm_config=LLMConfig(
                 provider="ollama",
                 model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_QWEN3VL8B
+            )
+        ),
+
+        "llama3-chatqa-8b": ModelConfig(
+            name="Llama3-ChatQA 8B",
+            provider="ollama",
+            model_id=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B,
+            base_url=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_HOST,
+            cost_per_1k_input=0.0,
+            cost_per_1k_output=0.0,
+            llm_config=LLMConfig(
+                provider="ollama",
+                model=ENVIRONMENT_CONFIG.OLLAMA_SERVICE_MODEL_LLAMA3_CHATQA_8B
             )
         )
     }
