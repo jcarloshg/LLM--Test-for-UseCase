@@ -169,7 +169,7 @@ if __name__ == "__main__":
     test_cases = EvaluationDataset.load_stories_for_test(
         num_easy=1,
         num_medium=1,
-        num_hard=1,
+        num_hard=2,
     )
 
     model_registry = ModelRegistry()

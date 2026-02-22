@@ -4,6 +4,7 @@ Measures operational costs and resource utilization for scalability analysis.
 """
 from typing import List, Dict, Any
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
+from src.application.evaluate_models.model.cost_tracker_response import CostTrackerResponse, ResourceUtilization
 
 
 class CostTracker:
@@ -53,7 +54,7 @@ class CostTracker:
         responses: List[ExecutableChainResponse],
         container_memory_limit_gb: float = 8.0,
         container_cpu_cores: int = 2
-    ) -> Dict[str, Any]:
+    ) -> ResourceUtilization:
         """
         Estimate resource utilization based on execution responses.
 
@@ -63,7 +64,7 @@ class CostTracker:
             container_cpu_cores: Number of CPU cores allocated (default: 2)
 
         Returns:
-            Dict containing:
+            ResourceUtilization: Contains:
                 - avg_latency: Average response latency in seconds
                 - throughput_requests_per_min: Estimated requests per minute
                 - estimated_memory_per_request_mb: Estimated memory usage per request
@@ -72,27 +73,27 @@ class CostTracker:
                 - concurrent_capacity: Estimated concurrent request capacity
         """
         if not responses:
-            return {
-                "avg_latency": 0.0,
-                "throughput_requests_per_min": 0.0,
-                "estimated_memory_per_request_mb": 0.0,
-                "estimated_cpu_usage_percent": 0.0,
-                "total_execution_time_seconds": 0.0,
-                "concurrent_capacity": 0
-            }
+            return ResourceUtilization(
+                avg_latency=0.0,
+                throughput_requests_per_min=0.0,
+                estimated_memory_per_request_mb=0.0,
+                estimated_cpu_usage_percent=0.0,
+                total_execution_time_seconds=0.0,
+                concurrent_capacity=1
+            )
 
         # Extract latencies from responses
         latencies = [res.latency for res in responses if hasattr(res, "latency")]
 
         if not latencies:
-            return {
-                "avg_latency": 0.0,
-                "throughput_requests_per_min": 0.0,
-                "estimated_memory_per_request_mb": 0.0,
-                "estimated_cpu_usage_percent": 0.0,
-                "total_execution_time_seconds": 0.0,
-                "concurrent_capacity": 0
-            }
+            return ResourceUtilization(
+                avg_latency=0.0,
+                throughput_requests_per_min=0.0,
+                estimated_memory_per_request_mb=0.0,
+                estimated_cpu_usage_percent=0.0,
+                total_execution_time_seconds=0.0,
+                concurrent_capacity=1
+            )
 
         # Calculate latency metrics
         avg_latency = sum(latencies) / len(latencies)
@@ -128,14 +129,14 @@ class CostTracker:
             int(available_memory_mb / (base_model_memory_gb * 1024))
         )
 
-        return {
-            "avg_latency": round(avg_latency, 4),
-            "throughput_requests_per_min": round(throughput_requests_per_min, 2),
-            "estimated_memory_per_request_mb": round(estimated_memory_per_request_mb, 2),
-            "estimated_cpu_usage_percent": round(estimated_cpu_usage_percent, 2),
-            "total_execution_time_seconds": round(total_execution_time, 2),
-            "concurrent_capacity": concurrent_capacity
-        }
+        return ResourceUtilization(
+            avg_latency=round(avg_latency, 4),
+            throughput_requests_per_min=round(throughput_requests_per_min, 2),
+            estimated_memory_per_request_mb=round(estimated_memory_per_request_mb, 2),
+            estimated_cpu_usage_percent=round(estimated_cpu_usage_percent, 2),
+            total_execution_time_seconds=round(total_execution_time, 2),
+            concurrent_capacity=concurrent_capacity
+        )
 
     @staticmethod
     def calculate_cost_analysis(
@@ -144,7 +145,7 @@ class CostTracker:
         max_requests_per_day: int = 5000,
         container_memory_limit_gb: float = 8.0,
         container_cpu_cores: int = 2
-    ) -> Dict[str, Any]:
+    ) -> CostTrackerResponse:
         """
         Calculate comprehensive cost analysis for infrastructure.
 
@@ -156,7 +157,7 @@ class CostTracker:
             container_cpu_cores: Number of CPU cores (default: 2)
 
         Returns:
-            Dict containing:
+            CostTrackerResponse: Contains:
                 - cost_per_thousand_requests: Cost per 1,000 requests in USD
                 - monthly_server_cost: Monthly infrastructure cost
                 - max_requests_per_day: Maximum requests per day
@@ -179,8 +180,8 @@ class CostTracker:
 
         # Calculate cost efficiency score
         # Lower latency and higher throughput = better efficiency
-        throughput = resource_util.get("throughput_requests_per_min", 0)
-        avg_latency = resource_util.get("avg_latency", 0)
+        throughput = resource_util.throughput_requests_per_min
+        avg_latency = resource_util.avg_latency
 
         # Efficiency score: 1.0 is ideal, lower values indicate room for improvement
         # Target: <2s latency, >30 req/min throughput
@@ -202,18 +203,18 @@ class CostTracker:
             recommendations.append(
                 f"High cost per 1,000 requests (${cost_per_thousand:.2f}). Review server capacity vs. cost."
             )
-        if resource_util.get("estimated_cpu_usage_percent", 0) > 80:
+        if resource_util.estimated_cpu_usage_percent > 80:
             recommendations.append(
                 "High CPU usage. Consider load balancing or upgrading compute resources."
             )
         if not recommendations:
             recommendations.append("Infrastructure utilization is within acceptable parameters.")
 
-        return {
-            "cost_per_thousand_requests": cost_per_thousand,
-            "monthly_server_cost": monthly_server_cost,
-            "max_requests_per_day": max_requests_per_day,
-            "resource_utilization": resource_util,
-            "cost_efficiency_score": round(cost_efficiency_score, 4),
-            "recommendations": recommendations
-        }
+        return CostTrackerResponse(
+            cost_per_thousand_requests=cost_per_thousand,
+            monthly_server_cost=monthly_server_cost,
+            max_requests_per_day=max_requests_per_day,
+            resource_utilization=resource_util,
+            cost_efficiency_score=round(cost_efficiency_score, 4),
+            recommendations=recommendations
+        )
