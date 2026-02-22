@@ -22,9 +22,8 @@ services:
     container_name: test-case-api
     ports:
       - "8001:8000"
-    environment:
-      - OLLAMA_HOST=http://ollama:11434
-      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
     volumes:
       - ./:/app
       - ./mlruns:/app/mlruns
@@ -32,7 +31,7 @@ services:
       - test-gen-network
     depends_on:
       - ollama
-    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
   mlflow:
     image: python:3.11-slim
