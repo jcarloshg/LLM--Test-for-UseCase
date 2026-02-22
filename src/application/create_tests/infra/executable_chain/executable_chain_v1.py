@@ -1,5 +1,6 @@
 import time
-from typing import Optional
+import json
+from typing import Optional, Dict, Any
 
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
@@ -29,15 +30,17 @@ class ExecutableChainV1(ExecutableChain):
         """Execute the RAG chain with the given prompt.
 
         Invokes the chain with the prompt input and measures execution latency.
+        The response is guaranteed to be valid JSON parsed output.
 
         Args:
             prompt: The user prompt/question to process
 
         Returns:
-            ExecutableChainResponse: Response containing generated JSON, latency, tokens, model, and provider
+            ExecutableChainResponse: Response containing generated JSON (Dict), latency, tokens, model, and provider
 
         Raises:
-            Exception: If chain execution fails or LLM is not configured
+            ValueError: If LLM is not configured
+            Exception: If chain execution fails or JSON parsing fails
         """
         try:
             # ─────────────────────────────────────
@@ -48,7 +51,7 @@ class ExecutableChainV1(ExecutableChain):
                     "LLM is not configured. Use update_llm() to set an LLM instance.")
 
             # ─────────────────────────────────────
-            # create chain
+            # Create RAG chain with JSON output parser
             # ─────────────────────────────────────
             rag_chain = (
                 {
@@ -67,6 +70,17 @@ class ExecutableChainV1(ExecutableChain):
             result = rag_chain.invoke({"question": prompt})
             latency = time.time() - start_time
 
+            print("\nresult")
+            print(result)
+
+            # ─────────────────────────────────────
+            # Validate JSON response
+            # ─────────────────────────────────────
+            if not isinstance(result, dict):
+                raise TypeError(
+                    f"Expected JSON dict response, got {type(result).__name__}. "
+                    f"Ensure the prompt template instructs the model to return valid JSON.")
+
             # ─────────────────────────────────────
             # Return as ExecutableChainResponse
             # ─────────────────────────────────────
@@ -78,6 +92,17 @@ class ExecutableChainV1(ExecutableChain):
                 provider=getattr(self.llm, '__class__', 'unknown').__name__,
             )
 
+        except ValueError as e:
+            print(f"="*60)
+            print(f"[ExecutableChainV1] - ValueError: {str(e)}")
+            print(f"="*60)
+            raise
+        except TypeError as e:
+            print(f"="*60)
+            print(
+                f"[ExecutableChainV1] - TypeError (Invalid JSON response): {str(e)}")
+            print(f"="*60)
+            raise
         except Exception as e:
             print(f"="*60)
             print(f"[ExecutableChainV1] - Exception: {str(e)}")
