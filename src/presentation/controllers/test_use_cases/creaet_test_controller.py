@@ -1,6 +1,7 @@
 from fastapi import Request
 from pydantic import ValidationError
 
+from src.application.create_tests.models.models_config import ModelsConfig
 from src.application.create_tests.models.generate_test_cases_request import GenerateRequest
 from src.application.shared.models.custom_response import CustomResponse
 
@@ -14,8 +15,14 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         body = await request.json()
         generate_request = GenerateRequest(**body)
 
+        # ─────────────────────────────────────
+        # init dependencies
+        # ─────────────────────────────────────
+
+        llm = ModelsConfig().get_llama3_2_1b()
+
         return CustomResponse.created(
-            message="jej"
+            message="jej",
             data="hols"
         )
 
