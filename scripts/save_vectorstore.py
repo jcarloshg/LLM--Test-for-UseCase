@@ -1,6 +1,5 @@
 """Script to create and save FAISS vectorstore"""
 
-import os
 import sys
 from pathlib import Path
 
@@ -17,8 +16,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-VECTORSTORE_PATH = os.getenv('VECTORSTORE_PATH', 'data/vectorstore_faiss')
-
 
 def create_and_save_vectorstore():
     """Create FAISS vectorstore from user stories and save locally"""
@@ -31,8 +28,7 @@ def create_and_save_vectorstore():
 
     try:
         # Load data
-        json_path = os.getenv(
-            'JSON_FILE_PATH', './data/user_stories_with_test_cases.json')
+        json_path = ENVIRONMENT_CONFIG.JSON_FILE_PATH
         logger.info("Loading data from %s...", json_path)
         data = load_documents(json_path)
         user_stories = data.get('user_stories', []) if isinstance(
@@ -82,8 +78,8 @@ def create_and_save_vectorstore():
         )
 
         # Save vectorstore
-        logger.info("Saving vectorstore to '%s'...", VECTORSTORE_PATH)
-        vectorstore.save_local(VECTORSTORE_PATH)
+        logger.info("Saving vectorstore to '%s'...", ENVIRONMENT_CONFIG.VECTORSTORE_PATH)
+        vectorstore.save_local(ENVIRONMENT_CONFIG.VECTORSTORE_PATH)
 
         logger.info("=" * 60)
         logger.info("✅ FAISS Vectorstore created successfully!")
