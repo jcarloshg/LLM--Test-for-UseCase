@@ -817,8 +817,6 @@ graph TD
 
     V -->|Source| W["📈 Grafana<br/>Monitoring & Dashboards<br/>Port 3000"]
 
-    Q -->|Metrics| X["📉 MLflow<br/>Experiment Tracking<br/>Port 5001<br/>Model & Performance Data"]
-
     style A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
     style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
     style C fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
@@ -875,3 +873,168 @@ graph LR
     style Grafana fill:#ffe082,stroke:#f57f17,stroke-width:2px
     style MLflow fill:#ce93d8,stroke:#4a148c,stroke-width:2px
 ```
+
+## Phase 8: Monitoring & Observability
+
+### Objective
+
+Continuously monitor the LLM application's operational health, performance, and quality through integrated logging, metrics tracking, and visualization. The implementation provides:
+
+- **Structured Logging**: JSON-formatted logs with correlation IDs for distributed tracing
+- **Log Aggregation**: Loki for centralized log storage with 7-day retention
+- **Visualization**: Grafana dashboards for request metrics, error rates, and retry patterns
+- **Model Tracking**: MLflow for experiment tracking, parameter logging, and model comparison
+- **Request Tracing**: Correlation IDs propagate through entire request lifecycle for debugging
+
+### Key Activities
+
+#### 1. Structured JSON Logging with Context Propagation
+
+All application logs are formatted as JSON with contextual information for analysis:
+
+**Logging Configuration** (src/application/shared/infrastructure/logging_config.py):
+
+```python
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super().add_fields(log_record, record, message_dict)
+        log_record["timestamp"] = self.formatTime(record, "%Y-%m-%dT%H:%M:%S%z")
+        log_record["service"] = "test-case-api"
+        log_record["environment"] = ENVIRONMENT_CONFIG.ENVIRONMENT
+        log_record["version"] = ENVIRONMENT_CONFIG.SERVICE_VERSION
+```
+
+**Log Fields**:
+
+| Field                  | Source              | Purpose                                  |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| `timestamp`            | CustomJsonFormatter | ISO-8601 formatted request time          |
+| `severity`             | Logging level       | DEBUG, INFO, WARNING, ERROR, CRITICAL    |
+| `message`              | Log message         | Human-readable log text                  |
+| `service`              | Static field        | Always "test-case-api"                   |
+| `environment`          | Environment config  | development, staging, production         |
+| `version`              | SERVICE_VERSION     | API version (1.0.0)                      |
+| `correlation_id`       | Middleware context  | UUID for request tracing across services |
+| `request.method`       | LoggingMiddleware   | HTTP method (GET, POST, etc.)            |
+| `request.path`         | LoggingMiddleware   | Request path (/test-use-cases/)          |
+| `request.client_ip`    | LoggingMiddleware   | Client IP address                        |
+| `response.status_code` | LoggingMiddleware   | HTTP status code returned                |
+| `response.duration_ms` | LoggingMiddleware   | Request execution time in milliseconds   |
+
+#### 2. Log Aggregation with Loki
+
+Loki collects and indexes all application logs for querying and visualization:
+
+**Loki Configuration** (loki-config.yml):
+
+```yaml
+# Storage & Retention
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/boltdb-shipper-active
+    shared_store: filesystem
+  filesystem:
+    directory: /loki/chunks
+
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 168h # 7 days
+```
+
+**Docker Integration** (docker-compose.yml:98-102):
+
+```yaml
+logging:
+  driver: loki
+  options:
+    loki-url: "http://localhost:3100/loki/api/v1/push"
+    loki-external-labels: "service=test-case-api,environment=development"
+    mode: "non-blocking"
+```
+
+#### 3. Metrics Visualization with Grafana
+
+Grafana displays real-time operational metrics via the FastAPI + LLM Operations dashboard:
+
+**Dashboard Panels** (grafana/dashboards/fastapi-llm.json):
+
+| Panel                       | Query                                                | Purpose                         | Time Range     |
+| --------------------------- | ---------------------------------------------------- | ------------------------------- | -------------- |
+| **Request Rate (5min avg)** | `rate({service="test-case-api"} [5m])`               | Track API usage patterns        | Last 5 minutes |
+| **Error Rate (5min avg)**   | `rate({service="test-case-api"} \|= "ERROR" [5m])`   | Monitor error frequency         | Last 5 minutes |
+| **LLM Retries (5min avg)**  | `rate({service="test-case-api"} \|= "WARNING" [5m])` | Track validation retry attempts | Last 5 minutes |
+| **Application Logs**        | `{service="test-case-api"}`                          | Real-time log stream            | Last 1 hour    |
+| **Error Logs**              | `{service="test-case-api"} \|= "ERROR"`              | Detailed error analysis         | Last 1 hour    |
+
+**Data Source Configuration** (grafana/provisioning/datasources/loki.yml):
+
+```yaml
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+    isDefault: true
+```
+
+#### 4. Request Tracing with Correlation IDs
+
+Each request gets a unique correlation ID for distributed tracing across service boundaries:
+
+**Correlation Flow**:
+
+1. **Generation** (CorrelationMiddleware): UUID generated if not in `X-Correlation-ID` header
+2. **Context Variable**: Stored in contextvars for access throughout request lifecycle
+3. **Log Propagation**: Automatically included in all logs via middleware
+4. **Response Header**: Returned to client in `X-Correlation-ID` response header
+5. **Grafana Query**: Dashboard template variable allows filtering logs by correlation_id
+
+### Tools & Technologies Implementation
+
+| Tool                      | Purpose             | Status         | Configuration                                                     |
+| ------------------------- | ------------------- | -------------- | ----------------------------------------------------------------- |
+| **python-json-logger**    | JSON formatting     | ✅ Implemented | CustomJsonFormatter with timestamp, service, environment, version |
+| **Loki**                  | Log aggregation     | ✅ Running     | Port 3100, 7-day retention, BoltDB storage, 12MB/s ingestion      |
+| **Grafana**               | Visualization       | ✅ Active      | Port 3000, FastAPI+LLM dashboard, Loki datasource, 10s refresh    |
+| **Docker Logging Driver** | Log transport       | ✅ Enabled     | Loki driver, non-blocking mode, external labels                   |
+| **MLflow**                | Model tracking      | ✅ Operational | Port 5001, file:./mlruns backend, experiment tagging              |
+| **Correlation IDs**       | Distributed tracing | ✅ Implemented | UUID generation, contextvars storage, header propagation          |
+| **RotatingFileHandler**   | File logging        | ✅ Configured  | 10MB rotation size, 5 backup files, logs/app.json.log             |
+
+**Production Checklist**:
+
+- ✅ Centralized log aggregation (Loki)
+- ✅ Real-time dashboards (Grafana)
+- ✅ Distributed tracing (Correlation IDs)
+- ✅ Model tracking (MLflow)
+- ⏳ Alert rules (Grafana alerting) (ToDo)
+- ⏳ SLA monitoring (custom metrics) (ToDo)
+- ⏳ Cost tracking integration (MLflow cost field) (ToDo)
+
+### Evidence Grafana & Loki
+
+![Grafana Dashboard - Request Metrics & Logs](docs/resource/img/image.png)
+_Grafana Dashboard showing real-time request rate (5min average), time series metrics, and structured JSON logs from the test-case-api service with live operational visibility_
+
+![Grafana Logs Panel - Structured Log Analysis](docs/resource/img/log.png)
+_Grafana Logs panel displaying detailed JSON logs with correlation IDs, request paths, HTTP methods, status codes, and execution duration for end-to-end distributed request tracing_
+
+### **Phase 9: Feedback & Iteration: (ToDo)**
+
+| Section            | Details                                                                                                                                                                                                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Phase Name**     | Feedback & Iteration                                                                                                                                                                                                                                                               |
+| **Objective**      | LLMOps is a continuous cycle—analyze production data, identify improvements, update prompts or models, and respond to changing requirements. Regular maintenance ensures your application stays relevant, accurate, and aligned with user needs as technology and business evolve. |
+| **Key Activities** | • Review monitoring data for improvement areas<br>• Collect and analyze user feedback<br>• Update prompts based on failure patterns<br>• Retrain or switch models when needed<br>• Expand evaluation datasets with production examples                                             |
+| **Tools**          | • **GitHub Actions** - Automated testing and deployment<br>• **Jupyter Notebooks** - Data analysis<br>• **Linear/Jira** - Issue tracking                                                                                                                                           |
+| **Outputs**        | • Updated prompts and models<br>• Improved evaluation datasets<br>• Performance improvement reports<br>• Roadmap for next iteration                                                                                                                                                |
+| **Challenges**     | **Deployment fatigue:** Treating launch as finish line instead of starting line. **Feedback bias:** Only listening to vocal minority. **No experimentation framework:** Making changes without measuring impact through A/B tests.                                                 |
