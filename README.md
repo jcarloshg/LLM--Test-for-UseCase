@@ -560,3 +560,318 @@ Output Evaluation Report
 | **MLflow**                     | Experiment tracking & comparison          | ✅ Implemented | [evaluate_models_application.py](src/application/evaluate_models/application/evaluate_models_application.py) |
 | **DeepEval**                   | LLM evaluation framework                  | 📋 ToDo        | Would enhance semantic evaluation                                                                            |
 | **Load Testing** (locust, wrk) | Throughput benchmarking                   | 📋 ToDo        | External load simulation recommended                                                                         |
+
+## Phase 7: Deployment & Serving
+
+### Objective
+
+Transition the LLM application from development to production by creating a robust, scalable API service with proper error handling, monitoring, and containerization. The implementation focuses on:
+
+- **API Framework**: High-performance async HTTP endpoints using FastAPI
+- **Containerization**: Multi-stage Docker builds with GPU support via NVIDIA CUDA
+- **Request Tracing**: Correlation IDs for distributed tracing and debugging
+- **Observability**: Structured JSON logging with Loki integration
+- **Service Orchestration**: Docker Compose for multi-service deployment
+
+### Key Activities
+
+#### 1. API Endpoint Creation & Response Standardization
+
+The application exposes REST endpoints through FastAPI with standardized response formatting:
+
+**Core Endpoints:**
+
+- **GET `/`** - Root endpoint (health verification)
+- **GET `/health`** - Service health status with LLM connectivity check
+- **GET `/metrics`** - Aggregated metrics endpoint (references MLflow UI at port 5000)
+- **POST `/test-use-cases/`** - Main endpoint for test case generation from user stories
+
+**Implementation Details** (src/main.py:18-28, src/presentation/routes/test_use_cases_route.py:5-11):
+
+```python
+# FastAPI application with standardized configuration
+app = FastAPI(
+    title="Test Case Generator API",
+    description="Generate structured test cases from user stories",
+    version="1.0.0"
+)
+
+# Routers for organized endpoint management
+app.include_router(test_use_cases)
+```
+
+**Response Structure** (src/application/shared/models/custom_response.py):
+All API responses follow a consistent JSON format with metadata:
+
+```json
+{
+  "message": "Human-readable response message",
+  "is_success": true,
+  "data": { "test_cases": [...] },
+  "status_code": 200
+}
+```
+
+Factory methods for status codes: `success()`, `created()`, `error()`, `something_was_wrong()`
+
+#### 2. Request Tracing & Correlation
+
+Middleware components ensure request context propagation for distributed tracing:
+
+**Correlation Middleware** (src/application/shared/middleware/correlation_middleware.py):
+
+- Generates UUID-based correlation IDs for each request
+- Accepts `X-Correlation-ID` header for trace continuation
+- Propagates IDs across service boundaries via context variables
+- Adds correlation ID to response headers for client reference
+
+**Logging Middleware** (src/application/shared/middleware/logging_middleware.py):
+
+- Tracks request/response timing (millisecond precision)
+- Logs method, path, and client IP for every request
+- Detects slow requests (>5000ms threshold) as warnings
+- Includes exception details with request context on failure
+- All logs include correlation_id for trace aggregation
+
+#### 3. Containerization with GPU Support
+
+Multi-stage Docker build optimizes image size while maintaining CUDA capabilities:
+
+**Build Process** (Dockerfile):
+
+1. **Builder Stage**: Compiles dependencies using `nvidia/cuda:11.8.0-runtime-ubuntu22.04`
+2. **Runtime Stage**: Minimal final image with copied packages
+3. **Python Setup**: Python 3.10 with pip for dependency management
+4. **Application**: Starts uvicorn on port 8000
+
+**Execution** (docker-compose.yml:77-104):
+
+```yaml
+api:
+  build: .
+  container_name: test-case-api
+  ports:
+    - "8001:8000" # External:Internal mapping
+  volumes:
+    - ./:/app
+    - ./mlruns:/app/mlruns
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+```
+
+#### 4. Configuration Management & Environment Variables
+
+Environment-aware configuration using Pydantic validation:
+
+**Key Configuration Variables** (src/application/shared/infrastructure/environment_variables.py):
+
+| Variable                           | Purpose                | Default                  | Environment Support            |
+| ---------------------------------- | ---------------------- | ------------------------ | ------------------------------ |
+| `OLLAMA_SERVICE_HOST`              | LLM backend URL        | `http://localhost:11435` | Docker internal                |
+| `OLLAMA_SERVICE_MODEL_LLAMA3_2_1B` | Default model name     | `llama3.2:1b`            | Config selectable              |
+| `LOG_LEVEL`                        | Logging verbosity      | `INFO`                   | development/production         |
+| `LOG_FORMAT`                       | Log output format      | `json`                   | Loki compatible                |
+| `ENVIRONMENT`                      | Deployment environment | `development`            | development/staging/production |
+| `SERVICE_VERSION`                  | API version            | `1.0.0`                  | Release tracking               |
+
+**Configuration Validation**:
+
+- Pydantic BaseModel with typed fields
+- Default values with fallback support
+- Environment variable aliasing for flexibility
+- Type coercion for numeric configurations
+
+**Startup Logging** (src/main.py:31-41):
+
+- Logs service version, environment, and log level on startup
+- Provides audit trail for deployment tracking
+
+#### 5. Service Orchestration & Health Management
+
+Docker Compose orchestrates all services with health checks and dependencies:
+
+**Service Network** (docker-compose.yml:126-128):
+
+```yaml
+networks:
+  test-gen-network:
+    driver: bridge
+```
+
+**Health Checks** (docker-compose.yml:20-25 for Ollama):
+
+```yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 60s
+```
+
+**Service Dependencies**:
+
+- API depends on: Ollama (LLM backend) ✓
+- Grafana depends on: Loki (log storage) ✓
+- MLflow UI: Standalone (experiment tracking)
+
+**Port Mappings**:
+
+| Service | Container Port | Host Port | Purpose                       |
+| ------- | -------------- | --------- | ----------------------------- |
+| API     | 8000           | 8001      | Test case generation endpoint |
+| Ollama  | 11434          | 11435     | LLM inference backend         |
+| Grafana | 3000           | 3000      | Monitoring dashboards         |
+| Loki    | 3100           | 3100      | Log aggregation & storage     |
+| MLflow  | 5000           | 5001      | Experiment tracking UI        |
+
+### Tools & Technologies Implementation
+
+| Tool               | Purpose          | Status         | Implementation                                        |
+| ------------------ | ---------------- | -------------- | ----------------------------------------------------- |
+| **FastAPI**        | API framework    | ✅ Implemented | src/main.py, async endpoints with Pydantic validation |
+| **Uvicorn**        | ASGI server      | ✅ Running     | Port 8000 (mapped to 8001), auto-reload in dev        |
+| **Docker**         | Containerization | ✅ Multi-stage | nvidia/cuda:11.8.0-runtime base image                 |
+| **Docker Compose** | Orchestration    | ✅ Active      | 5-service stack with health checks                    |
+| **NVIDIA CUDA**    | GPU support      | ✅ Enabled     | GPU resource allocation in compose                    |
+| **Pydantic**       | Validation       | ✅ Used        | CustomResponse, GenerateRequest models                |
+| **Loki**           | Log aggregation  | ✅ Connected   | JSON logging driver in compose                        |
+| **MLflow**         | Metrics tracking | ✅ Available   | Port 5001 for UI access                               |
+
+### Deployment Architecture
+
+**Request Flow**:
+
+1. Client sends POST to `http://localhost:8001/test-use-cases/`
+2. **CorrelationMiddleware** generates/extracts correlation ID
+3. **LoggingMiddleware** records request metadata and start time
+4. **Route Handler** (creaet_test_controller) processes request:
+   - Validates JSON body against GenerateRequest schema
+   - Instantiates ExecutableChainPrompting with selected model
+   - Runs CreateTestsApplication use case
+   - Returns CustomResponse with test cases or error
+5. Middleware logs response status and duration
+6. Response sent with correlation ID header
+7. Logs streamed to Loki for aggregation
+8. Metrics available in MLflow and Grafana
+
+**Request Processing Flow Diagram**:
+
+```mermaid
+graph TD
+    A["👤 Client Request<br/>POST /test-use-cases/<br/>Port 8001"] -->|Request| B["🔗 CorrelationMiddleware<br/>Generate/Extract<br/>X-Correlation-ID Header"]
+
+    B -->|Pass Context| C["📝 LoggingMiddleware<br/>Start Timer<br/>Log Method, Path, IP"]
+
+    C -->|Route| D["🛣️ Route Handler<br/>creaet_test_controller"]
+
+    D -->|Extract Body| E["✅ JSON Validation<br/>GenerateRequest Schema<br/>user_story: 20-500 chars"]
+
+    E -->|❌ Invalid| G["❌ Validation Error<br/>Return Error Response"]
+    E -->|✅ Valid| F["🤖 Model Factory<br/>ModelsConfig.Singleton<br/>Load llama3.2:1b<br/>Temperature: 0.0"]
+
+    F -->|Create Chain| H["⛓️ ExecutableChainPrompting<br/>Template: IMPROVED_PROMPT_V1<br/>LLM: OllamaLLM"]
+
+    H -->|Initialize| I["⚙️ CreateTestsApplication<br/>Inject ExecutableChain"]
+
+    I -->|Call execute| J["🔄 Chain Pipeline<br/>Prompt | LLM | RobustJsonParser"]
+
+    J -->|Invoke LLM| K["🤖 Ollama Inference<br/>IMPROVED_PROMPT_V1<br/>+ user_story input"]
+
+    K -->|Parse Output| L["📦 RobustJsonParser<br/>Handle Markdown JSON<br/>Strip code blocks<br/>Extract JSON object"]
+
+    L -->|Parsed Dict| M["✓ Type Check<br/>Validate dict type"]
+
+    M -->|❌ Not Dict| G
+    M -->|✅ Dict| N["📋 Structure Validation<br/>TestCasesResponse<br/>Required: test_cases array"]
+
+    N -->|❌ Invalid<br/>Attempt < 3| O["🔄 Retry Logic<br/>Re-invoke LLM<br/>Increment attempt"]
+
+    O -->|Retry| J
+
+    N -->|❌ Invalid<br/>Attempt = 3| G
+    N -->|✅ Valid| P["✅ ExecutableChainResponse<br/>result, latency, tokens<br/>model, provider, attempt"]
+
+    P -->|Return| Q["✅ CustomResponse.created<br/>Status: 201<br/>Data: test_cases"]
+
+    G -->|Return| R["❌ CustomResponse.error<br/>Status: 500"]
+
+    Q -->|Response Object| S["📝 LoggingMiddleware Exit<br/>Log Status & Duration<br/>Detect Slow Requests >5s"]
+
+    R -->|Response Object| S
+
+    S -->|Add Header| T["🔗 Correlation Middleware Exit<br/>Add X-Correlation-ID<br/>to Response Headers"]
+
+    T -->|HTTP Response| U["👤 Client Response<br/>JSON:<br/>message, is_success<br/>data, status_code"]
+
+    S -->|Stream| V["📊 Loki<br/>Log Aggregation<br/>Port 3100<br/>Store all logs"]
+
+    V -->|Source| W["📈 Grafana<br/>Monitoring & Dashboards<br/>Port 3000"]
+
+    Q -->|Metrics| X["📉 MLflow<br/>Experiment Tracking<br/>Port 5001<br/>Model & Performance Data"]
+
+    style A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style C fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style D fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style E fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style F fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    style H fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style I fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    style J fill:#ede7f6,stroke:#512da8,stroke-width:2px,color:#000
+    style K fill:#b3e5fc,stroke:#01579b,stroke-width:2px,color:#000
+    style L fill:#f0f4c3,stroke:#9e9d24,stroke-width:2px,color:#000
+    style M fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style N fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style O fill:#ffe0b2,stroke:#e65100,stroke-width:2px,color:#000
+    style P fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style Q fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style R fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000
+    style S fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style T fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style U fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style V fill:#b3e5fc,stroke:#01579b,stroke-width:2px,color:#000
+    style W fill:#ffe082,stroke:#f57f17,stroke-width:2px,color:#000
+    style X fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000
+```
+
+**Service Communication Architecture**:
+
+```mermaid
+graph LR
+    Client["👤 Client Applications"]
+
+    Client -->|HTTP/REST| API["🌐 FastAPI<br/>Port 8001"]
+
+    API -->|Async Call| Ollama["🤖 Ollama<br/>LLM Backend<br/>Port 11435"]
+
+    API -->|JSON Logs| Loki["📊 Loki<br/>Port 3100"]
+
+    Loki -->|Data Source| Grafana["📈 Grafana<br/>Port 3000"]
+
+    API -->|Track Metrics| MLflow["📉 MLflow<br/>Port 5001"]
+
+    subgraph "Docker Compose Network: test-gen-network"
+        API
+        Ollama
+        Loki
+        Grafana
+        MLflow
+    end
+
+    style Client fill:#bbdefb,stroke:#0d47a1,stroke-width:2px
+    style API fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style Ollama fill:#e0f2f1,stroke:#004d40,stroke-width:2px
+    style Loki fill:#b3e5fc,stroke:#01579b,stroke-width:2px
+    style Grafana fill:#ffe082,stroke:#f57f17,stroke-width:2px
+    style MLflow fill:#ce93d8,stroke:#4a148c,stroke-width:2px
+```
