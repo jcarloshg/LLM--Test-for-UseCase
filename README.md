@@ -4,26 +4,34 @@ This project implements a microservice that leverages Large Language Models (LLM
 
 ## Table of Contents
 
-### Setup & Deployment
+### 🚀 Getting Started & Deployment
 
-- [Getting Started](#getting-started)
-- [Next Steps](#next-steps)
+- [Prerequisites & Installation](#getting-started)
+- [Running the Service](#running-the-service)
+- [Running Model Evaluation](#running-model-evaluation)
 
-### LLMOps Framework (9 Phases)
+### 📊 LLMOps Framework (9 Phases)
 
 1. [Phase 1: Problem Definition & Use Case Design](#phase-1-problem-definition--use-case-design)
-2. [Architecture Decisions](#architecture-decisions)
-3. [Phase 2: Data Collection & Preparation](#phase-2-data-collection--preparation)
-4. [Phase 3: Model Selection & Evaluation](#phase-3-model-selection--evaluation)
-5. [Phase 5: RAG & Prompting](#phase-5-rag--prompting)
-6. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
-7. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
-8. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
-9. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
+2. [Phase 2: Data Collection & Preparation](#phase-2-data-collection--preparation)
+3. [Phase 3: Model Selection & Evaluation](#phase-3-model-selection--evaluation)
+4. [Phase 4: Prompt Engineering & Optimization](#phase-4-prompt-engineering--optimization)
+5. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
+6. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
+7. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
+8. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
 
-### Project Organization
+### 📈 Next Steps & Roadmap
 
-#### Directory Structure Overview
+- [Comprehensive ToDo List](#comprehensive-todo-list)
+  - [Phase 1-6: Completed Core Phases](#phase-1-completed-core-phases)
+  - [Phase 7: Deployment & Serving](#phase-7-deployment--serving-1)
+  - [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability-1)
+  - [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
+
+### 🗂️ Project Organization
+
+- [File System Tree](#file-system-tree)
 
 ## Getting Started
 
