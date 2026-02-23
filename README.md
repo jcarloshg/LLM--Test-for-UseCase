@@ -35,12 +35,12 @@ This project implements a microservice that leverages Large Language Models (LLM
 
 ## Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 
-- Docker and Docker Compose
-- NVIDIA GPU with CUDA support (optional but recommended for better performance)
+- 🐳 Docker and Docker Compose
+- 🎮 NVIDIA GPU with CUDA support (optional but recommended for better performance)
 
-### Installation
+### 📦 Installation
 
 ```bash
 # Clone the repository
@@ -63,15 +63,15 @@ docker compose exec ollama ollama pull qwen3-vl:8b
 docker compose exec ollama ollama pull llama3.2:3b
 ```
 
-### Running the Service
+### 🚀 Running the Service
 
 Once `docker-compose up -d` completes, the services are automatically running:
 
-- **Test Case Generation API**: http://localhost:8001
-- **Grafana Dashboard**: http://localhost:3000 (monitoring and visualization)
-- **MLflow UI**: http://localhost:5001 (experiment tracking)
-- **Ollama**: http://localhost:11435 (LLM backend)
-- **Loki**: http://localhost:3100 (log aggregation)
+- 🔌 **Test Case Generation API**: http://localhost:8001
+- 📊 **Grafana Dashboard**: http://localhost:3000 (monitoring and visualization)
+- 📈 **MLflow UI**: http://localhost:5001 (experiment tracking)
+- 🤖 **Ollama**: http://localhost:11435 (LLM backend)
+- 📝 **Loki**: http://localhost:3100 (log aggregation)
 
 Test the API:
 
@@ -81,13 +81,13 @@ curl -X POST http://localhost:8001/generate-tests \
   -d '{"story": "As a user, I want to log in with my email..."}'
 ```
 
-### Running Model Evaluation
+### 📊 Running Model Evaluation
 
-1. Start all services
-2. Verify Ollama is ready
-3. Run evaluation (⏱️ ~5-10 minutes for full dataset)
-4. View results in MLflow
-5. Monitor metrics in Grafana
+1. 🚀 Start all services
+2. ✅ Verify Ollama is ready
+3. 🔬 Run evaluation (⏱️ ~5-10 minutes for full dataset)
+4. 📈 View results in MLflow
+5. 📊 Monitor metrics in Grafana
 
 ```bash
 # 1.
@@ -104,7 +104,7 @@ http://localhost:3000
 
 ## Phase 1: Problem Definition & Use Case Design
 
-### Objective
+### 🎯 Objective
 
 Establish the foundation by clearly defining:
 
@@ -113,7 +113,7 @@ Establish the foundation by clearly defining:
 - **Scope**: Simple prompting approach with local model deployment via Ollama
 - **Constraints**: Budget (compute-based), latency (<5s P90), privacy (self-hosted)
 
-### Key Activities
+### 🎬 Key Activities
 
 **1. Define Use Case & Outcomes**
 
@@ -156,7 +156,7 @@ With Ollama, token cost = $0. Cost shifts to compute infrastructure.
 
 ## Phase 2: Data Collection & Preparation
 
-### Objective
+### 🎯 Objective
 
 Prepare high-quality training and evaluation data for your LLM application:
 
@@ -166,7 +166,7 @@ Prepare high-quality training and evaluation data for your LLM application:
 
 > **Key Principle:** Quality over quantity—100 high-quality examples often outperform 1,000 noisy ones.
 
-### Key Activities
+### 🎬 Key Activities
 
 **1. Collect Representative Examples**
 
@@ -205,7 +205,7 @@ Currently, the project includes **49 diverse user stories** across an e-commerce
 | **Medium** | ~27   | Shopping cart, search, inventory, notifications, checkout, product variants        |
 | **Hard**   | ~7    | Login/auth, password reset, profile updates, 2FA, secure payment processing        |
 
-### Tools & Technologies
+### 🛠️ Tools & Technologies
 
 | Tool                           | Purpose                                          | Status         | Implementation                                                                                                                                                         |
 | ------------------------------ | ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -223,11 +223,11 @@ Raw Data → Collection → Cleaning → Validation → Versioning → Ready for
 
 ## Phase 3: Model Selection & Evaluation
 
-### Objective
+### 🎯 Objective
 
 Evaluate different open-source LLM options to find the best fit for your use case by testing on your specific data. Consider model size, inference latency, memory requirements, and quality of outputs for local deployment. Focus on privacy-first, cost-effective models running on Ollama.
 
-### Key Activities
+### 🎬 Key Activities
 
 - **Compare models on evaluation dataset** - Run the evaluation set through multiple local models and compare outputs
 - **Test different model sizes** - Evaluate lightweight (1B), balanced (3B), and higher-quality (8B) models from the Meta Llama family
@@ -345,7 +345,7 @@ Example: ($100 ÷ (5,000 × 30)) × 1,000 = $0.67 per 1,000 requests
 
 _Model Performance Summary (5,000 requests/day baseline)_
 
-### Evidence RAG vs Prompt
+### 📸 Evidence RAG vs Prompt
 
 ![MLflow Model Comparison - Part 1](docs/resource/img/mlflow.png)
 _MLflow Dashboard showing quality, latency, and throughput metrics across evaluated models_
@@ -355,13 +355,13 @@ _MLflow Dashboard showing cost efficiency, resource utilization, and additional 
 
 ## Phase 4: Prompt Engineering & Optimization
 
-### Objective
+### 🎯 Objective
 
 Craft effective instructions that guide LLMs to produce desired outputs through iterative refinement. This phase often yields **80% of performance improvements** without model changes. Design system prompts, add examples (few-shot learning), structure outputs, and establish reusable templates.
 
 > **Key Insight:** A well-engineered prompt can make a 1B model outperform a poorly-prompted 8B model.
 
-### Key Activities
+### 🎬 Key Activities
 
 **1. Create Prompt Templates**
 
@@ -418,7 +418,7 @@ Rule 7: "steps" MUST be array of strings ONLY (NOT objects)
 Rule 8: "preconditions" MUST be array of strings ONLY (NOT objects)
 ```
 
-### Tools & Technologies
+### 🛠️ Tools & Technologies
 
 | Tool          | Purpose                      | Status         |
 | ------------- | ---------------------------- | -------------- |
@@ -427,13 +427,13 @@ Rule 8: "preconditions" MUST be array of strings ONLY (NOT objects)
 
 ## Phase 6: Evaluation & Testing
 
-### Objective
+### 🎯 Objective
 
 Systematically measure if your LLM application meets quality standards before production deployment. Use both automated metrics and human evaluation to assess accuracy, relevance, safety, and consistency. Testing catches issues early and provides benchmarks for measuring improvements.
 
 Implementation: [src/application/evaluate_models/](src/application/evaluate_models/)
 
-### Key Activities
+### 🎬 Key Activities
 
 **1. Run Automated Evaluations**
 
@@ -470,7 +470,7 @@ Implementation: [src/application/evaluate_models/](src/application/evaluate_mode
 - Profile memory usage and CPU consumption
 - Establish cost per request and cost efficiency
 
-### Evaluation Framework
+### 📐 Evaluation Framework
 
 #### 1. Automated Metrics
 
@@ -541,7 +541,7 @@ Edge Case Categories:
 | **Memory Usage**           | <4GB        | Peak RAM during inference       |
 | **Cost per 1,000 Stories** | <$100       | Infrastructure cost calculation |
 
-### Evaluation Workflow
+### 🔄 Evaluation Workflow
 
 ```
 Input Use Cases
@@ -563,7 +563,7 @@ Compare Models (Quality vs. Latency vs. Cost)
 Output Evaluation Report
 ```
 
-### Tools & Technologies
+### 🛠️ Tools & Technologies
 
 | Tool                           | Purpose                                   | Status         | Implementation                                                                                               |
 | ------------------------------ | ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -577,7 +577,7 @@ Output Evaluation Report
 
 ## Phase 7: Deployment & Serving
 
-### Objective
+### 🎯 Objective
 
 Transition the LLM application from development to production by creating a robust, scalable API service with proper error handling, monitoring, and containerization. The implementation focuses on:
 
@@ -587,7 +587,7 @@ Transition the LLM application from development to production by creating a robu
 - **Observability**: Structured JSON logging with Loki integration
 - **Service Orchestration**: Docker Compose for multi-service deployment
 
-### Key Activities
+### 🎬 Key Activities
 
 #### 1. API Endpoint Creation & Response Standardization
 
@@ -748,7 +748,7 @@ healthcheck:
 | Loki    | 3100           | 3100      | Log aggregation & storage     |
 | MLflow  | 5000           | 5001      | Experiment tracking UI        |
 
-### Tools & Technologies Implementation
+### 🛠️ Tools & Technologies Implementation
 
 | Tool               | Purpose          | Status         | Implementation                                        |
 | ------------------ | ---------------- | -------------- | ----------------------------------------------------- |
@@ -761,7 +761,7 @@ healthcheck:
 | **Loki**           | Log aggregation  | ✅ Connected   | JSON logging driver in compose                        |
 | **MLflow**         | Metrics tracking | ✅ Available   | Port 5001 for UI access                               |
 
-### Deployment Architecture
+### 🏗️ Deployment Architecture
 
 **Request Flow**:
 
@@ -890,7 +890,7 @@ graph LR
 
 ## Phase 8: Monitoring & Observability
 
-### Objective
+### 🎯 Objective
 
 Continuously monitor the LLM application's operational health, performance, and quality through integrated logging, metrics tracking, and visualization. The implementation provides:
 
@@ -900,7 +900,7 @@ Continuously monitor the LLM application's operational health, performance, and 
 - **Model Tracking**: MLflow for experiment tracking, parameter logging, and model comparison
 - **Request Tracing**: Correlation IDs propagate through entire request lifecycle for debugging
 
-### Key Activities
+### 🎬 Key Activities
 
 #### 1. Structured JSON Logging with Context Propagation
 
@@ -1012,7 +1012,7 @@ Each request gets a unique correlation ID for distributed tracing across service
 4. **Response Header**: Returned to client in `X-Correlation-ID` response header
 5. **Grafana Query**: Dashboard template variable allows filtering logs by correlation_id
 
-### Tools & Technologies Implementation
+### 🛠️ Tools & Technologies Implementation
 
 | Tool                      | Purpose             | Status         | Configuration                                                     |
 | ------------------------- | ------------------- | -------------- | ----------------------------------------------------------------- |
@@ -1034,7 +1034,7 @@ Each request gets a unique correlation ID for distributed tracing across service
 - ⏳ SLA monitoring (custom metrics) (ToDo)
 - ⏳ Cost tracking integration (MLflow cost field) (ToDo)
 
-### Evidence Grafana & Loki
+### 📸 Evidence Grafana & Loki
 
 ![Grafana Dashboard - Request Metrics & Logs](docs/resource/img/image.png)
 _Grafana Dashboard showing real-time request rate (5min average), time series metrics, and structured JSON logs from the test-case-api service with live operational visibility_
@@ -1042,9 +1042,9 @@ _Grafana Dashboard showing real-time request rate (5min average), time series me
 ![Grafana Logs Panel - Structured Log Analysis](docs/resource/img/log.png)
 _Grafana Logs panel displaying detailed JSON logs with correlation IDs, request paths, HTTP methods, status codes, and execution duration for end-to-end distributed request tracing_
 
-## Phase 9: Feedback & Iteration (ToDo)
+## Phase 9: Feedback & Iteration
 
-### Objective
+### 🎯 Objective
 
 LLMOps is a continuous cycle: analyze production data, identify improvements, update prompts or models, and respond to changing requirements. This phase creates systematic feedback loops to:
 
@@ -1054,7 +1054,7 @@ LLMOps is a continuous cycle: analyze production data, identify improvements, up
 - **Expand Evaluation Datasets**: Incorporate production examples into evaluation to improve test coverage
 - **Document Learnings**: Capture insights from each iteration for future improvements
 
-### Key Activities
+### 🎬 Key Activities
 
 #### 1. Performance Analysis & Monitoring Dashboard
 
@@ -1229,7 +1229,7 @@ Benefits
 | **predictions.json** | Mismatches increasing    | Expand evaluation set    |
 | **User Feedback**    | Quality ratings <0.7     | Add examples to few-shot |
 
-### Tools & Technologies for Implementation
+### 🛠️ Tools & Technologies for Implementation
 
 | Tool                        | Purpose                            | Status       | Future Implementation              |
 | --------------------------- | ---------------------------------- | ------------ | ---------------------------------- |
@@ -1241,7 +1241,7 @@ Benefits
 | **Version Control**         | Track prompt/config changes        | ✅ Git       | Document changes in CHANGELOG      |
 | **Slack/Email Alerts**      | Notify on metric degradation       | ⏳ (ToDo)    | Grafana alert integration          |
 
-### Feedback Bias Mitigation
+### ⚠️ Feedback Bias Mitigation
 
 **Avoiding Common Pitfalls**:
 
@@ -1253,7 +1253,7 @@ Benefits
 | **Survivorship Bias** | Only analyze successful test cases             | Explicitly track failures & timeouts  |
 | **Change Bias**       | Believe improvements that don't exist          | Use statistical significance testing  |
 
-### Success Metrics for Phase 9
+### 📈 Success Metrics for Phase 9
 
 Track these KPIs to measure iteration effectiveness:
 
@@ -1266,9 +1266,9 @@ Track these KPIs to measure iteration effectiveness:
 | **A/B Test Win Rate**    | >60%               | Percent of variants outperforming baseline |
 | **Dataset Coverage**     | 100+ real examples | Monthly refresh of evaluation dataset      |
 
-## Next Steps
+## 📋 Next Steps
 
-### Comprehensive ToDo List
+### ✅ Comprehensive ToDo List
 
 This section tracks all planned improvements and features across the LLMOps framework:
 
@@ -1487,9 +1487,9 @@ This section tracks all planned improvements and features across the LLMOps fram
   - Rollback procedures
   - Post-deployment monitoring requirements
 
-## Project Organization
+## 📁 Project Organization
 
-### File System Tree
+### 🌳 File System Tree
 
 ```
 LLM--Test-for-UseCase/
