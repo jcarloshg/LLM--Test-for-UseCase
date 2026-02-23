@@ -239,63 +239,95 @@ Comprehensive evaluation across three dimensions:
 
 Measured through rule compliance and output utility rather than traditional classification metrics.
 
-| Metric | Target | Details |
-| --- | --- | --- |
-| **Structural Compliance** | >95% | JSON parsing success on first attempt, no retry mechanisms |
-| **Quality Score** | ≥4.0/5.0 | Heuristic evaluation: preconditions, logical steps, field completeness |
-| **Retry Rate** | <5% | Malformed responses or schema violations |
-| **Test Case Count** | ≥3 per story | Average number of test cases generated per user story |
-| **Precondition Completeness** | ≥90% | % of test cases with non-empty, meaningful preconditions |
-| **Step Clarity** | 2-5 steps | Average steps per test case (optimal range) |
-| **Semantic Relevance** | ≥4.0/5.0 | LLM evaluation of story-to-tests alignment |
+- Implementation: [src/application/evaluate_models/model/quality_tracker.py](src/application/evaluate_models/model/quality_tracker.py)
+
+| Metric                        | Target       | Details                                                                |
+| ----------------------------- | ------------ | ---------------------------------------------------------------------- |
+| **Structural Compliance**     | >95%         | JSON parsing success on first attempt, no retry mechanisms             |
+| **Quality Score**             | ≥4.0/5.0     | Heuristic evaluation: preconditions, logical steps, field completeness |
+| **Retry Rate**                | <5%          | Malformed responses or schema violations                               |
+| **Test Case Count**           | ≥3 per story | Average number of test cases generated per user story                  |
+| **Precondition Completeness** | ≥90%         | % of test cases with non-empty, meaningful preconditions               |
+| **Step Clarity**              | 2-5 steps    | Average steps per test case (optimal range)                            |
+| **Semantic Relevance**        | ≥4.0/5.0     | LLM evaluation of story-to-tests alignment                             |
 
 #### 2. Performance & Latency (Latencia y Rendimiento)
 
-Managing inference latency with local models (Llama 3, Qwen, Mistral via Ollama).
+Managing inference latency with local models (Llama 3, Qwen, Mistral via Ollama). Tracking percentile-based metrics per best practices.
 
-| Metric | Target | Details |
-| --- | --- | --- |
-| **End-to-End Latency (P50)** | <3s | Median response time from request to complete response |
-| **End-to-End Latency (P90)** | <5s | 90th percentile latency across all requests |
-| **End-to-End Latency (P99)** | <10s | 99th percentile latency (worst case) |
-| **Time to First Token** | <1s | Inference startup time before generation begins |
-| **Throughput** | >10 req/min | Sustained requests per minute on single instance |
-| **Validation Overhead** | <20% | Additional validation time vs. pure text generation |
+- Implementation: [src/application/evaluate_models/model/latency_tracker.py](src/application/evaluate_models/model/latency_tracker.py)
+
+| Metric                  | Target      | Details                                               |
+| ----------------------- | ----------- | ----------------------------------------------------- |
+| **Mean Latency**        | <3s         | Average response time across all requests             |
+| **Median (P50)**        | <2.5s       | 50th percentile - typical response time               |
+| **P95 Latency**         | <5s         | 95% of requests complete within this time (SLA basis) |
+| **P99 Latency**         | <10s        | 99th percentile latency (worst case scenarios)        |
+| **Min Latency**         | Baseline    | Fastest recorded response time                        |
+| **Max Latency**         | <15s        | Slowest recorded response time                        |
+| **Std Dev**             | <2s         | Standard deviation indicates consistency              |
+| **Throughput**          | >10 req/min | Sustained requests per minute on single instance      |
+| **Validation Overhead** | <20%        | Additional validation time vs. pure text generation   |
+
+**SLA Definition (Best Practice):**
+
+> "95% of all requests must complete within the P95 latency target"
+>
+> - Implemented via `LatencyTracker.meets_sla(latencies, sla_p95_ms)`
+> - Validates P95 percentile against configurable threshold
 
 #### 3. Cost & Resource Efficiency (Coste por Solicitud y Eficiencia)
 
 With Ollama, token cost = $0. Cost shifts to compute infrastructure.
 
-| Metric | Target | Details |
-| --- | --- | --- |
-| **Infrastructure Cost** | <$100/1K | Monthly server cost per 1,000 requests |
-| **Resource Utilization (CPU)** | <80% | Average CPU usage during inference |
-| **Resource Utilization (RAM)** | <85% | Peak memory usage during inference |
-| **Resource Utilization (VRAM)** | <90% | GPU memory usage (if available) |
-| **Model Memory Footprint** | Baseline dependent | Total VRAM required for model weights |
-| **Cost per Request** | Model dependent | Infrastructure cost ÷ requests/month |
+- Implementation: [src/application/evaluate_models/model/cost_tracker.py](src/application/evaluate_models/model/cost_tracker.py)
+- Evaluation Integration: [src/application/evaluate_models/application/evaluate_models_application.py](src/application/evaluate_models/application/evaluate_models_application.py)
 
-#### Benchmark Testing Setup
+| Metric                      | Target      | Details                                                           |
+| --------------------------- | ----------- | ----------------------------------------------------------------- |
+| **Cost per 1,000 Requests** | <$20        | Monthly server cost ÷ (max_requests/day × 30) × 1,000             |
+| **Cost Efficiency Score**   | >0.7        | Composite score: (latency_efficiency + throughput_efficiency) / 2 |
+| **Throughput**              | >30 req/min | Sustained requests per minute (60 ÷ avg_latency)                  |
+| **CPU Usage**               | <80%        | Average CPU usage during inference (2-core baseline)              |
+| **Memory per Request**      | <100 MB     | (Base model memory ÷ num_requests) + 50 MB overhead               |
+| **Concurrent Capacity**     | >2 requests | Estimated simultaneous requests based on available memory         |
+| **Total Execution Time**    | <500s       | Sum of all request latencies for evaluation set                   |
 
-Test on the evaluation dataset with multiple story complexities:
+**Default Configuration (Baseline):**
 
-**Story Length Scenarios:**
-- Short stories (1 sentence) - quick inference baseline
-- Medium stories (2-3 sentences) - typical complexity
-- Long stories (4+ sentences) - stress test scenario
+```
+Monthly Server Cost:    $100 USD
+Max Requests/Day:       5,000
+Container Memory:       8 GB
+Container CPU Cores:    2
+Base Model Memory:      4.0 GB (quantized 4-bit)
+Memory Overhead:        50 MB per request
+```
 
-**Load Testing Patterns:**
-- Single request (baseline latency)
-- Sustained load (10+ concurrent requests)
-- Peak load (throughput limits)
+**Cost Calculation Formula:**
+
+```
+Cost per 1,000 = (Monthly Cost ÷ (Max Requests/Day × 30)) × 1,000
+Example: ($100 ÷ (5,000 × 30)) × 1,000 = $0.67 per 1,000 requests
+```
+
+**Optimization Thresholds & Recommendations:**
+
+| Condition                  | Recommendation                                | Impact                    |
+| -------------------------- | --------------------------------------------- | ------------------------- |
+| Latency > 3s               | Use 4-bit quantized model or upgrade hardware | Reduce response time      |
+| Throughput < 20 req/min    | Increase CPU cores or optimize prompts        | Improve capacity          |
+| Cost > $10 per 1K requests | Review server capacity utilization            | Lower infrastructure cost |
+| CPU Usage > 80%            | Enable load balancing or add replicas         | Prevent throttling        |
+| Efficiency Score < 0.6     | Comprehensive review of configuration         | Improve all metrics       |
 
 #### Model Comparison (1,000 requests/month)
 
-| Model | Input Tokens | Output Tokens | Latency (P90) | Monthly Cost | Recommendation |
-| --- | --- | --- | --- | --- | --- |
-| **Llama 3.2 1B** | 800 | 400 | 1-2s | $30-50 | Best for speed, good quality |
-| **Llama 3.2 3B** | 800 | 400 | 2-5s | $50-100 | Balanced speed/quality |
-| **Llama 3 ChatQA 8B** | 800 | 400 | 4-8s | $80-150 | Best quality, slower |
+| Model                 | Input Tokens | Output Tokens | Latency (P90) | Monthly Cost | Recommendation               |
+| --------------------- | ------------ | ------------- | ------------- | ------------ | ---------------------------- |
+| **Llama 3.2 1B**      | 800          | 400           | 1-2s          | $30-50       | Best for speed, good quality |
+| **Llama 3.2 3B**      | 800          | 400           | 2-5s          | $50-100      | Balanced speed/quality       |
+| **Llama 3 ChatQA 8B** | 800          | 400           | 4-8s          | $80-150      | Best quality, slower         |
 
 ### Evidence RAG vs Prompt
 
