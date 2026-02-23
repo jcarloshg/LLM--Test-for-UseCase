@@ -1468,8 +1468,6 @@ This section tracks all planned improvements and features across the LLMOps fram
   - Rollback procedures
   - Post-deployment monitoring requirements
 
----
-
 ## Project Organization
 
 ### File System Tree
