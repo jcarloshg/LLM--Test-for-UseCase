@@ -26,22 +26,19 @@ The system is designed to:
 2. [Architecture Decisions](#architecture-decisions)
 3. [Phase 2: Data Collection & Preparation](#phase-2-data-collection--preparation)
 4. [Phase 3: Model Selection & Evaluation](#phase-3-model-selection--evaluation)
-5. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
-6. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
-7. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
-8. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
+5. [Phase 5: RAG & Prompting](#phase-5-rag--prompting)
+6. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
+7. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
+8. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
+9. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
 
 ### Project Organization
 
 - [Project Structure](#project-structure)
 - [File System Organization](#file-system-organization)
   - [Root Level Files](#root-level-files)
-  - [Documentation (`docs/`)](#documentation-docs)
-  - [Source Code (`src/`)](#source-code-src)
   - [Data (`data/`)](#data-data)
   - [Docker (`docker/`)](#docker-docker)
-  - [Monitoring (`monitoring/`)](#monitoring-monitoring)
-  - [Scripts (`scripts/`)](#scripts-scripts)
   - [Logs (`logs/`)](#logs-logs)
 
 ### Setup & Deployment
@@ -259,6 +256,176 @@ Total Cost of Ownership = API Cost + Infrastructure Cost
 | **Llama 3.2 1B**      | 800              | 400               | $0          | $0               | $30-50         | $30-50  |
 | **Llama 3.2 3B**      | 800              | 400               | $0          | $0               | $50-100        | $50-100 |
 | **Llama 3 ChatQA 8B** | 800              | 400               | $0          | $0               | $80-150        | $80-150 |
+
+---
+
+### Evidence RAG vs Prompt
+
+![alt text](docs/resource/img/mlflow.png)
+![alt text](docs/resource/img/mlflow_01.png)
+
+## Phase 5: RAG & Prompting
+
+### Objective
+
+Design and implement prompt engineering strategies and retrieval-augmented generation (RAG) pipelines that provide the LLM with necessary context and guidance to generate accurate, comprehensive test cases. Choose the right approach (direct prompting vs. RAG) based on your data and use case requirements.
+
+### Key Activities
+
+- **Design effective prompts** - Craft prompt templates that clearly guide the LLM to generate well-structured test cases with preconditions, steps, and expected results
+- **Implement RAG pipelines** - Create retrieval systems that provide relevant examples and context when generating test cases for complex user stories
+- **Optimize prompts through iteration** - Test and refine prompts based on output quality, adjusting templates to improve test case comprehensiveness and accuracy
+- **Handle edge cases** - Engineer prompts to handle ambiguous user stories, incomplete requirements, and edge case scenarios
+- **Balance latency and quality** - Trade off between simple prompting for speed and RAG-enhanced generation for better context awareness
+
+### Implementation Approaches
+
+#### 1. Direct Prompting Strategy
+
+**Use Case:** Simple to moderately complex user stories that don't require external context or examples
+
+**Implementation:** `src/application/create_tests/infra/executable_chain/executable_chain_prompting.py`
+
+```python
+class ExecutableChainPrompting(ExecutableChain):
+    """Direct prompting without retrieval-augmented generation.
+
+    Suitable for tasks that don't require context retrieval.
+    Simple, fast execution without external knowledge retrieval.
+    """
+
+    def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
+        # Chain: PromptTemplate → LLM → RobustJsonOutputParser
+        # Creates simple pipeline: prompt → inference → validated JSON
+```
+
+**Advantages:**
+
+- Lower latency (no retrieval overhead)
+- Simpler architecture (no vector store dependencies)
+- Faster response times for straightforward user stories
+- Easier to debug and understand
+
+**Disadvantages:**
+
+- Limited context awareness
+- May struggle with complex or ambiguous stories
+- No access to examples or domain knowledge
+- Higher retry rate for edge cases
+
+**Configuration:**
+
+- Prompt template guides model behavior
+- Retry logic handles JSON parsing failures
+- Max retries: 3 attempts for structure validation
+
+---
+
+#### 2. RAG-Enhanced Strategy
+
+**Use Case:** Complex user stories, domain-specific requirements, or situations requiring example-based generation
+
+**Implementation:** `src/application/create_tests/infra/executable_chain/executable_chain_rag.py`
+
+```python
+class ExecutableChainRAG(ExecutableChain):
+    """RAG pattern with retrieval-augmented generation.
+
+    Provides context retrieval from vector stores and example-based generation.
+    Includes caching for performance optimization.
+    """
+
+    def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
+        # Chain: Retriever (cached) → PromptTemplate + Context → LLM → RobustJsonOutputParser
+        # Augments prompt with retrieved examples and context before inference
+```
+
+**Advantages:**
+
+- Better context awareness with retrieved examples
+- Handles complex and ambiguous stories better
+- Can ground generation in existing test cases
+- Higher quality output for domain-specific needs
+
+**Disadvantages:**
+
+- Higher latency due to retrieval step
+- Requires vector store setup and maintenance
+- Dependency on retrieval quality
+- More complex debugging
+
+**Core Features:**
+
+- **Cached Retrieval:** `_cached_retrieve()` method with LRU cache (max 100 items) reduces repeated retrievals
+- **Context Formatting:** Retrieved documents formatted as context for the LLM
+- **Validation & Retry:** Same structure validation as direct prompting with automatic retries
+- **Async Support:** `execute_async()` for batch processing with concurrent rate limiting (max 3 concurrent by default)
+- **Cache Management:** `get_cache_stats()` and `clear_cache()` methods for monitoring and maintenance
+
+**Configuration:**
+
+- Vector store retriever for semantic search
+- RAG cache with configurable size
+- Concurrent execution limits for batch operations
+- Retry logic identical to direct prompting (max 3 attempts)
+
+---
+
+### Choosing Your Approach
+
+| Factor                 | Direct Prompting                | RAG-Enhanced                             |
+| ---------------------- | ------------------------------- | ---------------------------------------- |
+| **Latency**            | <1s                             | 2-5s                                     |
+| **Best For**           | Simple stories, quick responses | Complex stories, domain knowledge needed |
+| **Setup Complexity**   | Low                             | Medium-High                              |
+| **Accuracy**           | Good (80-90%)                   | Better (90-95%)                          |
+| **Cost**               | Lower (no retrieval)            | Slightly higher (retrieval overhead)     |
+| **Example Dependency** | Prompt-based only               | Retriever-based context                  |
+| **Cache Benefits**     | N/A                             | Significant for repeated queries         |
+
+### Common Patterns
+
+**Pattern 1: Hybrid Approach**
+
+```
+1. Try direct prompting first
+2. If quality score < threshold, fall back to RAG
+3. Cache RAG results for similar future queries
+```
+
+**Pattern 2: Progressive Enhancement**
+
+```
+1. Start with simple prompting templates
+2. Monitor failure rates and retry counts
+3. Gradually add RAG for frequently failing story types
+4. Use cached results to improve latency
+```
+
+**Pattern 3: Context-Aware Routing**
+
+```
+1. Analyze incoming user story complexity
+2. Simple stories → Direct prompting
+3. Complex stories → RAG with cached retriever
+4. Monitor and adapt thresholds based on quality metrics
+```
+
+### Validation & Error Handling
+
+Both implementations include robust validation:
+
+- **Structure Validation:** Ensures response contains `test_cases` array with valid test case objects
+- **JSON Parsing:** Automatic retry on invalid JSON responses
+- **Type Checking:** Validates response is dictionary type (not string or list)
+- **Attempt Tracking:** Logs retry attempts and reasons for debugging
+
+### Outputs
+
+- **Prompt templates:** Optimized prompts guiding test case generation
+- **RAG pipeline:** Vector store setup with retriever and caching infrastructure
+- **Validation schemas:** Test case structure definitions for output validation
+- **Performance metrics:** Latency, retry rates, and cache effectiveness statistics
 
 ---
 
@@ -694,50 +861,10 @@ async def track_cost(request_data: dict, response_data: dict):
 - **FastAPI** - High-performance async API framework with automatic documentation
 - **Pydantic** - Request/response validation
 - **Docker** - Containerization for consistency across environments
-- **Kubernetes** - Orchestration and scaling
 - **Ollama** - Local inference engine
-- **Redis** - Response caching and rate limiting
-- **Prometheus** - Metrics collection
-- **ELK Stack** - Centralized logging (Elasticsearch, Logstash, Kibana)
 - **Uvicorn** - ASGI server for FastAPI
 
-### Production Checklist
-
-- [ ] API endpoints fully tested with automated tests
-- [ ] Input validation and sanitization implemented
-- [ ] Rate limiting configured and tested
-- [ ] Caching strategy implemented and benchmarked
-- [ ] SSL/TLS certificates installed
-- [ ] API authentication (JWT/API keys) working
-- [ ] Error handling and graceful degradation implemented
-- [ ] Monitoring and alerting set up
-- [ ] Logging centralized and searchable
-- [ ] Health checks implemented
-- [ ] Load balancing configured
-- [ ] Auto-scaling policies defined
-- [ ] Backup and disaster recovery plan documented
-- [ ] Security audit completed
-- [ ] Documentation complete (API docs, runbooks)
-- [ ] Team trained on deployment and rollback procedures
-
-### Outputs
-
-- **Production API endpoints** - FastAPI application running on port 8000 with documented endpoints
-- **Deployment documentation** - Step-by-step guides for deploying to Kubernetes, Docker, or standalone
-- **Security configuration** - Input validation rules, auth mechanisms, rate limiting policies
-- **Rollout plan and runbooks** - Canary deployment strategy, monitoring guides, rollback procedures
-- **Infrastructure as Code** - Docker, Kubernetes YAML configurations ready for deployment
-
-### Challenges & Mitigation
-
-| Challenge               | Risk                                                                        | Mitigation                                                                                 |
-| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Cold starts**         | High latency on first requests to new instances                             | Pre-load models on startup, use warmup requests, cache frequently used stories             |
-| **Cost explosion**      | No rate limiting leads to unexpected bills or resource exhaustion           | Implement strict rate limits, monitor usage per API key, set alerts                        |
-| **Security gaps**       | Not validating inputs allows prompt injection attacks                       | Implement input sanitization, use blocklist of dangerous patterns, test injection attempts |
-| **Silent failures**     | Model fails but returns generic errors, hard to debug                       | Implement detailed logging, distributed tracing, comprehensive error codes                 |
-| **Scaling bottlenecks** | Single Ollama instance becomes bottleneck under load                        | Run multiple Ollama instances, implement load balancing, use horizontal scaling            |
-| **State inconsistency** | Different pods generate different outputs for same input due to seed issues | Fix random seeds, implement deterministic generation, cache results                        |
+### Evidence
 
 ---
 
@@ -794,30 +921,6 @@ Continuously track your LLM application's reliability, cost-effectiveness, and q
 
 #### 2. Cost Tracking
 
-**Cost Breakdown:**
-
-```python
-# Track costs across dimensions
-{
-  "period": "2024-02-23",
-  "infrastructure_cost": {
-    "compute_hourly": 2.50,  # Kubernetes pod cost
-    "storage": 5.00,         # Persistent volume
-    "network": 1.20,         # Data transfer
-    "daily_total": 78.00
-  },
-  "usage_metrics": {
-    "total_requests": 15000,
-    "cost_per_request": 0.0052,
-    "requests_per_dollar": 192
-  },
-  "forecast": {
-    "weekly_cost": 546,
-    "monthly_cost": 2340
-  }
-}
-```
-
 **Cost Alerts:**
 
 | Alert                      | Condition                    | Action                      |
@@ -827,43 +930,6 @@ Continuously track your LLM application's reliability, cost-effectiveness, and q
 | **Efficiency degradation** | Cost per request ↑ 20%       | Check for retries or errors |
 
 #### 3. Logging Strategy
-
-**Structured Logging Format:**
-
-```json
-{
-  "timestamp": "2024-02-23T10:30:45.123Z",
-  "level": "INFO",
-  "request_id": "req_12345",
-  "service": "test-generator-api",
-  "pod": "test-generator-0",
-  "version": "v1.2.3",
-  "event": "test_generation_complete",
-  "duration_ms": 2850,
-  "input": {
-    "story": "As a customer, I want to search products...",
-    "difficulty": "medium",
-    "story_length": 78
-  },
-  "output": {
-    "test_cases_count": 3,
-    "quality_score": 0.92,
-    "json_valid": true
-  },
-  "model": {
-    "name": "llama3.2:1b",
-    "tokens_generated": 450
-  },
-  "system": {
-    "cpu_percent": 45,
-    "memory_mb": 1850,
-    "gpu_memory_mb": 2100
-  },
-  "error": null,
-  "user_id": "user_abc",
-  "api_key_hash": "sha256_xyz..."
-}
-```
 
 **Log Levels:**
 
@@ -1021,49 +1087,15 @@ for log in logs:
 
 - **Prometheus** - Metrics collection and alerting
 - **Grafana** - Metrics visualization and dashboards
-- **Elasticsearch** - Log storage and search
-- **Kibana** - Log visualization and analysis
 - **Datadog/New Relic** - All-in-one monitoring platform (alternative)
 - **CloudWatch** - AWS native monitoring (if on AWS)
 - **OpenTelemetry** - Distributed tracing
 - **Alertmanager** - Alert routing and grouping
 
-### Monitoring Checklist
+#### Evidence
 
-- [ ] Prometheus scraping metrics from all instances
-- [ ] Grafana dashboards created and shared with team
-- [ ] Elasticsearch logs shipping from all pods
-- [ ] Kibana saved searches for common debugging patterns
-- [ ] Alert rules defined for critical issues
-- [ ] Alert routing configured (PagerDuty/Slack/Email)
-- [ ] On-call schedule established with runbooks
-- [ ] Log retention policy set (30 days for detailed, 1 year for summary)
-- [ ] Tracing enabled on 10% of requests
-- [ ] SLO thresholds defined (99.5% uptime, P99 <10s)
-- [ ] Cost tracking dashboard operational
-- [ ] Quality metrics baseline established
-- [ ] Team trained on observability tooling
-- [ ] Incident response playbook documented
-
-### Outputs
-
-- **Real-time dashboards** - Grafana dashboards for operations team, accessible 24/7
-- **Alert configurations** - Prometheus rules and Alertmanager routing for all critical issues
-- **Performance reports** - Weekly/monthly reports showing trends, SLO compliance, and recommendations
-- **Cost tracking and forecasts** - Daily cost breakdown, monthly forecasts, cost optimization recommendations
-- **Debugging toolkit** - Documentation and scripts for investigating failures
-- **SLO definitions** - Service level objectives with agreed targets (e.g., 99.5% uptime)
-
-### Challenges & Mitigation
-
-| Challenge                  | Risk                                                             | Mitigation                                                                                   |
-| -------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| **Silent degradation**     | Quality drops but no alerts fire because only monitoring uptime  | Define quality-specific SLOs and alerts for quality score drops >10%                         |
-| **Log explosion**          | Storing every request is expensive at scale                      | Sample logs (10% of requests), aggregate metrics, archive old logs to cold storage           |
-| **Cost blindness**         | Discovering $10K bills after the fact instead of preventing them | Daily cost tracking, set budget alerts at 80% threshold, forecast monthly spend              |
-| **Alert fatigue**          | Too many alerts cause team to ignore all of them                 | Tune thresholds carefully, use alert aggregation, require manual action only for real issues |
-| **Incomplete context**     | Logs lack information needed for debugging                       | Implement structured logging with trace IDs, user IDs, model info, system stats              |
-| **No baseline comparison** | Hard to know if current metrics are good or bad                  | Establish baseline metrics, track trends over time, compare to SLO targets                   |
+![alt text](docs/resource/img/image.png)
+![alt text](docs/resource/img/log.png)
 
 ---
 
