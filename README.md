@@ -206,3 +206,98 @@ Currently, the project includes **49 diverse user stories** across an e-commerce
 Raw Data → Collection → Cleaning → Validation → Versioning → Ready for Use
            (49 stories)   (PII)      (Schema)     (DVC)      (training/eval)
 ```
+
+## Phase 3: Model Selection & Evaluation
+
+### Objective
+
+Evaluate different open-source LLM options to find the best fit for your use case by testing on your specific data. Consider model size, inference latency, memory requirements, and quality of outputs for local deployment. Focus on privacy-first, cost-effective models running on Ollama.
+
+### Key Activities
+
+- **Compare models on evaluation dataset** - Run the evaluation set through multiple local models and compare outputs
+- **Test different model sizes** - Evaluate lightweight (1B), balanced (3B), and higher-quality (8B) models from the Meta Llama family
+- **Measure performance metrics relevant to use case** - Evaluate based on structural compliance, quality scores, and semantic accuracy
+- **Evaluate latency and resource usage** - Calculate inference time and memory requirements for each model
+- **Document model comparison in decision matrix** - Create records for transparent decision-making and future reference
+
+### Model Candidates
+
+#### Open-Source Models (Local / Self-hosted)
+
+| Model             | Provider | Size          | Image              | Latency | Cost     | Notes                                                                       |
+| ----------------- | -------- | ------------- | ------------------ | ------- | -------- | --------------------------------------------------------------------------- |
+| **Llama 3.2 1B**  | Meta     | 1B parameters | `llama3.2:1b`      | ~1-2s   | $0/token | ✅ **Selected Choice** - Ultra-lightweight, fastest inference, minimal VRAM |
+| **Llama 3.2 3B**  | Meta     | 3B parameters | `llama3.2:3b`      | ~2-5s   | $0/token | ✅ **Primary Choice** - Good balance of speed, quality, privacy             |
+| Llama 3 ChatQA 8B | Meta     | 8B parameters | `llama3-chatqa:8b` | ~4-8s   | $0/token | Higher quality, slower, better reasoning, requires more VRAM                |
+
+### Evaluation Methodology
+
+Comprehensive evaluation across three dimensions:
+
+#### 1. Accuracy & Quality (Precisión y Calidad de la Salida)
+
+Measured through rule compliance and output utility rather than traditional classification metrics.
+
+| Metric | Target | Details |
+| --- | --- | --- |
+| **Structural Compliance** | >95% | JSON parsing success on first attempt, no retry mechanisms |
+| **Quality Score** | ≥4.0/5.0 | Heuristic evaluation: preconditions, logical steps, field completeness |
+| **Retry Rate** | <5% | Malformed responses or schema violations |
+| **Test Case Count** | ≥3 per story | Average number of test cases generated per user story |
+| **Precondition Completeness** | ≥90% | % of test cases with non-empty, meaningful preconditions |
+| **Step Clarity** | 2-5 steps | Average steps per test case (optimal range) |
+| **Semantic Relevance** | ≥4.0/5.0 | LLM evaluation of story-to-tests alignment |
+
+#### 2. Performance & Latency (Latencia y Rendimiento)
+
+Managing inference latency with local models (Llama 3, Qwen, Mistral via Ollama).
+
+| Metric | Target | Details |
+| --- | --- | --- |
+| **End-to-End Latency (P50)** | <3s | Median response time from request to complete response |
+| **End-to-End Latency (P90)** | <5s | 90th percentile latency across all requests |
+| **End-to-End Latency (P99)** | <10s | 99th percentile latency (worst case) |
+| **Time to First Token** | <1s | Inference startup time before generation begins |
+| **Throughput** | >10 req/min | Sustained requests per minute on single instance |
+| **Validation Overhead** | <20% | Additional validation time vs. pure text generation |
+
+#### 3. Cost & Resource Efficiency (Coste por Solicitud y Eficiencia)
+
+With Ollama, token cost = $0. Cost shifts to compute infrastructure.
+
+| Metric | Target | Details |
+| --- | --- | --- |
+| **Infrastructure Cost** | <$100/1K | Monthly server cost per 1,000 requests |
+| **Resource Utilization (CPU)** | <80% | Average CPU usage during inference |
+| **Resource Utilization (RAM)** | <85% | Peak memory usage during inference |
+| **Resource Utilization (VRAM)** | <90% | GPU memory usage (if available) |
+| **Model Memory Footprint** | Baseline dependent | Total VRAM required for model weights |
+| **Cost per Request** | Model dependent | Infrastructure cost ÷ requests/month |
+
+#### Benchmark Testing Setup
+
+Test on the evaluation dataset with multiple story complexities:
+
+**Story Length Scenarios:**
+- Short stories (1 sentence) - quick inference baseline
+- Medium stories (2-3 sentences) - typical complexity
+- Long stories (4+ sentences) - stress test scenario
+
+**Load Testing Patterns:**
+- Single request (baseline latency)
+- Sustained load (10+ concurrent requests)
+- Peak load (throughput limits)
+
+#### Model Comparison (1,000 requests/month)
+
+| Model | Input Tokens | Output Tokens | Latency (P90) | Monthly Cost | Recommendation |
+| --- | --- | --- | --- | --- | --- |
+| **Llama 3.2 1B** | 800 | 400 | 1-2s | $30-50 | Best for speed, good quality |
+| **Llama 3.2 3B** | 800 | 400 | 2-5s | $50-100 | Balanced speed/quality |
+| **Llama 3 ChatQA 8B** | 800 | 400 | 4-8s | $80-150 | Best quality, slower |
+
+### Evidence RAG vs Prompt
+
+![alt text](docs/resource/img/mlflow.png)
+![alt text](docs/resource/img/mlflow_01.png)
