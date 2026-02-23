@@ -81,7 +81,6 @@ services:
       - test-gen-network
     depends_on:
       - ollama
-      - loki
     deploy:
       resources:
         reservations:
@@ -89,12 +88,6 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki:3100/loki/api/v1/push"
-        labels: "service=test-case-api,environment=development"
-        mode: "non-blocking"
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
   mlflow:
