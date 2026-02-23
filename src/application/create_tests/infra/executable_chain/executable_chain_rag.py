@@ -1,11 +1,9 @@
 import time
 import json
-import re
 import asyncio
-from typing import Optional, Dict, Any, List
+from typing import Optional, List
 
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import BaseOutputParser
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_core.runnables import RunnableLambda
 from pydantic import ValidationError
@@ -14,38 +12,12 @@ from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
 from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
 from src.application.create_tests.infra.executable_chain.rag_cache import RAGCache
+from src.application.create_tests.infra.executable_chain.robust_json_output_parser import RobustJsonOutputParser
 
 
 def format_docs(docs):
     """Format retrieved documents for the prompt"""
     return "\n\n".join(doc.page_content for doc in docs)
-
-
-class RobustJsonOutputParser(BaseOutputParser):
-    """JSON parser that handles markdown-wrapped JSON output from LLMs."""
-
-    def parse(self, text: str) -> Dict[str, Any]:
-        """Parse JSON from text, handling markdown code blocks.
-
-        Handles cases where LLM wraps JSON in markdown:
-        ```json
-        {...}
-        ```
-        """
-        # Strip markdown code blocks
-        text = text.strip()
-        if text.startswith("```"):
-            # Remove opening markdown block
-            text = re.sub(r'^```(?:json)?\s*\n', '', text)
-            # Remove closing markdown block
-            text = re.sub(r'\n```\s*$', '', text)
-
-        # Try to extract JSON object if there's extra text
-        json_match = re.search(r'\{.*\}', text, re.DOTALL)
-        if json_match:
-            text = json_match.group(0)
-
-        return json.loads(text)
 
 
 class ExecutableChainRAG(ExecutableChain):

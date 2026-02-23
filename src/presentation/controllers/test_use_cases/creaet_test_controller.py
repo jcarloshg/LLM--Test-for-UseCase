@@ -24,41 +24,54 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         generate_request = GenerateRequest(**body)
 
         # ─────────────────────────────────────
-        # init dependencies
+        # llm rag - init dependencies
         # ─────────────────────────────────────
-        #         # llm rag
-        #         llm = ModelsConfig().get_llama3_2_1b()
-        #
-        #         # Load FAISS vectorstore
-        #         try:
-        #             retriever = load_faiss_vectorstore()
-        #         except FileNotFoundError as e:
-        #             print(f"="*60)
-        #             print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
-        #             print(f"="*60)
-        #             return CustomResponse.error(message=str(e))
-        #
-        #         # executable_chain_rag
-        #         executable_chain_rag = ExecutableChainRAG(
-        #             prompt_emplate=RAG_PROMPT,
-        #             retriever=retriever,
-        #             llm=llm,
-        #         )
+#         llm = ModelsConfig().get_llama3_2_1b()
+#
+#         # Load FAISS vectorstore
+#         try:
+#             retriever = load_faiss_vectorstore()
+#         except FileNotFoundError as e:
+#             print(f"="*60)
+#             print(
+#                 f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
+#             print(f"="*60)
+#             return CustomResponse.error(message=str(e))
+#
+#         # executable_chain_rag
+#         executable_chain_rag = ExecutableChainRAG(
+#             prompt_emplate=RAG_PROMPT,
+#             retriever=retriever,
+#             llm=llm,
+#         )
+#
+#         # init the use case
+#         create_tests_application = CreateTestsApplication(
+#             executable_chain=executable_chain_rag
+#         )
+#
+#         # run the use case
+#         create_tests_application_responde = create_tests_application.run(
+#             generate_request=generate_request
+#         )
+#
+#         return create_tests_application_responde
 
-        # llm prompting
+        # ─────────────────────────────────────
+        # llm prompting - dependecies
+        # ─────────────────────────────────────
         llm = ModelsConfig().get_llama3_2_1b()
         executable_chain_prompting = ExecutableChainPrompting(
             prompt_emplate=IMPROVED_PROMPT_V1,
             llm=llm
         )
 
-        # ─────────────────────────────────────
         # init use case
-        # ─────────────────────────────────────
         create_tests_application = CreateTestsApplication(
             executable_chain=executable_chain_prompting
         )
 
+        # run the use case
         create_tests_application_responde = create_tests_application.run(
             generate_request=generate_request
         )

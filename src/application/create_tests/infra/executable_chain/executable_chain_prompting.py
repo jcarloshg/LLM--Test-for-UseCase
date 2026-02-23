@@ -8,12 +8,11 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from pydantic import ValidationError
 
+from src.application.create_tests.infra.executable_chain.robust_json_output_parser import RobustJsonOutputParser
+from src.application.create_tests.infra.executable_chain.test_case_structure import (
+    TestCaseStructure, TestCasesResponse)
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
-from src.application.create_tests.infra.executable_chain.test_case_structure import (
-    TestCaseStructure,
-    TestCasesResponse,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +96,7 @@ class ExecutableChainPrompting(ExecutableChain):
         chain = (
             self.prompt_emplate
             | self.llm
-            | JsonOutputParser()
+            | RobustJsonOutputParser()
         )
 
         # ─────────────────────────────────────
