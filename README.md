@@ -1528,3 +1528,256 @@ curl -X POST http://localhost:8000/generate-tests \
   -H "Content-Type: application/json" \
   -d '{"story": "As a user, I want to log in with my email..."}'
 ```
+
+## Next Steps
+
+### Upcoming Enhancements & Implementation Tasks
+
+This section outlines all pending features and improvements marked as "ToDo" throughout the LLMOps framework. Items are organized by phase and priority.
+
+---
+
+### Phase 2: Data Collection & Preparation
+
+#### 1. Implement DVC (Data Version Control)
+
+**Purpose:** Version datasets for reproducibility and experiment tracking
+
+**Status:** ToDo
+
+**Description:**
+
+- Set up DVC to track all datasets in `data/` directory
+- Enable reproducible data pipelines for train/test splits
+- Maintain audit trail of dataset changes
+- Link DVC with git for version control integration
+
+**Implementation Details:**
+
+```bash
+# Initialize DVC in project
+dvc init
+
+# Track datasets
+dvc add data/test/user_stories.json
+dvc add data/examples/user_stories_with_test_cases.json
+
+# Create data pipeline (dvc.yaml)
+# Define stages for data collection, cleaning, splitting
+```
+
+**Expected Outcome:**
+
+- All datasets versioned and tracked
+- Data lineage documented
+- Reproducible data pipelines for future experiments
+- Ability to roll back to previous dataset versions
+
+---
+
+#### 2. Integrate Label Studio for Manual Annotation
+
+**Purpose:** Enable manual annotation and quality review of test cases
+
+**Status:** ToDo
+
+**Description:**
+
+- Set up Label Studio instance for human-in-the-loop annotation
+- Create annotation interface for test case quality review
+- Define labeling guidelines and scoring rubrics
+- Build feedback loop from QA to model improvements
+
+**Implementation Details:**
+
+```python
+# Label Studio configuration
+# Annotation tasks:
+# 1. Rate test case quality (1-5 scale)
+# 2. Flag issues (missing steps, vague preconditions, etc.)
+# 3. Suggest improvements
+# 4. Mark edge cases and special scenarios
+```
+
+**Expected Outcome:**
+
+- Quality annotations for generated test cases
+- Human feedback integrated into evaluation metrics
+- Training data for fine-tuning models
+- Continuous quality improvement cycle
+
+---
+
+### Phase 6: Evaluation & Testing
+
+#### 1. Implement DeepEval Framework
+
+**Purpose:** Use LLM evaluation framework with pre-built metrics for automated quality assessment
+
+**Status:** ToDo
+
+**Description:**
+
+- Integrate DeepEval library for standardized LLM evaluation
+- Implement pre-built metrics (relevance, faithfulness, coherence)
+- Create custom metrics for test case evaluation
+- Automate evaluation pipeline in CI/CD
+
+**Installation:**
+
+```bash
+pip install deepeval
+```
+
+**Configuration:**
+
+```python
+from deepeval import evaluate
+from deepeval.metrics import Relevance, Faithfulness
+
+# Define evaluation metrics
+# - Relevance: Test case relevant to user story
+# - Faithfulness: Test case grounded in story requirements
+# - Completeness: Coverage of story scenarios
+# - Clarity: Test steps are clear and specific
+```
+
+**Integration Points:**
+
+- Phase 6 evaluation pipeline
+- CI/CD workflow for automated testing
+- Quality tracking dashboard
+- Report generation
+
+**Expected Outcome:**
+
+- Standardized, reproducible evaluation metrics
+- Automated quality scoring for all generated test cases
+- Benchmarking across model versions
+- Evidence-based model selection
+
+---
+
+#### 2. Set Up Load Testing Tools (locust, wrk)
+
+**Purpose:** Latency and throughput benchmarking under production load
+
+**Status:** ToDo
+
+**Description:**
+
+- Install and configure load testing tools (locust and/or wrk)
+- Create load test scenarios simulating production traffic
+- Profile API latency at various request volumes
+- Identify performance bottlenecks and scaling limits
+
+**Installation:**
+
+```bash
+pip install locust
+# or
+brew install wrk  # macOS
+```
+
+**Locust Configuration Example:**
+
+```python
+from locust import HttpUser, task
+
+class TestCaseGenerationUser(HttpUser):
+    @task
+    def generate_tests(self):
+        payload = {
+            "story": "As a customer, I want to search for products...",
+            "difficulty": "medium"
+        }
+        self.client.post("/generate-tests", json=payload)
+```
+
+**Load Test Scenarios:**
+
+- Ramp up: Gradually increase users from 1 to 100
+- Sustained: Hold at peak load for 5-10 minutes
+- Spike: Sudden burst to test handling capacity
+- Stress: Push beyond expected capacity to find limits
+
+**Metrics to Track:**
+
+- Response time (P50, P90, P99)
+- Requests per second (RPS)
+- Error rate under load
+- Memory and CPU usage during load
+- Cache hit rates
+
+**Expected Outcome:**
+
+- Baseline performance metrics at different load levels
+- Identification of performance degradation points
+- Scaling recommendations (vertical vs. horizontal)
+- SLA targets for production deployment
+- Documentation of performance characteristics
+
+---
+
+### Summary of All ToDo Items
+
+| Phase       | Feature                   | Priority | Complexity | Est. Effort |
+| ----------- | ------------------------- | -------- | ---------- | ----------- |
+| **Phase 2** | DVC Data Versioning       | Medium   | Medium     | 4-6 hours   |
+| **Phase 2** | Label Studio Integration  | High     | High       | 8-12 hours  |
+| **Phase 6** | DeepEval Metrics          | High     | Medium     | 6-8 hours   |
+| **Phase 6** | Load Testing (locust/wrk) | Medium   | Medium     | 4-6 hours   |
+
+---
+
+### Recommended Implementation Order
+
+1. **Start with Load Testing** (Phase 6)
+   - Quick to set up and provides immediate insights
+   - Helps validate current infrastructure
+   - Foundation for scaling decisions
+
+2. **Implement DeepEval** (Phase 6)
+   - Enhances evaluation pipeline
+   - Provides standardized metrics
+   - Feeds into quality tracking
+
+3. **Set Up DVC** (Phase 2)
+   - Enables reproducible workflows
+   - Prepares for iterative improvements
+   - Supports future experiments
+
+4. **Integrate Label Studio** (Phase 2)
+   - Most complex, highest impact long-term
+   - Establishes human-in-the-loop feedback
+   - Powers continuous improvement cycle
+
+---
+
+### Integration with Existing Systems
+
+**DeepEval Integration:**
+
+- Feeds evaluation metrics into Phase 6: Evaluation & Testing
+- Metrics displayed on Grafana dashboards (Phase 8)
+- Results logged for feedback analysis (Phase 9)
+
+**Load Testing Integration:**
+
+- Results inform Phase 7: Deployment & Serving scaling decisions
+- Latency metrics feed into monitoring alerts (Phase 8)
+- Data informs infrastructure cost calculations
+
+**DVC Integration:**
+
+- Enables Phase 2: Data Collection & Preparation reproducibility
+- Supports Phase 5: RAG & Prompting with versioned context
+- Facilitates Phase 9: Feedback & Iteration experiments
+
+**Label Studio Integration:**
+
+- Provides ground truth for Phase 6: Evaluation & Testing
+- Generates training data for potential fine-tuning
+- Feeds human feedback into Phase 9: Feedback & Iteration
+
+---
