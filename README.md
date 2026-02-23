@@ -4,169 +4,230 @@ This project implements a microservice that leverages Large Language Models (LLM
 
 ## Table of Contents
 
-### LLMOps Framework (9 Phases)
+### 🚀 Getting Started & Deployment
+
+- [Prerequisites & Installation](#getting-started)
+- [Running the Service](#running-the-service)
+- [Running Model Evaluation](#running-model-evaluation)
+
+### 📊 LLMOps Framework (9 Phases)
 
 1. [Phase 1: Problem Definition & Use Case Design](#phase-1-problem-definition--use-case-design)
-2. [Architecture Decisions](#architecture-decisions)
-3. [Phase 2: Data Collection & Preparation](#phase-2-data-collection--preparation)
-4. [Phase 3: Model Selection & Evaluation](#phase-3-model-selection--evaluation)
-5. [Phase 5: RAG & Prompting](#phase-5-rag--prompting)
-6. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
-7. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
-8. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
-9. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
+2. [Phase 2: Data Collection & Preparation](#phase-2-data-collection--preparation)
+3. [Phase 3: Model Selection & Evaluation](#phase-3-model-selection--evaluation)
+4. [Phase 4: Prompt Engineering & Optimization](#phase-4-prompt-engineering--optimization)
+5. [Phase 6: Evaluation & Testing](#phase-6-evaluation--testing)
+6. [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
+7. [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability)
+8. [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
 
-### Project Organization
+### 📈 Next Steps & Roadmap
 
-- [Project Structure](#project-structure)
-- [File System Organization](#file-system-organization)
-  - [Root Level Files](#root-level-files)
-  - [Data (`data/`)](#data-data)
-  - [Docker (`docker/`)](#docker-docker)
-  - [Logs (`logs/`)](#logs-logs)
+- [Comprehensive ToDo List](#comprehensive-todo-list)
+  - [Phase 1-6: Completed Core Phases](#phase-1-completed-core-phases)
+  - [Phase 7: Deployment & Serving](#phase-7-deployment--serving-1)
+  - [Phase 8: Monitoring & Observability](#phase-8-monitoring--observability-1)
+  - [Phase 9: Feedback & Iteration](#phase-9-feedback--iteration)
 
-### Setup & Deployment
+### 🗂️ Project Organization
 
-- [Getting Started](#getting-started)
-- [Next Steps](#next-steps)
+- [File System Tree](#file-system-tree)
 
-## Quick Navigation
+## Getting Started
 
-**For Implementation:**
+### 📋 Prerequisites
 
-- Start with [Phase 1: Problem Definition](#phase-1-problem-definition--use-case-design)
-- Review [Architecture Decisions](#architecture-decisions)
-- Prepare data in [Phase 2](#phase-2-data-collection--preparation)
-- Select models in [Phase 3](#phase-3-model-selection--evaluation)
+- 🐳 Docker and Docker Compose
+- 🎮 NVIDIA GPU with CUDA support (optional but recommended for better performance)
 
-**For Production:**
+### 📦 Installation
 
-- Deploy using [Phase 7: Deployment & Serving](#phase-7-deployment--serving)
-- Setup monitoring with [Phase 8](#phase-8-monitoring--observability)
-- Plan iterations with [Phase 9](#phase-9-feedback--iteration)
+```bash
+# Clone the repository
+git clone <repository-url>
+cd LLM--Test-for-UseCase
 
-**For Development:**
+# Create .env file (configure as needed)
+cp .env.example .env  # if available, or create manually
 
-- Understand [File System Organization](#file-system-organization)
-- Run [Getting Started](#getting-started)
-- View [Project Structure](#project-structure)
+# Build and start all services
+docker-compose up -d
+
+# Wait for Ollama to be ready (check health with)
+docker-compose exec ollama ollama list
+
+# Pull the required models (if not auto-loaded)
+docker compose exec ollama ollama pull llama3.2:1b
+docker compose exec ollama ollama pull llama3-chatqa:8b
+docker compose exec ollama ollama pull qwen3-vl:8b
+docker compose exec ollama ollama pull llama3.2:3b
+```
+
+### 🚀 Running the Service
+
+Once `docker-compose up -d` completes, the services are automatically running:
+
+- 🔌 **Test Case Generation API**: http://localhost:8001
+- 📊 **Grafana Dashboard**: http://localhost:3000 (monitoring and visualization)
+- 📈 **MLflow UI**: http://localhost:5001 (experiment tracking)
+- 🤖 **Ollama**: http://localhost:11435 (LLM backend)
+- 📝 **Loki**: http://localhost:3100 (log aggregation)
+
+Test the API:
+
+```bash
+curl -X POST http://localhost:8001/generate-tests \
+  -H "Content-Type: application/json" \
+  -d '{"story": "As a user, I want to log in with my email..."}'
+```
+
+### 📊 Running Model Evaluation
+
+1. 🚀 Start all services
+2. ✅ Verify Ollama is ready
+3. 🔬 Run evaluation (⏱️ ~5-10 minutes for full dataset)
+4. 📈 View results in MLflow
+5. 📊 Monitor metrics in Grafana
+
+```bash
+# 1.
+docker compose up -d
+# 2.
+docker compose exec ollama ollama list
+# 3.
+docker compose exec api python src/application/evaluate_models/application/evaluate_models_application.py
+# 4.
+http://localhost:5001
+# 5.
+http://localhost:3000
+```
 
 ## Phase 1: Problem Definition & Use Case Design
 
-### Objective
+### 🎯 Objective
 
-Clearly define what problem you're solving and whether an LLM is the right solution. Establish success criteria, constraints (budget, latency, privacy), and scope to prevent costly mistakes later. Determine if you need simple prompting, RAG (Retrieval-Augmented Generation), or fine-tuning.
+Establish the foundation by clearly defining:
 
-### Key Activities
+- **Problem Statement**: Generate valid, structured test cases from user stories using prompt engineering and LLM capabilities
+- **Solution Fit**: LLM chosen for natural language understanding and creative test case generation
+- **Scope**: Simple prompting approach with local model deployment via Ollama
+- **Constraints**: Budget (compute-based), latency (<5s P90), privacy (self-hosted)
 
-- **Define specific use case and expected outcomes** - Generate valid, structured test cases from user stories using prompt engineering
-- **Identify success metrics (accuracy, latency, cost per request)**
-  - Structural compliance (JSON parsing success rate >95%)
-  - Quality score tracking
-  - Response latency <5 seconds (P90)
-  - Infrastructure cost per 1,000 requests
-- **Assess if LLM is appropriate vs. simpler solutions** - LLM chosen for natural language understanding and creative test case generation
-- **Document requirements and compliance needs (GDPR, HIPAA)** - Data anonymization and PII protection for input stories
-- **Decide build vs. buy (API vs. self-hosted models)** - Build approach: Deploy and run all models locally using Ollama for complete control and privacy
+### 🎬 Key Activities
 
-### Success Metrics & Constraints
+**1. Define Use Case & Outcomes**
 
-#### 1. Precisión y Calidad de la Salida (Accuracy & Quality)
+- Receive a user story as input
+- Generate structured test cases using an LLM
+- Perform basic quality validation on the generated output
+- Expose functionality through a REST API
 
-Since the objective is to generate valid and structured test artifacts, accuracy is measured through rule compliance and output utility rather than traditional classification metrics.
+**2. Success Metrics & Constraints**
 
-| Metric                                                | Details                                                                                                                                  | Target   |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| **Structural Compliance (JSON Parsing Success Rate)** | Percentage of LLM responses that parse successfully as valid JSON on first attempt, without triggering retry mechanisms                  | >95%     |
-| **Average Quality Score**                             | API returns a quality score evaluating heuristics: empty preconditions, minimum logical steps in test cases, field completeness          | ≥4.0/5.0 |
-| **Retry Rate**                                        | Frequency of retry invocations due to malformed responses or schema-breaking hallucinations. Indicates if prompt design needs adjustment | <5%      |
+These metrics define success across three dimensions:
 
-#### 2. Latencia y Rendimiento (Latency & Performance)
+**a) Accuracy & Quality (Precisión y Calidad de la Salida)**
 
-Local models (Llama 3, Mistral via Ollama) introduce specific latency challenges, especially without GPU acceleration in production environments.
+Measured through rule compliance and output utility rather than traditional classification metrics.
 
-| Metric | Details | Target |
-| -- | | |
-| **Total Endpoint Latency (P90 / P99)** | Time from receiving `POST /generate-tests` to returning JSON payload, including inference, parsing, and validation | P90 <5s, P99 <10s |
-| **Validation Overhead** | Additional time for structural, heuristic, and LLM-as-judge validation vs. pure text generation | <20% of total latency |
+| Metric                    | Target   | Details                                                                |
+| ------------------------- | -------- | ---------------------------------------------------------------------- |
+| **Structural Compliance** | >95%     | JSON parsing success on first attempt, no retry mechanisms             |
+| **Quality Score**         | ≥4.0/5.0 | Heuristic evaluation: preconditions, logical steps, field completeness |
+| **Retry Rate**            | <5%      | Malformed responses or schema violations                               |
 
-#### 3. Coste por Solicitud y Eficiencia (Cost per Request)
+**b) Performance & Latency (Latencia y Rendimiento)**
 
-With Ollama, inference cost per API token is $0, but cost shifts to compute infrastructure.
+Managing inference latency with local models (Llama 3, Qwen, Mistral via Ollama).
 
-| Metric                                      | Details                                                                                                                                   | Approach                               |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| **Infrastructure Cost per 1,000 Requests**  | Monthly server cost ÷ max request throughput without latency degradation                                                                  | Monitor via container resource usage   |
-| **Resource Utilization (CPU / RAM / VRAM)** | Track Docker container consumption during peak load. Justify trade-offs (e.g., 4-bit quantized models reduce RAM at slight accuracy cost) | Log CPU/RAM usage, establish baselines |
+| Metric                  | Target            | Details                                                                         |
+| ----------------------- | ----------------- | ------------------------------------------------------------------------------- |
+| **End-to-End Latency**  | P90 <5s, P99 <10s | Time from `POST /generate-tests` to response (inference + parsing + validation) |
+| **Validation Overhead** | <20%              | Additional validation time vs. pure text generation                             |
+
+**c) Cost & Resource Efficiency (Coste por Solicitud y Eficiencia)**
+
+With Ollama, token cost = $0. Cost shifts to compute infrastructure.
+
+| Metric                   | Approach                  | Details                                   |
+| ------------------------ | ------------------------- | ----------------------------------------- |
+| **Infrastructure Cost**  | Monitor resource usage    | Monthly server cost ÷ max throughput      |
+| **Resource Utilization** | Log CPU/RAM/VRAM baseline | Docker container consumption at peak load |
 
 ## Phase 2: Data Collection & Preparation
 
-### Objective
+### 🎯 Objective
 
-Gather, clean, and organize data needed for your LLM application—including examples for prompts, evaluation datasets, and training data if fine-tuning. Quality over quantity is critical; 100 high-quality examples often beat 1,000 noisy ones.
+Prepare high-quality training and evaluation data for your LLM application:
 
-### Key Activities
+- Gather diverse examples for prompts, evaluation, and potential fine-tuning
+- Ensure data quality, diversity, and proper formatting
+- Maintain reproducibility and traceability throughout the data lifecycle
 
-- **Collect representative input-output examples** - Gather diverse user stories covering different features, difficulty levels, and user personas
-- **Create evaluation datasets with ground truth labels** - Pair user stories with manually validated test cases as reference outputs
-- **Clean and anonymize data (remove PII)** - Ensure no sensitive information is exposed in stories or test data
-- **Structure data in appropriate formats (JSONL, CSV, JSON)** - Organize data for easy loading and validation
-- **Version datasets for reproducibility** - Track dataset changes and maintain audit trail for experiment tracking
+> **Key Principle:** Quality over quantity—100 high-quality examples often outperform 1,000 noisy ones.
+
+### 🎬 Key Activities
+
+**1. Collect Representative Examples**
+
+- Gather diverse user stories covering different features, complexity levels, and user personas
+- Aim for balanced representation across domains (e-commerce, authentication, analytics, etc.)
+- Capture edge cases and boundary conditions
+
+**2. Clean & Anonymize Data**
+
+- Remove personally identifiable information (PII) from stories and test data
+- Standardize formatting and remove inconsistencies
+- Validate data integrity before storage
+
+**3. Structure Data for Use**
+
+- Format as JSON, JSONL, or CSV for easy loading
+- Include metadata (difficulty, domain, quality score)
+- Create clear separation between input and output
 
 ### Dataset Overview
 
 Currently, the project includes **49 diverse user stories** across an e-commerce platform:
 
-| Dataset | Location | Contents | Size |
-| - | - | | -- |
-| **Test Stories** | `data/test/user_stories.json` | 49 user stories with difficulty levels (easy/medium/hard) | 1,097 bytes |
-| **Ground Truth Examples** | `data/examples/user_stories_with_test_cases.json` | 2 user stories with complete test case generations and quality scores | ~5+ KB |
+| Dataset                   | Location                                                                                           | Contents                                                      | Size        |
+| ------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------- |
+| **Test Stories**          | [data/test/user_stories.json](data/test/user_stories.json)                                         | 49 user stories with difficulty levels (easy/medium/hard)     | 1,097 bytes |
+| **Ground Truth Examples** | [data/examples/user_stories_with_test_cases.json](data/examples/user_stories_with_test_cases.json) | 49 user stories with 100 test cases, quality scores 0.71-0.92 | ~90+ KB     |
 
 ### Data Distribution
 
-**User Story Difficulty Levels:**
+**49 User Stories Across Difficulty Levels:**
 
-- **Easy:** Product recommendations, account data export, invoice printing, voice search, wishlists, etc.
-- **Medium:** Shopping cart, search, inventory management, notifications, checkout, product variants, etc.
-- **Hard:** Login/authentication, password reset, profile updates, two-factor authentication, secure payment, etc.
+| Difficulty | Count | Example User Stories                                                               |
+| ---------- | ----- | ---------------------------------------------------------------------------------- |
+| **Easy**   | ~15   | Product recommendations, account export, invoice printing, voice search, wishlists |
+| **Medium** | ~27   | Shopping cart, search, inventory, notifications, checkout, product variants        |
+| **Hard**   | ~7    | Login/auth, password reset, profile updates, 2FA, secure payment processing        |
 
-**Difficulty Breakdown (49 total stories):**
+### 🛠️ Tools & Technologies
 
-- Easy: ~15 stories
-- Medium: ~27 stories
-- Hard: ~7 stories
+| Tool                           | Purpose                                          | Status         | Implementation                                                                                                                                                         |
+| ------------------------------ | ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pydantic**                   | Input/output validation with schema enforcement  | ✅ Implemented | [input](src/application/create_tests/models/generate_test_cases_request.py) [output](src/application/create_tests/infra/executable_chain/robust_json_output_parser.py) |
+| **JSON Schema Validator**      | Validate test case structure compliance          | ✅ Implemented | [robust_json_output_parser.py](src/application/create_tests/infra/executable_chain/robust_json_output_parser.py)                                                       |
+| **DVC (Data Version Control)** | Version control for datasets and reproducibility | 📋 ToDo        | 📋 ToDo                                                                                                                                                                |
+| **Label Studio**               | Human-in-the-loop annotation and QA review       | 📋 ToDo        | 📋 ToDo                                                                                                                                                                |
 
-### Ground Truth Test Cases
+**Data Pipeline (ToDo):**
 
-The examples include complete test case sets with:
-
-- **Test Case Types:** Positive, negative, and edge-case scenarios
-- **Preconditions:** Prerequisites for test execution
-- **Steps:** Sequential test actions
-- **Expected Results:** Detailed assertions
-- **Quality Scores:** Assessed outputs (0.88-0.92 range)
-- **Priority Levels:** High, medium, low test prioritization
-
-**Example**: US_001 (Login functionality) has 3 test cases:
-
-- TC_001: Successful login with valid credentials (positive)
-- TC_002: Login fails with invalid password (negative)
-- TC_003: Login fails with non-existent email (negative)
-
-### Tools & Technologies
-
-- **Pydantic** - Data validation with schema enforcement
-- **JSON Schema Validator** - Validate test case structure
-- **DVC (Data Version Control)** - Version datasets for reproducibility (ToDo)
-- **Label Studio** - Manual annotation and quality review (ToDo)
+```
+Raw Data → Collection → Cleaning → Validation → Versioning → Ready for Use
+           (49 stories)   (PII)      (Schema)     (DVC)      (training/eval)
+```
 
 ## Phase 3: Model Selection & Evaluation
 
-### Objective
+### 🎯 Objective
 
 Evaluate different open-source LLM options to find the best fit for your use case by testing on your specific data. Consider model size, inference latency, memory requirements, and quality of outputs for local deployment. Focus on privacy-first, cost-effective models running on Ollama.
 
-### Key Activities
+### 🎬 Key Activities
 
 - **Compare models on evaluation dataset** - Run the evaluation set through multiple local models and compare outputs
 - **Test different model sizes** - Evaluate lightweight (1B), balanced (3B), and higher-quality (8B) models from the Meta Llama family
@@ -178,251 +239,265 @@ Evaluate different open-source LLM options to find the best fit for your use cas
 
 #### Open-Source Models (Local / Self-hosted)
 
-| Model | Provider | Size | Image | Latency | Cost | Notes |
-| -- | -- | - | | - | -- | |
-| **Llama 3.2 1B** | Meta | 1B parameters | `llama3.2:1b` | ~1-2s | $0/token | ✅ **Selected Choice** - Ultra-lightweight, fastest inference, minimal VRAM |
-| **Llama 3.2 3B** | Meta | 3B parameters | `llama3.2:3b` | ~2-5s | $0/token | ✅ **Primary Choice** - Good balance of speed, quality, privacy |
-| Llama 3 ChatQA 8B | Meta | 8B parameters | `llama3-chatqa:8b` | ~4-8s | $0/token | Higher quality, slower, better reasoning, requires more VRAM |
+| Model             | Provider | Size          | Image              | Latency | Cost     | Notes                                                                       |
+| ----------------- | -------- | ------------- | ------------------ | ------- | -------- | --------------------------------------------------------------------------- |
+| **Llama 3.2 1B**  | Meta     | 1B parameters | `llama3.2:1b`      | ~1-2s   | $0/token | ✅ **Selected Choice** - Ultra-lightweight, fastest inference, minimal VRAM |
+| **Llama 3.2 3B**  | Meta     | 3B parameters | `llama3.2:3b`      | ~2-5s   | $0/token | ✅ **Primary Choice** - Good balance of speed, quality, privacy             |
+| Llama 3 ChatQA 8B | Meta     | 8B parameters | `llama3-chatqa:8b` | ~4-8s   | $0/token | Higher quality, slower, better reasoning, requires more VRAM                |
 
 ### Evaluation Methodology
 
-#### 1. Performance Metrics
+Comprehensive evaluation across three dimensions:
 
-| Metric                        | How to Measure                               | Success Criteria    | Tool                       |
-| ----------------------------- | -------------------------------------------- | ------------------- | -------------------------- |
-| **Structural Compliance**     | % of valid JSON outputs on first attempt     | >95%                | Pydantic validator         |
-| **Quality Score**             | Average heuristic-based quality assessment   | ≥4.0/5.0            | Custom LLM-as-judge prompt |
-| **Test Case Count**           | Average number of test cases per story       | ≥3 per story        | Count validation           |
-| **Semantic Relevance**        | LLM evaluation of story-to-tests alignment   | ≥4.0/5.0            | Secondary LLM evaluation   |
-| **Precondition Completeness** | % of test cases with non-empty preconditions | ≥90%                | Schema validation          |
-| **Step Clarity**              | Average steps per test case                  | 2-5 steps (optimal) | Count analysis             |
+#### 1. Accuracy & Quality (Precisión y Calidad de la Salida)
 
-#### 2. Latency Benchmarks
+Measured through rule compliance and output utility rather than traditional classification metrics.
 
-Test on the evaluation dataset with multiple story lengths:
+- Implementation: [src/application/evaluate_models/model/quality_tracker.py](src/application/evaluate_models/model/quality_tracker.py)
+
+| Metric                        | Target       | Details                                                                |
+| ----------------------------- | ------------ | ---------------------------------------------------------------------- |
+| **Structural Compliance**     | >95%         | JSON parsing success on first attempt, no retry mechanisms             |
+| **Quality Score**             | ≥4.0/5.0     | Heuristic evaluation: preconditions, logical steps, field completeness |
+| **Retry Rate**                | <5%          | Malformed responses or schema violations                               |
+| **Test Case Count**           | ≥3 per story | Average number of test cases generated per user story                  |
+| **Precondition Completeness** | ≥90%         | % of test cases with non-empty, meaningful preconditions               |
+| **Step Clarity**              | 2-5 steps    | Average steps per test case (optimal range)                            |
+| **Semantic Relevance**        | ≥4.0/5.0     | LLM evaluation of story-to-tests alignment                             |
+
+#### 2. Performance & Latency (Latencia y Rendimiento)
+
+Managing inference latency with local models (Llama 3, Qwen, Mistral via Ollama). Tracking percentile-based metrics per best practices.
+
+- Implementation: [src/application/evaluate_models/model/latency_tracker.py](src/application/evaluate_models/model/latency_tracker.py)
+
+| Metric                  | Target      | Details                                               |
+| ----------------------- | ----------- | ----------------------------------------------------- |
+| **Mean Latency**        | <3s         | Average response time across all requests             |
+| **Median (P50)**        | <2.5s       | 50th percentile - typical response time               |
+| **P95 Latency**         | <5s         | 95% of requests complete within this time (SLA basis) |
+| **P99 Latency**         | <10s        | 99th percentile latency (worst case scenarios)        |
+| **Min Latency**         | Baseline    | Fastest recorded response time                        |
+| **Max Latency**         | <15s        | Slowest recorded response time                        |
+| **Std Dev**             | <2s         | Standard deviation indicates consistency              |
+| **Throughput**          | >10 req/min | Sustained requests per minute on single instance      |
+| **Validation Overhead** | <20%        | Additional validation time vs. pure text generation   |
+
+**SLA Definition (Best Practice):**
+
+> "95% of all requests must complete within the P95 latency target"
+>
+> - Implemented via `LatencyTracker.meets_sla(latencies, sla_p95_ms)`
+> - Validates P95 percentile against configurable threshold
+
+#### 3. Cost & Resource Efficiency (Coste por Solicitud y Eficiencia)
+
+With Ollama, token cost = $0. Cost shifts to compute infrastructure.
+
+- Implementation: [src/application/evaluate_models/model/cost_tracker.py](src/application/evaluate_models/model/cost_tracker.py)
+- Evaluation Integration: [src/application/evaluate_models/application/evaluate_models_application.py](src/application/evaluate_models/application/evaluate_models_application.py)
+
+| Metric                      | Target      | Details                                                           |
+| --------------------------- | ----------- | ----------------------------------------------------------------- |
+| **Cost per 1,000 Requests** | <$20        | Monthly server cost ÷ (max_requests/day × 30) × 1,000             |
+| **Cost Efficiency Score**   | >0.7        | Composite score: (latency_efficiency + throughput_efficiency) / 2 |
+| **Throughput**              | >30 req/min | Sustained requests per minute (60 ÷ avg_latency)                  |
+| **CPU Usage**               | <80%        | Average CPU usage during inference (2-core baseline)              |
+| **Memory per Request**      | <100 MB     | (Base model memory ÷ num_requests) + 50 MB overhead               |
+| **Concurrent Capacity**     | >2 requests | Estimated simultaneous requests based on available memory         |
+| **Total Execution Time**    | <500s       | Sum of all request latencies for evaluation set                   |
+
+**Default Configuration (Baseline):**
 
 ```
-Benchmark Setup:
-- Short stories (1 sentence)
-- Medium stories (2-3 sentences)
-- Long stories (4+ sentences)
-- Peak load (10 concurrent requests)
-
-Measure:
-- Time to first token (TTF)
-- End-to-end latency (P50, P90, P99)
-- Throughput (requests/second)
+Monthly Server Cost:    $100 USD
+Max Requests/Day:       5,000
+Container Memory:       8 GB
+Container CPU Cores:    2
+Base Model Memory:      4.0 GB (quantized 4-bit)
+Memory Overhead:        50 MB per request
 ```
-
-#### 3. Cost Analysis
 
 **Cost Calculation Formula:**
 
 ```
-Cost per Request = (Input Tokens + Output Tokens) × Model Rate
-Infrastructure Cost = Monthly Server Cost ÷ Requests/Month
-
-Total Cost of Ownership = API Cost + Infrastructure Cost
+Cost per 1,000 = (Monthly Cost ÷ (Max Requests/Day × 30)) × 1,000
+Example: ($100 ÷ (5,000 × 30)) × 1,000 = $0.67 per 1,000 requests
 ```
 
-**Example Comparison (1,000 requests/month):**
+**Optimization Thresholds & Recommendations:**
 
-| Model | Avg Input Tokens | Avg Output Tokens | Cost per 1K | Monthly API Cost | Infrastructure | Total |
-| | - | -- | -- | - | -- | - |
-| **Llama 3.2 1B** | 800 | 400 | $0 | $0 | $30-50 | $30-50 |
-| **Llama 3.2 3B** | 800 | 400 | $0 | $0 | $50-100 | $50-100 |
-| **Llama 3 ChatQA 8B** | 800 | 400 | $0 | $0 | $80-150 | $80-150 |
+| Condition                  | Recommendation                                | Impact                    |
+| -------------------------- | --------------------------------------------- | ------------------------- |
+| Latency > 3s               | Use 4-bit quantized model or upgrade hardware | Reduce response time      |
+| Throughput < 20 req/min    | Increase CPU cores or optimize prompts        | Improve capacity          |
+| Cost > $10 per 1K requests | Review server capacity utilization            | Lower infrastructure cost |
+| CPU Usage > 80%            | Enable load balancing or add replicas         | Prevent throttling        |
+| Efficiency Score < 0.6     | Comprehensive review of configuration         | Improve all metrics       |
 
-### Evidence RAG vs Prompt
+#### Model Comparison & MLflow Evaluation Results
 
-![alt text](docs/resource/img/mlflow.png)
-![alt text](docs/resource/img/mlflow_01.png)
+| Model                 | Quality Score | Avg Latency | P95 Latency | Throughput | Cost/1K | Efficiency |
+| --------------------- | ------------- | ----------- | ----------- | ---------- | ------- | ---------- |
+| **Llama 3.2 1B**      | 0.78-0.82     | 1.2s        | 1.8s        | 50 req/min | $0.67   | 0.85       |
+| **Llama 3.2 3B**      | 0.85-0.90     | 2.5s        | 4.2s        | 24 req/min | $0.67   | 0.72       |
+| **Llama 3 ChatQA 8B** | 0.88-0.95     | 4.5s        | 7.1s        | 13 req/min | $0.67   | 0.58       |
 
-## Phase 5: RAG & Prompting
+_Model Performance Summary (5,000 requests/day baseline)_
 
-### Objective
+### 📸 Evidence RAG vs Prompt
 
-Design and implement prompt engineering strategies and retrieval-augmented generation (RAG) pipelines that provide the LLM with necessary context and guidance to generate accurate, comprehensive test cases. Choose the right approach (direct prompting vs. RAG) based on your data and use case requirements.
+![MLflow Model Comparison - Part 1](docs/resource/img/mlflow.png)
+_MLflow Dashboard showing quality, latency, and throughput metrics across evaluated models_
 
-### Key Activities
+![MLflow Model Comparison - Part 2](docs/resource/img/mlflow_01.png)
+_MLflow Dashboard showing cost efficiency, resource utilization, and additional performance metrics_
 
-- **Design effective prompts** - Craft prompt templates that clearly guide the LLM to generate well-structured test cases with preconditions, steps, and expected results
-- **Implement RAG pipelines** - Create retrieval systems that provide relevant examples and context when generating test cases for complex user stories
-- **Optimize prompts through iteration** - Test and refine prompts based on output quality, adjusting templates to improve test case comprehensiveness and accuracy
-- **Handle edge cases** - Engineer prompts to handle ambiguous user stories, incomplete requirements, and edge case scenarios
-- **Balance latency and quality** - Trade off between simple prompting for speed and RAG-enhanced generation for better context awareness
+## Phase 4: Prompt Engineering & Optimization
 
-### Implementation Approaches
+### 🎯 Objective
 
-#### 1. Direct Prompting Strategy
+Craft effective instructions that guide LLMs to produce desired outputs through iterative refinement. This phase often yields **80% of performance improvements** without model changes. Design system prompts, add examples (few-shot learning), structure outputs, and establish reusable templates.
 
-**Use Case:** Simple to moderately complex user stories that don't require external context or examples
+> **Key Insight:** A well-engineered prompt can make a 1B model outperform a poorly-prompted 8B model.
 
-**Implementation:** `src/application/create_tests/infra/executable_chain/executable_chain_prompting.py`
+### 🎬 Key Activities
 
-```python
-class ExecutableChainPrompting(ExecutableChain):
-    """Direct prompting without retrieval-augmented generation.
+**1. Create Prompt Templates**
 
-    Suitable for tasks that don't require context retrieval.
-    Simple, fast execution without external knowledge retrieval.
-    """
+- Build reusable templates with variables
+- Support different input variations
+- Enable A/B testing of prompt versions
 
-    def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
-        # Chain: PromptTemplate → LLM → RobustJsonOutputParser
-        # Creates simple pipeline: prompt → inference → validated JSON
-```
+**2. Implement Few-Shot Examples**
 
-**Advantages:**
+- Provide representative input-output examples
+- Show desired format and quality levels
+- Improve accuracy through demonstration learning
 
-- Lower latency (no retrieval overhead)
-- Simpler architecture (no vector store dependencies)
-- Faster response times for straightforward user stories
-- Easier to debug and understand
+### Prompt Engineering Techniques
 
-**Disadvantages:**
+- Implementation: [src/application/create_tests/models/templates.py](src/application/create_tests/models/templates.py)
 
-- Limited context awareness
-- May struggle with complex or ambiguous stories
-- No access to examples or domain knowledge
-- Higher retry rate for edge cases
+| Technique             | Use Case               | Implementation                                                                                                       |
+| --------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Role-Based**        | Domain expertise       | "You are an expert QA Engineer specializing in test case design..."                                                  |
+| **Structured Output** | JSON schema            | Strict JSON with 8 required fields (id, type, title, priority, preconditions, steps, expected_result, quality_score) |
+| **Few-Shot Learning** | Format consistency     | Example test case structure embedded in prompt template                                                              |
+| **Explicit Rules**    | Error prevention       | 8 numbered rules (coverage balance, priority distribution, array format requirements)                                |
+| **Edge Case Focus**   | Comprehensive coverage | Test type categories: positive / negative / edge_case / boundary                                                     |
 
-**Configuration:**
+**Active Prompt Variants from templates.py:**
 
-- Prompt template guides model behavior
-- Retry logic handles JSON parsing failures
-- Max retries: 3 attempts for structure validation
+1. **RAG_PROMPT** (Advanced)
+   - Incorporates external context via RAG retrieval
+   - Best for: Complex or domain-specific user stories
+   - Structure: Role-based → Task clarity → Test field table → Rules → Few-shot example
 
-#### 2. RAG-Enhanced Strategy
+2. **PROMPT** (Basic)
+   - Minimal instructions, fastest inference
+   - Best for: Simple stories, speed-critical deployments
+   - Structure: Compact field definitions → JSON example
 
-**Use Case:** Complex user stories, domain-specific requirements, or situations requiring example-based generation
+3. **IMPROVED_PROMPT_V1** (Production Default)
+   - Enhanced with detailed validation rules and table structure
+   - Best for: Quality-critical, production environments
+   - Structure: Role-based → Test field table → 8 explicit rules → Few-shot example
+   - Key Rules: Coverage balance (3-8 test cases), Priority distribution (1-2 critical, 2-3 high), Quality score (6-9 range)
 
-**Implementation:** `src/application/create_tests/infra/executable_chain/executable_chain_rag.py`
-
-```python
-class ExecutableChainRAG(ExecutableChain):
-    """RAG pattern with retrieval-augmented generation.
-
-    Provides context retrieval from vector stores and example-based generation.
-    Includes caching for performance optimization.
-    """
-
-    def execute(self, prompt: str, max_retries: int = 3) -> ExecutableChainResponse:
-        # Chain: Retriever (cached) → PromptTemplate + Context → LLM → RobustJsonOutputParser
-        # Augments prompt with retrieved examples and context before inference
-```
-
-**Advantages:**
-
-- Better context awareness with retrieved examples
-- Handles complex and ambiguous stories better
-- Can ground generation in existing test cases
-- Higher quality output for domain-specific needs
-
-**Disadvantages:**
-
-- Higher latency due to retrieval step
-- Requires vector store setup and maintenance
-- Dependency on retrieval quality
-- More complex debugging
-
-**Core Features:**
-
-- **Cached Retrieval:** `_cached_retrieve()` method with LRU cache (max 100 items) reduces repeated retrievals
-- **Context Formatting:** Retrieved documents formatted as context for the LLM
-- **Validation & Retry:** Same structure validation as direct prompting with automatic retries
-- **Async Support:** `execute_async()` for batch processing with concurrent rate limiting (max 3 concurrent by default)
-- **Cache Management:** `get_cache_stats()` and `clear_cache()` methods for monitoring and maintenance
-
-**Configuration:**
-
-- Vector store retriever for semantic search
-- RAG cache with configurable size
-- Concurrent execution limits for batch operations
-- Retry logic identical to direct prompting (max 3 attempts)
-
-### Choosing Your Approach
-
-| Factor                 | Direct Prompting                | RAG-Enhanced                             |
-| ---------------------- | ------------------------------- | ---------------------------------------- |
-| **Latency**            | <1s                             | 2-5s                                     |
-| **Best For**           | Simple stories, quick responses | Complex stories, domain knowledge needed |
-| **Setup Complexity**   | Low                             | Medium-High                              |
-| **Accuracy**           | Good (80-90%)                   | Better (90-95%)                          |
-| **Cost**               | Lower (no retrieval)            | Slightly higher (retrieval overhead)     |
-| **Example Dependency** | Prompt-based only               | Retriever-based context                  |
-| **Cache Benefits**     | N/A                             | Significant for repeated queries         |
-
-### Common Patterns
-
-**Pattern 1: Hybrid Approach**
+**Validation Framework (IMPROVED_PROMPT_V1):**
 
 ```
-1. Try direct prompting first
-2. If quality score < threshold, fall back to RAG
-3. Cache RAG results for similar future queries
+Rule 1: Generate 3-8 test cases covering happy path, edge cases, errors
+Rule 2: Ensure balanced coverage across positive, negative, edge case types
+Rule 3: Each test case MUST have all required fields
+Rule 4: Priority distribution (1-2 critical, 2-3 high, 1-2 medium, 0-1 low)
+Rule 5: Quality score should reflect comprehensiveness (6-9 typical)
+Rule 6: Be specific and actionable in each step
+Rule 7: "steps" MUST be array of strings ONLY (NOT objects)
+Rule 8: "preconditions" MUST be array of strings ONLY (NOT objects)
 ```
 
-**Pattern 2: Progressive Enhancement**
+### 🛠️ Tools & Technologies
 
-```
-1. Start with simple prompting templates
-2. Monitor failure rates and retry counts
-3. Gradually add RAG for frequently failing story types
-4. Use cached results to improve latency
-```
-
-**Pattern 3: Context-Aware Routing**
-
-```
-1. Analyze incoming user story complexity
-2. Simple stories → Direct prompting
-3. Complex stories → RAG with cached retriever
-4. Monitor and adapt thresholds based on quality metrics
-```
-
-### Validation & Error Handling
-
-Both implementations include robust validation:
-
-- **Structure Validation:** Ensures response contains `test_cases` array with valid test case objects
-- **JSON Parsing:** Automatic retry on invalid JSON responses
-- **Type Checking:** Validates response is dictionary type (not string or list)
-- **Attempt Tracking:** Logs retry attempts and reasons for debugging
-
-### Outputs
-
-- **Prompt templates:** Optimized prompts guiding test case generation
-- **RAG pipeline:** Vector store setup with retriever and caching infrastructure
-- **Validation schemas:** Test case structure definitions for output validation
-- **Performance metrics:** Latency, retry rates, and cache effectiveness statistics
+| Tool          | Purpose                      | Status         |
+| ------------- | ---------------------------- | -------------- |
+| **Pydantic**  | Structured output validation | ✅ Implemented |
+| **LangChain** | Prompt templating & chaining | ✅ Implemented |
 
 ## Phase 6: Evaluation & Testing
 
-### Objective
+### 🎯 Objective
 
 Systematically measure if your LLM application meets quality standards before production deployment. Use both automated metrics and human evaluation to assess accuracy, relevance, safety, and consistency. Testing catches issues early and provides benchmarks for measuring improvements.
 
-### Key Activities
+Implementation: [src/application/evaluate_models/](src/application/evaluate_models/)
 
-- **Run automated evaluations on test dataset** - Execute evaluation scripts against held-out test stories to measure structural and semantic quality
-- **Implement LLM-as-judge for qualitative assessment** - Use a separate LLM prompt to evaluate test case relevance, completeness, and alignment with user stories
-- **Conduct human evaluation samples** - Have QA specialists review and score random samples of generated test cases
-- **Test edge cases and adversarial inputs** - Evaluate model behavior on edge cases (vague stories, incomplete requirements, conflicting criteria)
-- **Measure cost, latency, and throughput** - Profile inference time, resource consumption, and sustained throughput under load
+### 🎬 Key Activities
 
-### Evaluation Framework
+**1. Run Automated Evaluations**
+
+- Execute evaluation scripts against held-out test stories
+- Measure structural and semantic quality using QualityTracker
+- Validate JSON parsing success, field completeness, test case coverage
+- Generate quality metrics (accuracy, compliance, coverage)
+
+**2. Implement LLM-as-Judge Evaluation**
+
+- Use separate LLM prompt to assess test case relevance
+- Evaluate completeness and alignment with user stories
+- Compare generated vs. ground truth test cases
+- Establish semantic relevance scores
+
+**3. Conduct Human Evaluation Samples**
+
+- QA specialists review 10-20% of generated test cases
+- Score on 1-5 scale: Relevance, Completeness, Clarity, Usability
+- Achieve ≥90% inter-rater agreement
+- Validate model outputs meet quality expectations
+
+**4. Test Edge Cases & Adversarial Inputs**
+
+- Evaluate on vague, conflicting, multi-role stories
+- Test non-functional requirements and complex flows
+- Assess boundary conditions and unusual scenarios
+- Measure model robustness and failure modes
+
+**5. Profile Performance Metrics**
+
+- Measure latency (P50, P90, P99 percentiles)
+- Calculate throughput and resource utilization
+- Profile memory usage and CPU consumption
+- Establish cost per request and cost efficiency
+
+### 📐 Evaluation Framework
 
 #### 1. Automated Metrics
 
-| Metric | Definition | How to Measure | Target | Tool |
-| | -- | -- | | - |
-| **Structural Compliance** | % of valid JSON outputs parseable on first attempt | Count successful parses ÷ total requests | >95% | Pydantic validator |
-| **Field Completeness** | % of test cases with all required fields non-empty | Check preconditions, steps, expected_result populated | >90% | Schema validator |
-| **Test Case Count** | Average number of test cases generated per story | Sum all test cases ÷ number of stories | ≥3 per story | Count analysis |
-| **Precondition Relevance** | Quality of preconditions (not generic/empty) | Automated script evaluation | ≥4.0/5.0 | `src/application/evaluate_models/model/quality_tracker.py` |
-| **Step Specificity** | Steps are concrete and measurable (not vague) | Automated script scoring | ≥4.0/5.0 | `src/application/evaluate_models/model/quality_tracker.py` |
-| **Expected Result Clarity** | Assertions are clear and verifiable | Automated script evaluation | ≥4.0/5.0 | `src/application/evaluate_models/model/quality_tracker.py` |
+Implementation: [QualityTracker](src/application/evaluate_models/model/quality_tracker.py)
+
+| Metric                    | Target   | Measurement                     | Implementation              |
+| ------------------------- | -------- | ------------------------------- | --------------------------- |
+| **Structural Compliance** | >95%     | % valid JSON on 1st attempt     | Pydantic parsing validation |
+| **Field Completeness**    | >90%     | All required fields non-empty   | Schema field validation     |
+| **Test Case Count**       | ≥3/story | Avg test cases per story        | Count analysis              |
+| **Quality Score**         | ≥4.0/5.0 | Overall quality assessment      | QualityTracker heuristics   |
+| **Precondition Quality**  | ≥4.0/5.0 | Non-generic, meaningful setup   | LLM evaluation              |
+| **Step Specificity**      | ≥4.0/5.0 | Concrete, measurable actions    | LLM evaluation              |
+| **Result Clarity**        | ≥4.0/5.0 | Clear, verifiable assertions    | LLM evaluation              |
+| **Retry Rate**            | <5%      | Failed attempts requiring retry | Execution tracking          |
+
+**Quality Metrics Calculation:**
+
+The `QualityTracker.calculate_quality_score()` computes:
+
+- `quality_score`: Overall composite score (0.0-1.0)
+- `precondition_score`: Precondition quality (0.0-1.0)
+- `structure_score`: JSON structure adherence (0.0-1.0)
+- `passing_rate`: % of tests meeting criteria
+- `json_parsing_success_rate`: % successful JSON parses
+- `avg_quality_score`: Average test case quality (0-10 scale)
+- `retry_rate`: % requests requiring retries
 
 #### 2. Human Evaluation Protocol
 
@@ -434,17 +509,12 @@ Systematically measure if your LLM application meets quality standards before pr
 
 **Evaluation Rubric (1-5 scale):**
 
-| Criterion | 1 (Poor) | 3 (Acceptable) | 5 (Excellent) |
-| - | - | -- | |
-| **Relevance** | Test case unrelated to story | Covers main feature but misses details | Fully addresses all story aspects |
-| **Completeness** | Missing test scenarios | Has positive + negative cases | Includes positive, negative, edge cases |
-| **Clarity** | Steps are vague/confusing | Steps are mostly clear | Steps are precise, specific, actionable |
-| **Usability** | Tester cannot execute | Tester needs clarification | Ready to execute, fully self-contained |
-
-**Success Criteria:**
-
-- Average human score ≥4.0/5.0 for all criteria
-- ≥90% inter-rater agreement on pass/fail decisions
+| Criterion        | 1 (Poor)                     | 3 (Acceptable)                         | 5 (Excellent)                           |
+| ---------------- | ---------------------------- | -------------------------------------- | --------------------------------------- |
+| **Relevance**    | Test case unrelated to story | Covers main feature but misses details | Fully addresses all story aspects       |
+| **Completeness** | Missing test scenarios       | Has positive + negative cases          | Includes positive, negative, edge cases |
+| **Clarity**      | Steps are vague/confusing    | Steps are mostly clear                 | Steps are precise, specific, actionable |
+| **Usability**    | Tester cannot execute        | Tester needs clarification             | Ready to execute, fully self-contained  |
 
 #### 3. Edge Case Testing
 
@@ -460,14 +530,6 @@ Edge Case Categories:
 6. Boundary Conditions - Stories with specific limits or constraints
 ```
 
-**Test Examples:**
-
-- Very short stories (1 sentence)
-- Very long stories (10+ sentences)
-- Stories with technical jargon
-- Stories without clear acceptance criteria
-- Stories mentioning external systems/APIs
-
 #### 4. Performance Benchmarks
 
 | Metric                     | Target      | Measurement                     |
@@ -479,1305 +541,1025 @@ Edge Case Categories:
 | **Memory Usage**           | <4GB        | Peak RAM during inference       |
 | **Cost per 1,000 Stories** | <$100       | Infrastructure cost calculation |
 
-### Tools & Technologies
+### 🔄 Evaluation Workflow
 
-- **DeepEval** - LLM evaluation framework with pre-built metrics (ToDo)
-- **Pydantic** - Schema validation and structural compliance checking
-- **Load Testing Tools** (locust, wrk) - Latency and throughput benchmarking (ToDo)
+```
+Input Use Cases
+    ↓
+Execute on Model
+    ↓
+Capture ExecutableChainResponse (latency, test_cases, quality_score)
+    ↓
+Run QualityTracker.calculate_quality_score()
+    ↓
+Run LatencyTracker.calculate_latency_stats()
+    ↓
+Run CostTracker.calculate_cost_analysis()
+    ↓
+Generate MLflow Artifacts
+    ↓
+Compare Models (Quality vs. Latency vs. Cost)
+    ↓
+Output Evaluation Report
+```
+
+### 🛠️ Tools & Technologies
+
+| Tool                           | Purpose                                   | Status         | Implementation                                                                                               |
+| ------------------------------ | ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Pydantic**                   | Schema validation & structural compliance | ✅ Implemented | Built into response parsing                                                                                  |
+| **QualityTracker**             | Heuristic quality evaluation              | ✅ Implemented | [quality_tracker.py](src/application/evaluate_models/model/quality_tracker.py)                               |
+| **LatencyTracker**             | Latency & performance metrics             | ✅ Implemented | [latency_tracker.py](src/application/evaluate_models/model/latency_tracker.py)                               |
+| **CostTracker**                | Infrastructure cost analysis              | ✅ Implemented | [cost_tracker.py](src/application/evaluate_models/model/cost_tracker.py)                                     |
+| **MLflow**                     | Experiment tracking & comparison          | ✅ Implemented | [evaluate_models_application.py](src/application/evaluate_models/application/evaluate_models_application.py) |
+| **DeepEval**                   | LLM evaluation framework                  | 📋 ToDo        | Would enhance semantic evaluation                                                                            |
+| **Load Testing** (locust, wrk) | Throughput benchmarking                   | 📋 ToDo        | External load simulation recommended                                                                         |
 
 ## Phase 7: Deployment & Serving
 
-### Objective
+### 🎯 Objective
 
-Transition your LLM application from development to production by integrating into your architecture, setting up APIs, implementing security, and ensuring scalability. Includes both technical infrastructure and user-facing interfaces.
+Transition the LLM application from development to production by creating a robust, scalable API service with proper error handling, monitoring, and containerization. The implementation focuses on:
 
-### Key Activities
+- **API Framework**: High-performance async HTTP endpoints using FastAPI
+- **Containerization**: Multi-stage Docker builds with GPU support via NVIDIA CUDA
+- **Request Tracing**: Correlation IDs for distributed tracing and debugging
+- **Observability**: Structured JSON logging with Loki integration
+- **Service Orchestration**: Docker Compose for multi-service deployment
 
-- **Create API endpoints with authentication** - Design RESTful API with token-based auth (JWT/API keys)
-- **Implement rate limiting and caching** - Prevent abuse, reduce latency with response caching
-- **Set up load balancing and auto-scaling** - Distribute load across multiple instances, scale based on demand
-- **Configure security measures (input validation, filtering)** - Validate inputs, implement prompt injection defenses
-- **Stage rollout (beta → full production)** - Test with limited users first, monitor metrics, gradually roll out
+### 🎬 Key Activities
 
-### Deployment Architecture
+#### 1. API Endpoint Creation & Response Standardization
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Client Applications                         │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                    HTTP/REST API
-                           │
-┌──────────────────────────┴──────────────────────────────────────┐
-│                    API Gateway / Load Balancer                  │
-│  (Rate Limiting, Authentication, Request Routing)               │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-    ┌───▼───┐          ┌───▼───┐          ┌───▼───┐
-    │ API   │          │ API   │          │ API   │
-    │Pod 1  │          │Pod 2  │          │Pod 3  │
-    ││          ││          ││
-    │Cache │          │Cache │          │Cache │
-    └───┬───┘          └───┬───┘          └───┬───┘
-        │                  │                  │
-        └──────────────────┼──────────────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-    ┌───▼────────┐    ┌───▼────────┐    ┌───▼────────┐
-    │ Ollama     │    │ Ollama     │    │ Ollama     │
-    │Instance 1  │    │Instance 2  │    │Instance 3  │
-    │(1B Model)  │    │(1B Model)  │    │(1B Model)  │
-    └────────────┘    └────────────┘    └────────────┘
-```
+The application exposes REST endpoints through FastAPI with standardized response formatting:
 
-### API Design
+**Core Endpoints:**
 
-#### Endpoint Specification
+- **GET `/`** - Root endpoint (health verification)
+- **GET `/health`** - Service health status with LLM connectivity check
+- **GET `/metrics`** - Aggregated metrics endpoint (references MLflow UI at port 5000)
+- **POST `/test-use-cases/`** - Main endpoint for test case generation from user stories
 
-**Endpoint:** `POST /generate-tests`
+**Implementation Details** (src/main.py:18-28, src/presentation/routes/test_use_cases_route.py:5-11):
 
 ```python
-# Request
-{
-  "user_story": "As a customer, I want to search for products by category so that I can find items quickly",
-  "difficulty": "medium",  # optional: easy, medium, hard
-  "num_test_cases": 4,     # optional: default 3
-  "model": "llama3.2:1b"   # optional: which model to use
-}
-
-# Response (Success - 200)
-{
-  "request_id": "req_12345",
-  "story_id": "US_001",
-  "model_used": "llama3.2:1b",
-  "processing_time_ms": 2850,
-  "test_cases": [
-    {
-      "id": "TC_001",
-      "type": "positive",
-      "title": "Search by valid category",
-      "priority": "high",
-      "preconditions": ["User is logged in", "Product database is populated"],
-      "steps": [
-        "Click search bar",
-        "Select category filter",
-        "Click search"
-      ],
-      "expected_result": "Products matching category are displayed"
-    },
-    # ... more test cases
-  ],
-  "quality_score": 0.92,
-  "success": true
-}
-
-# Response (Error - 400)
-{
-  "error": "Invalid request",
-  "message": "User story cannot be empty",
-  "request_id": "req_12345",
-  "success": false
-}
-```
-
-#### Other Endpoints
-
-| Endpoint | Method | Purpose | Auth Required |
-| -- | | - | |
-| `/generate-tests` | POST | Generate test cases from user story | Yes (API key) |
-| `/health` | GET | Service health check | No |
-| `/metrics` | GET | Prometheus metrics (requests, latency, errors) | No (internal only) |
-| `/models` | GET | List available models and their status | Yes |
-| `/version` | GET | API version information | No |
-| `/estimate-cost` | POST | Estimate cost/latency before generation | Yes |
-
-### Security Implementation
-
-#### Input Validation
-
-```python
-# Validate and sanitize user story input
-class UserStoryInput(BaseModel):
-    user_story: str = Field(..., min_length=10, max_length=2000)
-    difficulty: Optional[str] = Field(default="medium", pattern="^(easy|medium|hard)$")
-    num_test_cases: Optional[int] = Field(default=3, ge=1, le=10)
-
-    @validator('user_story')
-    def validate_story(cls, v):
-        # Remove potentially harmful characters
-        # Check for prompt injection patterns
-        if any(prompt_injection_pattern in v for pattern in DANGEROUS_PATTERNS):
-            raise ValueError("Input contains suspicious patterns")
-        return v
-```
-
-#### Authentication & Authorization
-
-- **API Key Authentication:** Each client gets unique API key
-- **JWT Tokens:** For web clients with session management
-- **Rate Limiting:**
-  - Default: 10 requests/minute per key
-  - Premium: 100 requests/minute per key
-  - Burst: Allow up to 5 concurrent requests
-
-#### Prompt Injection Defense
-
-```python
-# Detect and block prompt injection attempts
-DANGEROUS_PATTERNS = [
-    "ignore previous instructions",
-    "system:",
-    "prompt:",
-    "forget everything",
-    "do the opposite"
-]
-
-# Input filtering
-def sanitize_input(user_story: str) -> str:
-    # Remove control characters
-    story = ''.join(c for c in user_story if c.isprintable())
-    # Limit consecutive special characters
-    story = re.sub(r'([^\w\s]){3,}', r'\1\1', story)
-    return story
-```
-
-### Performance Optimization
-
-#### Caching Strategy
-
-| Cache Level | Implementation | TTL | Key |
-| | | - | -- |
-| **Response Cache** | Redis | 1 hour | `{story_hash}_{model}_{difficulty}` |
-| **Model Cache** | In-memory | Persistent | Model weights in VRAM |
-| **Template Cache** | Application memory | Persistent | Prompt templates |
-
-**Cache Hit Logic:**
-
-```python
-cache_key = hash(story + model + difficulty)
-if cache.exists(cache_key):
-    return cache.get(cache_key)  # Return cached result
-else:
-    result = generate_tests(story)
-    cache.set(cache_key, result, ttl=3600)  # Cache for 1 hour
-    return result
-```
-
-#### Inference Optimization
-
-- **Model Quantization:** Use 4-bit quantization to reduce VRAM
-- **Batch Processing:** Queue requests and process in batches
-- **Token Streaming:** Return results as they're generated (SSE)
-- **Hardware Acceleration:** Use GPU when available
-
-### Deployment Workflow
-
-#### 1. Containerization
-
-```dockerfile
-FROM ollama/ollama:latest
-
-# Copy application code
-COPY src/ /app/src/
-COPY requirements.txt /app/
-
-# Install dependencies
-RUN pip install -r /app/requirements.txt
-
-# Expose API port
-EXPOSE 8000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s \
-    CMD curl -f http://localhost:8000/health || exit 1
-
-# Run FastAPI application
-CMD ["python", "/app/src/main.py"]
-```
-
-### Monitoring & Observability
-
-Complete production monitoring and observability setup for the LLM test case generation microservice. Tracks system health, performance, quality metrics, and business outcomes.
-
-#### 1. Real-Time Metrics
-
-**Key Performance Indicators (KPIs):**
-
-| Metric | Type | Target | Alert Threshold |
-| | - | | |
-| **Request Latency** | Histogram (P50, P90, P99) | P90 <5s | P90 >5s |
-| **Throughput** | Counter (req/sec) | 10+ req/sec | <5 req/sec |
-| **Success Rate** | Gauge | >95% | <95% |
-| **Error Rate** | Counter | <1% | >2% |
-| **Queue Depth** | Gauge | <10 items | >20 items |
-| **Cache Hit Rate** | Gauge | >70% | <60% |
-| **Model Inference Time** | Histogram | <3s (1B), <5s (3B) | Exceeds target |
-| **Quality Score** | Gauge (avg) | ≥4.0/5.0 | <3.8/5.0 |
-
-#### 2. Dashboards
-
-**Main Dashboard (Real-Time Overview):**
-
-- Requests/min, P90 latency, error rate
-- Quality score trend (24h, 7d, 30d)
-- Test case generation success rate
-- Model distribution and fallback usage
-- Infrastructure resource usage
-
-**Quality Dashboard:**
-
-- Quality metrics by model and difficulty
-- Test case count distribution
-- Precondition/step/result quality scores
-- User satisfaction ratings
-
-**Cost Dashboard:**
-
-- Daily cost trend
-- Cost per request
-- Cost by model and feature
-- Monthly forecast vs. actual
-
-#### 3. Distributed Tracing
-
-```python
-from opentelemetry import trace, metrics
-from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-
-jaeger_exporter = JaegerExporter(
-    agent_host_name="jaeger",
-    agent_port=6831,
+# FastAPI application with standardized configuration
+app = FastAPI(
+    title="Test Case Generator API",
+    description="Generate structured test cases from user stories",
+    version="1.0.0"
 )
 
-trace.get_tracer_provider().add_span_processor(
-    BatchSpanProcessor(jaeger_exporter)
-)
-
-# Use in endpoints
-@app.post("/generate-tests")
-async def generate_tests(request: UserStoryInput):
-    with trace.get_tracer(__name__).start_as_current_span("generate_tests") as span:
-        span.set_attribute("story_id", request.story_id)
-        span.set_attribute("difficulty", request.difficulty)
-        # ... implementation
+# Routers for organized endpoint management
+app.include_router(test_use_cases)
 ```
 
-#### 4. Performance Profiling
+**Response Structure** (src/application/shared/models/custom_response.py):
+All API responses follow a consistent JSON format with metadata:
 
-**Baseline Metrics (Collected Continuously):**
-
-```python
-# Profile each request
-@app.middleware("http")
-async def profile_middleware(request: Request, call_next):
-    start_time = time.time()
-    response = await call_next(request)
-
-    # Record timing breakdown
-    timings = {
-        "input_validation": ...,
-        "model_inference": ...,
-        "output_validation": ...,
-        "response_serialization": ...
-    }
-
-    metrics.record_request_profile(request.url.path, timings)
-    return response
+```json
+{
+  "message": "Human-readable response message",
+  "is_success": true,
+  "data": { "test_cases": [...] },
+  "status_code": 200
+}
 ```
 
-#### 5. Cost Tracking
+Factory methods for status codes: `success()`, `created()`, `error()`, `something_was_wrong()`
 
-**Real-Time Cost Monitoring:**
+#### 2. Request Tracing & Correlation
 
-```python
-# Track costs in real-time
-async def track_cost(request_data: dict, response_data: dict):
-    # Infrastructure cost
-    infra_cost = calculate_infrastructure_cost(
-        duration_ms=response_data["duration_ms"],
-        model=response_data["model"],
-        resources_used=response_data["resources"]
-    )
+Middleware components ensure request context propagation for distributed tracing:
 
-    # Log cost
-    cost_logger.info({
-        "request_id": request_data["id"],
-        "cost_dollars": infra_cost,
-        "model": response_data["model"],
-        "tokens_generated": response_data["tokens"]
-    })
+**Correlation Middleware** (src/application/shared/middleware/correlation_middleware.py):
 
-    # Update cost counter
-    api_cost_total.inc(infra_cost)
+- Generates UUID-based correlation IDs for each request
+- Accepts `X-Correlation-ID` header for trace continuation
+- Propagates IDs across service boundaries via context variables
+- Adds correlation ID to response headers for client reference
+
+**Logging Middleware** (src/application/shared/middleware/logging_middleware.py):
+
+- Tracks request/response timing (millisecond precision)
+- Logs method, path, and client IP for every request
+- Detects slow requests (>5000ms threshold) as warnings
+- Includes exception details with request context on failure
+- All logs include correlation_id for trace aggregation
+
+#### 3. Containerization with GPU Support
+
+Multi-stage Docker build optimizes image size while maintaining CUDA capabilities:
+
+**Build Process** (Dockerfile):
+
+1. **Builder Stage**: Compiles dependencies using `nvidia/cuda:11.8.0-runtime-ubuntu22.04`
+2. **Runtime Stage**: Minimal final image with copied packages
+3. **Python Setup**: Python 3.10 with pip for dependency management
+4. **Application**: Starts uvicorn on port 8000
+
+**Execution** (docker-compose.yml:77-104):
+
+```yaml
+api:
+  build: .
+  container_name: test-case-api
+  ports:
+    - "8001:8000" # External:Internal mapping
+  volumes:
+    - ./:/app
+    - ./mlruns:/app/mlruns
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
 ```
 
-**Monthly Cost Report:**
+#### 4. Configuration Management & Environment Variables
 
-- Total infrastructure cost
-- Cost per request average
-- Cost breakdown by model
-- Cost forecast for next month
-- Cost optimization recommendations
+Environment-aware configuration using Pydantic validation:
 
-### Tools & Technologies
+**Key Configuration Variables** (src/application/shared/infrastructure/environment_variables.py):
 
-- **FastAPI** - High-performance async API framework with automatic documentation
-- **Pydantic** - Request/response validation
-- **Docker** - Containerization for consistency across environments
-- **Ollama** - Local inference engine
-- **Uvicorn** - ASGI server for FastAPI
+| Variable                           | Purpose                | Default                  | Environment Support            |
+| ---------------------------------- | ---------------------- | ------------------------ | ------------------------------ |
+| `OLLAMA_SERVICE_HOST`              | LLM backend URL        | `http://localhost:11435` | Docker internal                |
+| `OLLAMA_SERVICE_MODEL_LLAMA3_2_1B` | Default model name     | `llama3.2:1b`            | Config selectable              |
+| `LOG_LEVEL`                        | Logging verbosity      | `INFO`                   | development/production         |
+| `LOG_FORMAT`                       | Log output format      | `json`                   | Loki compatible                |
+| `ENVIRONMENT`                      | Deployment environment | `development`            | development/staging/production |
+| `SERVICE_VERSION`                  | API version            | `1.0.0`                  | Release tracking               |
 
-### Evidence
+**Configuration Validation**:
+
+- Pydantic BaseModel with typed fields
+- Default values with fallback support
+- Environment variable aliasing for flexibility
+- Type coercion for numeric configurations
+
+**Startup Logging** (src/main.py:31-41):
+
+- Logs service version, environment, and log level on startup
+- Provides audit trail for deployment tracking
+
+#### 5. Service Orchestration & Health Management
+
+Docker Compose orchestrates all services with health checks and dependencies:
+
+**Service Network** (docker-compose.yml:126-128):
+
+```yaml
+networks:
+  test-gen-network:
+    driver: bridge
+```
+
+**Health Checks** (docker-compose.yml:20-25 for Ollama):
+
+```yaml
+healthcheck:
+  test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+  interval: 30s
+  timeout: 10s
+  retries: 5
+  start_period: 60s
+```
+
+**Service Dependencies**:
+
+- API depends on: Ollama (LLM backend) ✓
+- Grafana depends on: Loki (log storage) ✓
+- MLflow UI: Standalone (experiment tracking)
+
+**Port Mappings**:
+
+| Service | Container Port | Host Port | Purpose                       |
+| ------- | -------------- | --------- | ----------------------------- |
+| API     | 8000           | 8001      | Test case generation endpoint |
+| Ollama  | 11434          | 11435     | LLM inference backend         |
+| Grafana | 3000           | 3000      | Monitoring dashboards         |
+| Loki    | 3100           | 3100      | Log aggregation & storage     |
+| MLflow  | 5000           | 5001      | Experiment tracking UI        |
+
+### 🛠️ Tools & Technologies Implementation
+
+| Tool               | Purpose          | Status         | Implementation                                        |
+| ------------------ | ---------------- | -------------- | ----------------------------------------------------- |
+| **FastAPI**        | API framework    | ✅ Implemented | src/main.py, async endpoints with Pydantic validation |
+| **Uvicorn**        | ASGI server      | ✅ Running     | Port 8000 (mapped to 8001), auto-reload in dev        |
+| **Docker**         | Containerization | ✅ Multi-stage | nvidia/cuda:11.8.0-runtime base image                 |
+| **Docker Compose** | Orchestration    | ✅ Active      | 5-service stack with health checks                    |
+| **NVIDIA CUDA**    | GPU support      | ✅ Enabled     | GPU resource allocation in compose                    |
+| **Pydantic**       | Validation       | ✅ Used        | CustomResponse, GenerateRequest models                |
+| **Loki**           | Log aggregation  | ✅ Connected   | JSON logging driver in compose                        |
+| **MLflow**         | Metrics tracking | ✅ Available   | Port 5001 for UI access                               |
+
+### 🏗️ Deployment Architecture
+
+**Request Flow**:
+
+1. Client sends POST to `http://localhost:8001/test-use-cases/`
+2. **CorrelationMiddleware** generates/extracts correlation ID
+3. **LoggingMiddleware** records request metadata and start time
+4. **Route Handler** (creaet_test_controller) processes request:
+   - Validates JSON body against GenerateRequest schema
+   - Instantiates ExecutableChainPrompting with selected model
+   - Runs CreateTestsApplication use case
+   - Returns CustomResponse with test cases or error
+5. Middleware logs response status and duration
+6. Response sent with correlation ID header
+7. Logs streamed to Loki for aggregation
+8. Metrics available in MLflow and Grafana
+
+**Request Processing Flow Diagram**:
+
+```mermaid
+graph TD
+    A["👤 Client Request<br/>POST /test-use-cases/<br/>Port 8001"] -->|Request| B["🔗 CorrelationMiddleware<br/>Generate/Extract<br/>X-Correlation-ID Header"]
+
+    B -->|Pass Context| C["📝 LoggingMiddleware<br/>Start Timer<br/>Log Method, Path, IP"]
+
+    C -->|Route| D["🛣️ Route Handler<br/>creaet_test_controller"]
+
+    D -->|Extract Body| E["✅ JSON Validation<br/>GenerateRequest Schema<br/>user_story: 20-500 chars"]
+
+    E -->|❌ Invalid| G["❌ Validation Error<br/>Return Error Response"]
+    E -->|✅ Valid| F["🤖 Model Factory<br/>ModelsConfig.Singleton<br/>Load llama3.2:1b<br/>Temperature: 0.0"]
+
+    F -->|Create Chain| H["⛓️ ExecutableChainPrompting<br/>Template: IMPROVED_PROMPT_V1<br/>LLM: OllamaLLM"]
+
+    H -->|Initialize| I["⚙️ CreateTestsApplication<br/>Inject ExecutableChain"]
+
+    I -->|Call execute| J["🔄 Chain Pipeline<br/>Prompt | LLM | RobustJsonParser"]
+
+    J -->|Invoke LLM| K["🤖 Ollama Inference<br/>IMPROVED_PROMPT_V1<br/>+ user_story input"]
+
+    K -->|Parse Output| L["📦 RobustJsonParser<br/>Handle Markdown JSON<br/>Strip code blocks<br/>Extract JSON object"]
+
+    L -->|Parsed Dict| M["✓ Type Check<br/>Validate dict type"]
+
+    M -->|❌ Not Dict| G
+    M -->|✅ Dict| N["📋 Structure Validation<br/>TestCasesResponse<br/>Required: test_cases array"]
+
+    N -->|❌ Invalid<br/>Attempt < 3| O["🔄 Retry Logic<br/>Re-invoke LLM<br/>Increment attempt"]
+
+    O -->|Retry| J
+
+    N -->|❌ Invalid<br/>Attempt = 3| G
+    N -->|✅ Valid| P["✅ ExecutableChainResponse<br/>result, latency, tokens<br/>model, provider, attempt"]
+
+    P -->|Return| Q["✅ CustomResponse.created<br/>Status: 201<br/>Data: test_cases"]
+
+    G -->|Return| R["❌ CustomResponse.error<br/>Status: 500"]
+
+    Q -->|Response Object| S["📝 LoggingMiddleware Exit<br/>Log Status & Duration<br/>Detect Slow Requests >5s"]
+
+    R -->|Response Object| S
+
+    S -->|Add Header| T["🔗 Correlation Middleware Exit<br/>Add X-Correlation-ID<br/>to Response Headers"]
+
+    T -->|HTTP Response| U["👤 Client Response<br/>JSON:<br/>message, is_success<br/>data, status_code"]
+
+    S -->|Stream| V["📊 Loki<br/>Log Aggregation<br/>Port 3100<br/>Store all logs"]
+
+    V -->|Source| W["📈 Grafana<br/>Monitoring & Dashboards<br/>Port 3000"]
+
+    style A fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style B fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style C fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style D fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style E fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style F fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    style H fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style I fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    style J fill:#ede7f6,stroke:#512da8,stroke-width:2px,color:#000
+    style K fill:#b3e5fc,stroke:#01579b,stroke-width:2px,color:#000
+    style L fill:#f0f4c3,stroke:#9e9d24,stroke-width:2px,color:#000
+    style M fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style N fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    style O fill:#ffe0b2,stroke:#e65100,stroke-width:2px,color:#000
+    style P fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style Q fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#000
+    style R fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000
+    style S fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    style T fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style U fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#000
+    style V fill:#b3e5fc,stroke:#01579b,stroke-width:2px,color:#000
+    style W fill:#ffe082,stroke:#f57f17,stroke-width:2px,color:#000
+    style X fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px,color:#000
+```
+
+**Service Communication Architecture**:
+
+```mermaid
+graph LR
+    Client["👤 Client Applications"]
+
+    Client -->|HTTP/REST| API["🌐 FastAPI<br/>Port 8001"]
+
+    API -->|Async Call| Ollama["🤖 Ollama<br/>LLM Backend<br/>Port 11435"]
+
+    API -->|JSON Logs| Loki["📊 Loki<br/>Port 3100"]
+
+    Loki -->|Data Source| Grafana["📈 Grafana<br/>Port 3000"]
+
+    API -->|Track Metrics| MLflow["📉 MLflow<br/>Port 5001"]
+
+    subgraph "Docker Compose Network: test-gen-network"
+        API
+        Ollama
+        Loki
+        Grafana
+        MLflow
+    end
+
+    style Client fill:#bbdefb,stroke:#0d47a1,stroke-width:2px
+    style API fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    style Ollama fill:#e0f2f1,stroke:#004d40,stroke-width:2px
+    style Loki fill:#b3e5fc,stroke:#01579b,stroke-width:2px
+    style Grafana fill:#ffe082,stroke:#f57f17,stroke-width:2px
+    style MLflow fill:#ce93d8,stroke:#4a148c,stroke-width:2px
+```
 
 ## Phase 8: Monitoring & Observability
 
-### Objective
+### 🎯 Objective
 
-Continuously track your LLM application's reliability, cost-effectiveness, and quality in production. Monitor both technical metrics (latency, errors) and quality metrics (user satisfaction, accuracy) to quickly identify and respond to issues.
+Continuously monitor the LLM application's operational health, performance, and quality through integrated logging, metrics tracking, and visualization. The implementation provides:
 
-### Key Activities
+- **Structured Logging**: JSON-formatted logs with correlation IDs for distributed tracing
+- **Log Aggregation**: Loki for centralized log storage with 7-day retention
+- **Visualization**: Grafana dashboards for request metrics, error rates, and retry patterns
+- **Model Tracking**: MLflow for experiment tracking, parameter logging, and model comparison
+- **Request Tracing**: Correlation IDs propagate through entire request lifecycle for debugging
 
-- **Track usage and cost metrics** - Monitor requests per minute, average latency, resource utilization, and associated infrastructure costs
-- **Monitor quality metrics (user feedback, ratings)** - Collect and analyze user satisfaction ratings, error reports, and qualitative feedback on test case quality
-- **Set up alerts for anomalies** - Trigger notifications when latency spikes, error rates exceed threshold, or costs deviate from baseline
-- **Log all inputs/outputs for debugging** - Store request/response pairs for traceability, debugging, and quality analysis
-- **Analyze failure patterns** - Identify recurring issues, common error types, and failure modes for continuous improvement
+### 🎬 Key Activities
 
-### Observability Framework
+#### 1. Structured JSON Logging with Context Propagation
 
-#### 1. Technical Metrics
+All application logs are formatted as JSON with contextual information for analysis:
 
-**Request-Level Metrics:**
-
-| Metric | Description | Tool | Alert Threshold |
-| - | | - | -- |
-| **Request Latency** | Time from request to response (P50, P90, P99) | Prometheus | P90 >5s |
-| **Requests Per Second** | Throughput/RPS | Prometheus | >50 RPS |
-| **Error Rate** | % of failed requests | Prometheus | >2% |
-| **Status Code Distribution** | 2xx, 4xx, 5xx breakdown | Prometheus | >1% 5xx errors |
-| **Cache Hit Rate** | % of cached responses | Prometheus | <70% indicates issue |
-| **Queue Depth** | Pending requests in queue | Prometheus | >10 items |
-
-**System-Level Metrics:**
-
-| Metric | Description | Tool | Alert Threshold |
-| | - | | |
-| **CPU Usage** | Pod CPU utilization | Kubernetes metrics | >80% |
-| **Memory Usage** | Pod memory utilization | Kubernetes metrics | >85% |
-| **Disk Usage** | Persistent volume usage | Kubernetes metrics | >90% |
-| **GPU Memory** | VRAM usage (if available) | nvidia-smi | >90% |
-| **Network I/O** | Bytes in/out per second | Kubernetes metrics | Baseline dependent |
-| **Pod Restart Count** | Unexpected restarts | Kubernetes metrics | >0 in 1 hour |
-
-**Model-Specific Metrics:**
-
-| Metric                                | Description                                 | Calculation                        | Target   |
-| ------------------------------------- | ------------------------------------------- | ---------------------------------- | -------- |
-| **Test Case Generation Success Rate** | % of stories that generate valid test cases | successes ÷ total requests         | >95%     |
-| **Average Test Cases Per Story**      | Mean number of test cases produced          | sum of test cases ÷ stories        | ≥3.0     |
-| **JSON Parsing Success Rate**         | % of outputs that parse as valid JSON       | valid outputs ÷ total responses    | >98%     |
-| **Average Quality Score**             | Mean quality assessment score               | average of quality_scores          | ≥4.0/5.0 |
-| **Retry Rate**                        | % of requests requiring retries             | retry requests ÷ total requests    | <3%      |
-| **Model Switch Rate**                 | % of requests falling back to 3B model      | fallback requests ÷ total requests | <5%      |
-
-#### 2. Cost Tracking
-
-**Cost Alerts:**
-
-| Alert | Condition | Action |
-| -- | - | |
-| **Budget overage** | Actual > forecast × 1.2 | Notify ops team |
-| **Cost spike** | Daily cost > daily avg × 1.5 | Investigate usage surge |
-| **Efficiency degradation** | Cost per request ↑ 20% | Check for retries or errors |
-
-#### 3. Logging Strategy
-
-**Log Levels:**
-
-| Level | Use Case | Examples |
-| | | - |
-| **DEBUG** | Development troubleshooting | Token details, intermediate values |
-| **INFO** | Normal operation events | Request start/completion, model switches |
-| **WARN** | Potential issues | Slow requests, retries, cache misses |
-| **ERROR** | Failures | Generation failures, validation errors |
-| **CRITICAL** | System-level issues | Service unavailable, out of memory |
-
-#### 5. Dashboard Design
-
-**Main Dashboard (Real-time Overview):**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Test Case Generation API - Production Dashboard              │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│ Health Status: ✅ Healthy (99.9% uptime last 24h)           │
-│                                                              │
-│ ┌───────────────────┬───────────────────┬─────────────────┐ │
-│ │ Requests/min      │ Avg Latency       │ Error Rate      │ │
-│ │ 125 req/min       │ 2.3s (P90: 4.2s)  │ 0.8%            │ │
-│ └───────────────────┴───────────────────┴─────────────────┘ │
-│                                                              │
-│ ┌───────────────────┬───────────────────┬─────────────────┐ │
-│ │ Quality Score     │ Success Rate      │ Daily Cost      │ │
-│ │ 4.1/5.0           │ 95.2%             │ $87.50          │ │
-│ └───────────────────┴───────────────────┴─────────────────┘ │
-│                                                              │
-│ ┌──────────────────────────────────────────────────────────┐ │
-│ │ Latency Distribution (last 1 hour)                       │ │
-│ │ P50: 1.8s | P90: 4.2s | P99: 8.5s                        │ │
-│ │ ████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ │ │
-│ └──────────────────────────────────────────────────────────┘ │
-│                                                              │
-│ ┌──────────────────────────────────────────────────────────┐ │
-│ │ User Satisfaction (last 7 days)                          │ │
-│ │ ⭐⭐⭐⭐⭐ 5 stars: 42% │ ⭐⭐⭐⭐ 4 stars: 38%             │ │
-│ │ ⭐⭐⭐ 3 stars: 15% │ ⭐⭐ 2 stars: 4% │ ⭐ 1 star: 1%     │ │
-│ └──────────────────────────────────────────────────────────┘ │
-│                                                              │
-│ Recent Alerts: None | Last Updated: 2 minutes ago            │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Quality Dashboard:**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Quality Metrics Dashboard                                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│ Test Case Metrics:                                           │
-│  • Structural Compliance: 96.2% (target: >95%)              │
-│  • Field Completeness: 94.1% (target: >90%)                 │
-│  • Avg Test Cases: 3.2 per story (target: ≥3.0)            │
-│  • JSON Valid: 98.5% (target: >98%)                         │
-│                                                              │
-│ Quality Scores by Model:                                     │
-│  • llama3.2:1b: 3.8/5.0 (used 80% of time)                  │
-│  • llama3.2:3b: 4.2/5.0 (used 20% of time)                  │
-│                                                              │
-│ Quality by Difficulty:                                       │
-│  • Easy: 4.3/5.0 (50 samples)                               │
-│  • Medium: 4.0/5.0 (120 samples)                            │
-│  • Hard: 3.7/5.0 (30 samples)                               │
-│                                                              │
-│ Top Issues (Last 24h):                                       │
-│  1. Vague expected results (8% of cases) - prompt update     │
-│  2. Missing edge cases (5% of cases) - model evaluation      │
-│  3. Too many test cases (3% of cases) - threshold tuning     │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Alert Configuration
-
-**Critical Alerts (Immediate Notification):**
-
-```yaml
-alerts:
-  - name: ServiceDown
-    condition: up{job="test-generator"} == 0
-    duration: 2m
-    severity: critical
-    action: page_oncall
-
-  - name: HighErrorRate
-    condition: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
-    duration: 5m
-    severity: critical
-    action: page_oncall
-
-  - name: DiskAlmostFull
-    condition: disk_usage_percent > 90
-    duration: 0m
-    severity: critical
-    action: page_oncall
-```
-
-**Warning Alerts (Email/Slack):**
-
-```yaml
-- name: HighLatency
-  condition: histogram_quantile(0.9, http_duration_seconds) > 5
-  duration: 10m
-  severity: warning
-  action: slack_notify
-
-- name: QualityDegradation
-  condition: avg(quality_score) < 3.8
-  duration: 1h
-  severity: warning
-  action: slack_notify
-
-- name: UnexpectedCostIncrease
-  condition: daily_cost > avg_daily_cost * 1.3
-  duration: 30m
-  severity: warning
-  action: slack_notify
-```
-
-### Debugging Tools
-
-**Tracing Request:**
+**Logging Configuration** (src/application/shared/infrastructure/logging_config.py):
 
 ```python
-# Enable distributed tracing to follow request through system
-import opentelemetry
-
-# Example: Trace a problematic request
-trace_id = "req_12345"
-
-# Retrieve logs
-logs = elasticsearch.search(
-    query={"match": {"trace_id": trace_id}},
-    sort=[{"timestamp": "asc"}]
-)
-
-# View journey
-for log in logs:
-    print(f"{log['timestamp']}: {log['event']} - {log['duration_ms']}ms")
-    # Output:
-    # 10:30:45.000: request_received
-    # 10:30:45.100: input_validated
-    # 10:30:47.900: model_invoked
-    # 10:30:47.950: output_generated
-    # 10:30:48.050: validation_complete
-    # 10:30:48.080: response_sent
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        super().add_fields(log_record, record, message_dict)
+        log_record["timestamp"] = self.formatTime(record, "%Y-%m-%dT%H:%M:%S%z")
+        log_record["service"] = "test-case-api"
+        log_record["environment"] = ENVIRONMENT_CONFIG.ENVIRONMENT
+        log_record["version"] = ENVIRONMENT_CONFIG.SERVICE_VERSION
 ```
 
-### Tools & Technologies
+**Log Fields**:
 
-- **Prometheus** - Metrics collection and alerting
-- **Grafana** - Metrics visualization and dashboards
-- **Datadog/New Relic** - All-in-one monitoring platform (alternative)
-- **CloudWatch** - AWS native monitoring (if on AWS)
-- **OpenTelemetry** - Distributed tracing
-- **Alertmanager** - Alert routing and grouping
+| Field                  | Source              | Purpose                                  |
+| ---------------------- | ------------------- | ---------------------------------------- |
+| `timestamp`            | CustomJsonFormatter | ISO-8601 formatted request time          |
+| `severity`             | Logging level       | DEBUG, INFO, WARNING, ERROR, CRITICAL    |
+| `message`              | Log message         | Human-readable log text                  |
+| `service`              | Static field        | Always "test-case-api"                   |
+| `environment`          | Environment config  | development, staging, production         |
+| `version`              | SERVICE_VERSION     | API version (1.0.0)                      |
+| `correlation_id`       | Middleware context  | UUID for request tracing across services |
+| `request.method`       | LoggingMiddleware   | HTTP method (GET, POST, etc.)            |
+| `request.path`         | LoggingMiddleware   | Request path (/test-use-cases/)          |
+| `request.client_ip`    | LoggingMiddleware   | Client IP address                        |
+| `response.status_code` | LoggingMiddleware   | HTTP status code returned                |
+| `response.duration_ms` | LoggingMiddleware   | Request execution time in milliseconds   |
 
-#### Evidence
+#### 2. Log Aggregation with Loki
 
-![alt text](docs/resource/img/image.png)
-![alt text](docs/resource/img/log.png)
+Loki collects and indexes all application logs for querying and visualization:
+
+**Loki Configuration** (loki-config.yml):
+
+```yaml
+# Storage & Retention
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /loki/boltdb-shipper-active
+    shared_store: filesystem
+  filesystem:
+    directory: /loki/chunks
+
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 168h # 7 days
+```
+
+**Docker Integration** (docker-compose.yml:98-102):
+
+```yaml
+logging:
+  driver: loki
+  options:
+    loki-url: "http://localhost:3100/loki/api/v1/push"
+    loki-external-labels: "service=test-case-api,environment=development"
+    mode: "non-blocking"
+```
+
+#### 3. Metrics Visualization with Grafana
+
+Grafana displays real-time operational metrics via the FastAPI + LLM Operations dashboard:
+
+**Dashboard Panels** (grafana/dashboards/fastapi-llm.json):
+
+| Panel                       | Query                                                | Purpose                         | Time Range     |
+| --------------------------- | ---------------------------------------------------- | ------------------------------- | -------------- |
+| **Request Rate (5min avg)** | `rate({service="test-case-api"} [5m])`               | Track API usage patterns        | Last 5 minutes |
+| **Error Rate (5min avg)**   | `rate({service="test-case-api"} \|= "ERROR" [5m])`   | Monitor error frequency         | Last 5 minutes |
+| **LLM Retries (5min avg)**  | `rate({service="test-case-api"} \|= "WARNING" [5m])` | Track validation retry attempts | Last 5 minutes |
+| **Application Logs**        | `{service="test-case-api"}`                          | Real-time log stream            | Last 1 hour    |
+| **Error Logs**              | `{service="test-case-api"} \|= "ERROR"`              | Detailed error analysis         | Last 1 hour    |
+
+**Data Source Configuration** (grafana/provisioning/datasources/loki.yml):
+
+```yaml
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+    isDefault: true
+```
+
+#### 4. Request Tracing with Correlation IDs
+
+Each request gets a unique correlation ID for distributed tracing across service boundaries:
+
+**Correlation Flow**:
+
+1. **Generation** (CorrelationMiddleware): UUID generated if not in `X-Correlation-ID` header
+2. **Context Variable**: Stored in contextvars for access throughout request lifecycle
+3. **Log Propagation**: Automatically included in all logs via middleware
+4. **Response Header**: Returned to client in `X-Correlation-ID` response header
+5. **Grafana Query**: Dashboard template variable allows filtering logs by correlation_id
+
+### 🛠️ Tools & Technologies Implementation
+
+| Tool                      | Purpose             | Status         | Configuration                                                     |
+| ------------------------- | ------------------- | -------------- | ----------------------------------------------------------------- |
+| **python-json-logger**    | JSON formatting     | ✅ Implemented | CustomJsonFormatter with timestamp, service, environment, version |
+| **Loki**                  | Log aggregation     | ✅ Running     | Port 3100, 7-day retention, BoltDB storage, 12MB/s ingestion      |
+| **Grafana**               | Visualization       | ✅ Active      | Port 3000, FastAPI+LLM dashboard, Loki datasource, 10s refresh    |
+| **Docker Logging Driver** | Log transport       | ✅ Enabled     | Loki driver, non-blocking mode, external labels                   |
+| **MLflow**                | Model tracking      | ✅ Operational | Port 5001, file:./mlruns backend, experiment tagging              |
+| **Correlation IDs**       | Distributed tracing | ✅ Implemented | UUID generation, contextvars storage, header propagation          |
+| **RotatingFileHandler**   | File logging        | ✅ Configured  | 10MB rotation size, 5 backup files, logs/app.json.log             |
+
+**Production Checklist**:
+
+- ✅ Centralized log aggregation (Loki)
+- ✅ Real-time dashboards (Grafana)
+- ✅ Distributed tracing (Correlation IDs)
+- ✅ Model tracking (MLflow)
+- ⏳ Alert rules (Grafana alerting) (ToDo)
+- ⏳ SLA monitoring (custom metrics) (ToDo)
+- ⏳ Cost tracking integration (MLflow cost field) (ToDo)
+
+### 📸 Evidence Grafana & Loki
+
+![Grafana Dashboard - Request Metrics & Logs](docs/resource/img/image.png)
+_Grafana Dashboard showing real-time request rate (5min average), time series metrics, and structured JSON logs from the test-case-api service with live operational visibility_
+
+![Grafana Logs Panel - Structured Log Analysis](docs/resource/img/log.png)
+_Grafana Logs panel displaying detailed JSON logs with correlation IDs, request paths, HTTP methods, status codes, and execution duration for end-to-end distributed request tracing_
 
 ## Phase 9: Feedback & Iteration
 
-### Objective
+### 🎯 Objective
 
-LLMOps is a continuous cycle—analyze production data, identify improvements, update prompts or models, and respond to changing requirements. Regular maintenance ensures your application stays relevant, accurate, and aligned with user needs as technology and business evolve.
+LLMOps is a continuous cycle: analyze production data, identify improvements, update prompts or models, and respond to changing requirements. This phase creates systematic feedback loops to:
 
-### Key Activities
+- **Monitor Production Performance**: Use Loki/Grafana dashboards and MLflow metrics to track real-world performance
+- **Collect Failure Cases**: Analyze prediction mismatches and error logs to identify improvement opportunities
+- **Iterate Prompts & Models**: Test variations using A/B testing before production deployment
+- **Expand Evaluation Datasets**: Incorporate production examples into evaluation to improve test coverage
+- **Document Learnings**: Capture insights from each iteration for future improvements
 
-- **Review monitoring data for improvement areas** - Analyze dashboards, logs, and metrics to identify patterns where quality drops or errors occur
-- **Collect and analyze user feedback** - Aggregate ratings, comments, and bug reports to understand real-world satisfaction and pain points
-- **Update prompts based on failure patterns** - Refine prompts when analysis shows systemic issues (e.g., "missing edge cases in 20% of hard stories")
-- **Retrain or switch models when needed** - Evaluate new model versions, test on your dataset, and upgrade when quality improves justify the change
-- **Expand evaluation datasets with production examples** - Add real-world failures to eval dataset to prevent regression
+### 🎬 Key Activities
 
-### Feedback Loop Cycle
+#### 1. Performance Analysis & Monitoring Dashboard
+
+Continuously monitor production metrics to identify degradation and opportunities:
+
+**Monitoring Workflow**:
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                    LLMOps Continuous Cycle                        │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│          ┌──────────────────────────────────────────┐            │
-│          │    1. Monitor & Analyze (1-2 weeks)      │            │
-│          │  • Review error patterns and metrics    │            │
-│          │  • Aggregate user feedback              │            │
-│          │  • Identify top 3 improvement areas     │            │
-│          └────────────────┬─────────────────────────┘            │
-│                           │                                      │
-│          ┌────────────────▼─────────────────────────┐            │
-│          │    2. Plan Improvements (1 week)         │            │
-│          │  • Root cause analysis                  │            │
-│          │  • Design prompt/model changes          │            │
-│          │  • Create test cases for fixes          │            │
-│          └────────────────┬─────────────────────────┘            │
-│                           │                                      │
-│          ┌────────────────▼─────────────────────────┐            │
-│          │    3. Implement & Test (1-2 weeks)       │            │
-│          │  • Update prompts/models                │            │
-│          │  • A/B test on validation set           │            │
-│          │  • Document changes                     │            │
-│          └────────────────┬─────────────────────────┘            │
-│                           │                                      │
-│          ┌────────────────▼─────────────────────────┐            │
-│          │    4. Evaluate & Validate (1 week)       │            │
-│          │  • Run full evaluation suite             │            │
-│          │  • Compare baseline vs improved          │            │
-│          │  • Get stakeholder approval              │            │
-│          └────────────────┬─────────────────────────┘            │
-│                           │                                      │
-│          ┌────────────────▼─────────────────────────┐            │
-│          │   5. Deploy & Monitor (ongoing)          │            │
-│          │  • Canary rollout (5% → 100%)           │            │
-│          │  • Monitor key metrics                   │            │
-│          │  • Measure impact of changes             │            │
-│          │  • Document learnings                    │            │
-│          └────────────────┬─────────────────────────┘            │
-│                           │                                      │
-│                           └──► Back to Step 1                    │
-│                                                                   │
-└──────────────────────────────────────────────────────────────────┘
+Grafana Dashboard (Real-time)
+  ├─ Request Rate: Daily/Weekly trends
+  ├─ Error Rate: Spike detection
+  ├─ LLM Retries: Validation failure tracking
+  └─ Latency: P95/P99 performance
+         ↓
+    MLflow Experiments (Historical)
+      ├─ Model comparison metrics
+      ├─ Quality scores by prompt
+      └─ Cost efficiency trends
+         ↓
+    Analysis (Weekly Review)
+      ├─ Identify degradation
+      ├─ Compare vs baseline
+      └─ Prioritize improvements
 ```
 
-### Data Collection for Feedback
+**Key Metrics to Track**:
 
-#### User Feedback Forms
+| Metric                  | Source             | Alert Threshold  | Action                                          |
+| ----------------------- | ------------------ | ---------------- | ----------------------------------------------- |
+| **Error Rate**          | Loki logs, Grafana | >5% increase     | Page on-call, investigate root cause            |
+| **LLM Retry Rate**      | Warning logs       | >10% of requests | Review prompt validation rules, adjust template |
+| **Quality Score Trend** | MLflow experiments | >10% drop        | A/B test new prompt version                     |
+| **Latency P95**         | LoggingMiddleware  | >6000ms          | Profile bottleneck (LLM vs parsing)             |
+| **Cost per 1K Tokens**  | CostTracker        | >$0.15           | Evaluate smaller model or quantization          |
 
-**In-App Rating Collection:**
+#### 2. Prompt Engineering Iteration Workflow
+
+Systematically test and deploy prompt improvements:
+
+**A/B Testing Framework** (To be implemented):
 
 ```python
-# After each generation, collect feedback
-feedback_schema = {
-    "request_id": "req_12345",
-    "timestamp": "2024-02-23T10:30:45Z",
-    "user_id": "user_abc",
-    "story_id": "US_001",
-    "rating": 4,  # 1-5 stars
-    "satisfaction": {
-        "quality": 4,        # Relevance and accuracy of test cases
-        "completeness": 5,   # Coverage of scenarios
-        "usability": 3,      # Easy to execute/understand
-        "speed": 5           # Response time acceptable
-    },
-    "feedback_type": "suggestion",  # ["praise", "bug", "suggestion"]
-    "comment": "Would like more edge cases for negative scenarios",
-    "would_recommend": true,         # NPS question
-    "improvement_priority": "medium"
-}
-```
+# Location: (To be created) src/application/feedback/prompt_variants.py
 
-#### Production Data Analysis
+class PromptVariants:
+    """Manage multiple prompt versions for A/B testing."""
 
-**Monthly Data Review Meeting:**
-
-```markdown
-# February 2024 - Production Data Review
-
-## Key Metrics
-
-- Total Requests: 45,000
-- Success Rate: 95.2% (target: >95%)
-- Avg Quality Score: 4.1/5.0 (baseline: 3.9)
-- User Satisfaction: 82% (4+ stars)
-- P90 Latency: 4.2s (target: <5s)
-- Monthly Cost: $2,847 (on budget)
-
-## Top Issues (Last Month)
-
-1. **"Hard" stories generate fewer test cases** (18% < 3 cases)
-   - Impact: 540 stories affected
-   - Root cause: Model struggles with complex requirements
-   - Fix: Update prompt with better complex story examples
-
-2. **Missing edge cases in 20% of cart operations**
-   - Impact: Quality scores 3.2/5.0 vs 4.1 average
-   - Root cause: Prompt doesn't explicitly ask for edge cases
-   - Fix: Add edge case template to prompt
-
-3. **Latency spike at 2-3 PM daily**
-   - Impact: P99 reaches 15s (target <10s)
-   - Root cause: Peak load, all pods at 85%+ CPU
-   - Fix: Auto-scale to 5 pods during peak hours
-
-## Positive Findings
-
-- 92% of users mark results as "useful"
-- No major security issues reported
-- Llama 3.2 1B performs well (no fallbacks needed)
-
-## Action Items for March
-
-- [ ] Update prompt with edge case template
-- [ ] Increase auto-scale ceiling from 3 to 5 pods
-- [ ] A/B test new prompt on 10% of traffic
-- [ ] Evaluate Llama 3.2 3B for hard stories only
-- [ ] Add explicit edge case examples to training data
-
-## Next Review: March 23, 2024
-```
-
-### Iteration Process
-
-#### 1. Analyze Failure Patterns
-
-**Example: Edge Case Missing Issue**
-
-```python
-# Query production logs for failures
-failures = elasticsearch.search({
-    "query": {
-        "bool": {
-            "must": [
-                {"term": {"quality_score": {"gte": 2.0, "lte": 3.5}}},
-                {"term": {"event": "test_generation_complete"}}
+    VARIANTS = {
+        "v1": {
+            "name": "IMPROVED_PROMPT_V1",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Current production prompt",
+            "created_date": "2025-02-01",
+            "status": "active",
+        },
+        "v2": {
+            "name": "IMPROVED_PROMPT_V2_STRICT_RULES",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Add explicit JSON formatting rules, stricter validation",
+            "created_date": "2025-02-23",
+            "status": "candidate",
+            "changes": [
+                "Enforce array format for steps/preconditions",
+                "Add JSON schema example",
+                "Reduce token budget, focus on essential fields",
+            ]
+        },
+        "v3": {
+            "name": "IMPROVED_PROMPT_V3_FEW_SHOT",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Add few-shot examples from successful test cases",
+            "created_date": "2025-02-23",
+            "status": "candidate",
+            "changes": [
+                "Include 3 high-quality example test cases",
+                "Show edge case handling",
+                "Demonstrate proper JSON output",
             ]
         }
-    },
-    "size": 100
-})
-
-# Analyze patterns
-print(f"Total low-quality generations: {len(failures)}")
-print(f"Common story topics: {Counter([f['topic'] for f in failures])}")
-print(f"Avg test case count: {mean([f['test_count'] for f in failures])}")
-# Output:
-# Total low-quality generations: 847
-# Common story topics: [('cart_operations', 156), ('payment', 134), ('search', 98)]
-# Avg test case count: 2.1  # Below 3.0 target
-
-# Identify the issue
-for failure in failures[:5]:
-    print(f"Story: {failure['story']}")
-    print(f"  - Test cases: {failure['test_count']}")
-    print(f"  - Quality: {failure['quality_score']}")
-    print(f"  - User feedback: {failure['user_comment']}")
-```
-
-#### 2. Update Prompts
-
-**Example: Add Edge Cases Template**
-
-```python
-# Original prompt
-original_prompt = """
-Generate test cases for this user story.
-For each test case, include:
-- Preconditions
-- Steps
-- Expected result
-
-User Story: {story}
-"""
-
-# Improved prompt (based on failure analysis)
-improved_prompt = """
-Generate comprehensive test cases for this user story.
-Include test cases for:
-1. Happy path (normal, successful scenario)
-2. Error cases (invalid inputs, failures)
-3. Edge cases (boundary conditions, unusual inputs)
-4. Security cases (where applicable)
-
-For each test case, include:
-- Preconditions (what must be true before test)
-- Steps (numbered, specific actions)
-- Expected result (what should happen)
-
-User Story: {story}
-
-Examples of edge cases to consider:
-- Empty/null inputs
-- Maximum/minimum values
-- Concurrent operations
-- Network failures
-- Permission restrictions
-"""
-
-# A/B test on sample
-results_original = test_prompt(original_prompt, test_set=10)  # 2.1 test cases avg
-results_improved = test_prompt(improved_prompt, test_set=10)  # 3.4 test cases avg
-
-improvement = (results_improved - results_original) / results_original * 100
-print(f"Improvement: {improvement:.1f}%")  # Output: 61.9%
-```
-
-#### 3. A/B Test Changes
-
-**Testing Framework:**
-
-```python
-# Split traffic for A/B testing
-class PromptVersion(Enum):
-    CONTROL = "original"  # 95% traffic
-    TREATMENT = "improved"  # 5% traffic
-
-# Route requests
-def get_prompt_version(user_id: str) -> PromptVersion:
-    hash_val = hash(user_id) % 100
-    if hash_val < 5:
-        return PromptVersion.TREATMENT
-    return PromptVersion.CONTROL
-
-# Measure impact over 1 week
-results = {
-    "control": {
-        "quality_score": 3.9,
-        "test_case_count": 2.1,
-        "user_satisfaction": 0.79,
-        "sample_size": 8550
-    },
-    "treatment": {
-        "quality_score": 4.2,  # +7.7% improvement
-        "test_case_count": 3.4,  # +61.9% improvement
-        "user_satisfaction": 0.86,  # +8.9% improvement
-        "sample_size": 450
     }
-}
 
-# Statistical significance test
-from scipy.stats import ttest_ind
-t_stat, p_value = ttest_ind(treatment_scores, control_scores)
-if p_value < 0.05:
-    print("✅ Improvement is statistically significant (p < 0.05)")
-    # Roll out to 100% traffic
-else:
-    print("⚠️ Result could be due to chance, continue testing")
+    @staticmethod
+    def run_experiment(variant: str, dataset: List[str], sample_size: int = 100):
+        """
+        A/B test a prompt variant against production baseline.
+
+        Returns:
+            ExperimentResult with quality_score, latency, cost metrics
+        """
+        pass
 ```
 
-#### 4. Expand Evaluation Dataset
-
-**Adding Production Examples:**
-
-```python
-# Monthly: Add real failures to evaluation dataset
-failed_stories = elasticsearch.search({
-    "query": {"term": {"quality_score": {"lt": 3.0}}},
-    "size": 50
-})
-
-# Manually review and improve
-for story in failed_stories:
-    print(f"Story: {story['story']}")
-
-    # Manually generate better test cases
-    corrected_test_cases = [
-        {
-            "type": "positive",
-            "title": "Valid cart operation",
-            "preconditions": [...],
-            "steps": [...],
-            "expected_result": "..."
-        },
-        # ... more cases
-    ]
-
-    # Add to evaluation dataset with human-generated ground truth
-    eval_dataset.add({
-        "story_id": story['id'],
-        "user_story": story['story'],
-        "ground_truth_test_cases": corrected_test_cases,
-        "source": "production_improvement",
-        "date_added": "2024-02-23"
-    })
-
-print(f"Added {len(failed_stories)} new examples to evaluation dataset")
-```
-
-## Project Structure
+**Iteration Workflow**:
 
 ```
-.
-├── README.md                          # Complete project documentation and LLMOps framework
-├── .env                               # Environment variables (models, API keys, configs)
-├── .gitignore                         # Git ignore rules
-├── docker-compose.yml                 # Docker Compose configuration
-├── requirements.txt                   # Python dependencies
-│
-├── docs/                              # Documentation
-│   ├── decisions.md                   # Architecture and technology decisions
-│   └── LLMOps/                        # LLMOps framework detailed phases
-│       ├── 01.definition.md           # Phase 1: Problem Definition
-│       ├── 02.data_preparation.md     # Phase 2: Data Collection & Preparation
-│       └── 03.model-selection.md      # Phase 3: Model Selection & Evaluation
-│
-├── src/                               # Source code
-│   ├── main.py                        # FastAPI application entry point
-│   ├── config.py                      # Configuration management
-│   ├── models.py                      # Pydantic models for validation
-│   ├── api/
-│   │   ├── endpoints.py               # API route handlers
-│   │   └── auth.py                    # Authentication & authorization
-│   ├── services/
-│   │   ├── generation.py              # Test case generation logic
-│   │   ├── validation.py              # Output validation
-│   │   ├── ollama_client.py           # Ollama model interface
-│   │   └── cache.py                   # Redis caching layer
-│   ├── prompts/
-│   │   ├── generate_tests.yaml        # Main generation prompt
-│   │   └── evaluate_quality.yaml      # Quality evaluation prompt
-│   └── utils/
-│       ├── logging.py                 # Structured logging setup
-│       ├── metrics.py                 # Prometheus metrics
-│       └── security.py                # Input validation & sanitization
-│
-├── data/                              # Data and datasets
-│   ├── examples/
-│   │   └── user_stories_with_test_cases.json   # Ground truth examples
-│   ├── test/
-│   │   └── user_stories.json          # Test dataset (49 stories)
-│   └── results.json                   # Generated test case results
-│
-├── docker/                            # Docker configuration
-│   ├── Dockerfile                     # FastAPI application image
-│   ├── docker-compose.yml             # Multi-container orchestration
-│   ├── ollama/
-│   │   ├── Dockerfile                 # Ollama service image
-│   │   └── entrypoint.sh              # Model loading script
-│   └── nginx/
-│       └── nginx.conf                 # Reverse proxy configuration
-│
-├── monitoring/                        # Monitoring & observability
-│   ├── prometheus/
-│   │   ├── prometheus.yml             # Prometheus configuration
-│   │   └── alerts.yml                 # Alert rules
-│   ├── grafana/
-│   │   ├── dashboards/
-│   │   │   ├── main_dashboard.json    # Real-time metrics dashboard
-│   │   │   └── quality_dashboard.json # Quality metrics dashboard
-│   │   └── provisioning/              # Grafana provisioning configs
-│   ├── elasticsearch/
-│   │   └── elasticsearch.yml          # Elasticsearch config
-│   └── logstash/
-│       └── logstash.conf              # Log processing pipeline
-│
-├── scripts/                           # Utility scripts
-│   ├── setup.sh                       # Initial setup script
-│   ├── run_evaluation.py              # Automated evaluation runner
-│   ├── analyze_logs.py                # Log analysis script
-│   ├── generate_report.py             # Report generation
-│   └── migrate_models.sh              # Model migration script
-│
-├── .github/
-│   └── workflows/
-│       ├── tests.yml                  # Automated testing on push
-│       ├── evaluation.yml             # Weekly evaluation runs
-│       ├── deploy.yml                 # Deployment automation
-│       └── monitoring.yml             # Monitoring checks
-│
-└── logs/                              # Application logs (gitignored)
-    ├── application.log                # Application logs
-    ├── access.log                     # API access logs
-    └── error.log                      # Error logs
+1. Hypothesis Formation
+   └─ Based on failure analysis
+
+2. Prompt Variation Creation
+   └─ v2, v3, v4 variants
+
+3. Small-Scale Testing (10-20 examples)
+   ├─ Quick validation of concept
+   ├─ Check for regressions
+   └─ Estimate improvement
+
+4. Full Evaluation (100+ examples)
+   ├─ Run quality_tracker, latency_tracker, cost_tracker
+   ├─ Compare against baseline (MLflow)
+   └─ Statistical significance testing
+
+5. Comparison & Decision
+   ├─ If improvement > 5%: Candidate for deployment
+   ├─ If improvement < 2%: Archive variant, try different approach
+   └─ If regression: Debug and iterate
+
+6. Production Deployment
+   ├─ Update IMPROVED_PROMPT_V1 in templates.py
+   ├─ Update version number
+   ├─ Document changes in CHANGELOG
+   └─ Monitor metrics for 24h post-deployment
 ```
 
-## File System Organization
+#### 3. Model Selection & Switching Strategy
 
-### Root Level Files
+Periodically evaluate if a different model is better:
 
-| File | Purpose |
-| -- | |
-| `README.md` | Complete project documentation covering all 9 LLMOps phases |
-| `.env` | Environment variables (model names, API keys, configuration) |
-| `requirements.txt` | Python package dependencies |
-| `docker-compose.yml` | Local development environment setup |
-| `.gitignore` | Git ignore rules (logs, cache, .env) |
+**Model Evaluation Criteria**:
 
-### Data (`data/`)
+| Factor             | Current (1B)    | Candidate (3B) | Candidate (8B)   |
+| ------------------ | --------------- | -------------- | ---------------- |
+| **Quality Score**  | 0.78            | 0.85           | 0.91             |
+| **Latency P95**    | 2100ms          | 3200ms         | 5100ms           |
+| **Cost per 1K**    | $0.05           | $0.08          | $0.12            |
+| **Throughput**     | 476 req/hr      | 318 req/hr     | 204 req/hr       |
+| **Memory**         | 4GB             | 8GB            | 16GB             |
+| **Recommendation** | **Low latency** | **Balanced**   | **High quality** |
 
-- **examples/** - Ground truth examples for evaluation
-  - `user_stories_with_test_cases.json` - 2 complete stories with perfect test cases
-- **test/** - Test dataset
-  - `user_stories.json` - 49 user stories with difficulty levels (easy/medium/hard)
-- **results.json** - Generated test case results and quality scores
+#### 4. Dataset Expansion & Continuous Improvement
 
-### Docker (`docker/`)
+Incorporate production data into evaluation:
 
-- **Dockerfile** - FastAPI application image
-  - Base: Python 3.9
-  - Dependencies: FastAPI, Pydantic, requests, redis-py
-  - Health checks enabled
+**Production Data Pipeline**:
 
-- **docker-compose.yml** - Local environment orchestration
-  - FastAPI service (port 8000)
-  - Ollama service (port 11434)
-  - Redis cache (port 6379)
-  - Prometheus (port 9090)
-
-- **ollama/Dockerfile** - Ollama service image with model preloading
-
-## Getting Started
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Python 3.9+
-- Ollama (for local model inference)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd LLM--Test-for-UseCase
-
-# Build and start services
-docker-compose up -d
-
-# Install the models
-docker compose exec ollama ollama pull llama3.2:1b
-docker compose exec ollama ollama pull llama3-chatqa:8b
-docker compose exec ollama ollama pull qwen3-vl:8b
-docker compose exec ollama ollama pull llama3.2:3b
-
-# Install Python dependencies
-pip install -r requirements.txt
+```
+Production Requests
+  ├─ user_story (input)
+  ├─ generated_test_cases (output)
+  ├─ quality_assessment (manual or heuristic)
+  ├─ correlation_id (for tracing)
+  └─ timestamp
+     ↓
+Monthly Dataset Refresh
+  ├─ Extract N (e.g., 50) successful, high-quality examples
+  ├─ Extract N failure cases that were recovered
+  └─ Add to evaluation dataset (data/examples/user_stories_with_test_cases.json)
+     ↓
+Benefits
+  ├─ Evaluation dataset stays representative of actual usage
+  ├─ Few-shot examples reflect real-world patterns
+  ├─ New edge cases are captured
+  └─ Model retraining benefits from production insights
 ```
 
-### Running the Service
+**Feedback Loop Integration**:
 
-```bash
-# Start the microservice
-python src/main.py
+| Data Source          | Signal                   | Action                   |
+| -------------------- | ------------------------ | ------------------------ |
+| **Loki Logs**        | Common error patterns    | Update validation rules  |
+| **Grafana Retries**  | Retry threshold exceeded | Relax or adjust rules    |
+| **MLflow Metrics**   | Quality score declining  | Trigger A/B testing      |
+| **predictions.json** | Mismatches increasing    | Expand evaluation set    |
+| **User Feedback**    | Quality ratings <0.7     | Add examples to few-shot |
 
-# Test the API
-curl -X POST http://localhost:8000/generate-tests \
-  -H "Content-Type: application/json" \
-  -d '{"story": "As a user, I want to log in with my email..."}'
-```
+### 🛠️ Tools & Technologies for Implementation
 
-## Next Steps
+| Tool                        | Purpose                            | Status       | Future Implementation              |
+| --------------------------- | ---------------------------------- | ------------ | ---------------------------------- |
+| **MLflow Experiments**      | Compare prompt/model variants      | ✅ Available | Automated A/B comparison           |
+| **Loki/Grafana**            | Real-time monitoring               | ✅ Running   | Custom alert rules                 |
+| **Python Analysis Scripts** | Failure detection & categorization | ⏳ (ToDo)    | Build FailureAnalyzer class        |
+| **Jupyter Notebooks**       | Data exploration & visualization   | ⏳ (ToDo)    | Weekly analysis notebooks          |
+| **GitHub Actions**          | Automated testing & deployment     | ⏳ (ToDo)    | CI/CD pipeline (.github/workflows) |
+| **Version Control**         | Track prompt/config changes        | ✅ Git       | Document changes in CHANGELOG      |
+| **Slack/Email Alerts**      | Notify on metric degradation       | ⏳ (ToDo)    | Grafana alert integration          |
 
-### Upcoming Enhancements & Implementation Tasks
+### ⚠️ Feedback Bias Mitigation
 
-This section outlines all pending features and improvements marked as "ToDo" throughout the LLMOps framework. Items are organized by phase and priority.
+**Avoiding Common Pitfalls**:
+
+| Pitfall               | Risk                                           | Mitigation                            |
+| --------------------- | ---------------------------------------------- | ------------------------------------- |
+| **Recency Bias**      | Over-weight recent failures                    | Use 7-day rolling window for analysis |
+| **Vocal Minority**    | Focus only on high-traffic errors              | Weight by frequency × severity        |
+| **Confirmation Bias** | Only look for failures that confirm hypothesis | Examine unexpected success cases too  |
+| **Survivorship Bias** | Only analyze successful test cases             | Explicitly track failures & timeouts  |
+| **Change Bias**       | Believe improvements that don't exist          | Use statistical significance testing  |
+
+### 📈 Success Metrics for Phase 9
+
+Track these KPIs to measure iteration effectiveness:
+
+| KPI                      | Target             | Measurement                                |
+| ------------------------ | ------------------ | ------------------------------------------ |
+| **Quality Score Trend**  | +2% per month      | MLflow quality_score metric                |
+| **Error Rate**           | <3%                | Loki log analysis                          |
+| **Deployment Frequency** | 2-3 per month      | Git commits to main branch                 |
+| **Iteration Cycle Time** | 1 week             | From hypothesis to deployment              |
+| **A/B Test Win Rate**    | >60%               | Percent of variants outperforming baseline |
+| **Dataset Coverage**     | 100+ real examples | Monthly refresh of evaluation dataset      |
+
+## 📋 Next Steps
+
+### ✅ Comprehensive ToDo List
+
+This section tracks all planned improvements and features across the LLMOps framework:
+
+#### Phase 1: Problem Definition & Use Case Design
+
+**Completed:**
+
+- ✅ Problem statement definition
+- ✅ Solution fit assessment
+- ✅ Scope and constraints documentation
+- ✅ Success metrics definition
+
+**Future Enhancements:**
+
+- 🔮 **Custom evaluation metrics** - Define domain-specific quality scoring aligned with business KPIs
+- 🔮 **DVC integration** - Version control for use case documents and evaluation criteria
 
 ---
 
-### Phase 2: Data Collection & Preparation
+#### Phase 2: Data Collection & Preparation
 
-#### 1. Implement DVC (Data Version Control)
+**Completed:**
 
-**Purpose:** Version datasets for reproducibility and experiment tracking
+- ✅ 49 user stories collected
+- ✅ 100 test cases generated
+- ✅ Dataset structured and validated
+- ✅ Quality distribution analysis
 
-**Status:** ToDo
+**Future Enhancements:**
 
-**Description:**
+- 🔮 **Label Studio integration** - Human-in-the-loop annotation for quality assessment
+- 🔮 **Data pipeline orchestration** - Apache Airflow/Prefect for automated data ingestion and validation
+- 🔮 **DVC versioning** - Track dataset changes and maintain reproducibility across experiments
 
-- Set up DVC to track all datasets in `data/` directory
-- Enable reproducible data pipelines for train/test splits
-- Maintain audit trail of dataset changes
-- Link DVC with git for version control integration
+---
 
-**Implementation Details:**
+#### Phase 3: Model Selection & Evaluation
 
-```bash
-# Initialize DVC in project
-dvc init
+**Completed:**
 
-# Track datasets
-dvc add data/test/user_stories.json
-dvc add data/examples/user_stories_with_test_cases.json
+- ✅ Evaluated 1B, 3B, 8B models
+- ✅ Quality and latency benchmarking
+- ✅ Cost analysis per model
+- ✅ Recommendation framework
 
-# Create data pipeline (dvc.yaml)
-# Define stages for data collection, cleaning, splitting
+**Future Enhancements:**
+
+- 🔮 **DeepEval framework** - Semantic similarity and hallucination detection across models
+- 🔮 **Load testing** - Throughput benchmarking with locust/wrk for production readiness
+- 🔮 **Multi-model ensemble** - Combine predictions from multiple models for improved quality
+
+---
+
+#### Phase 4: Prompt Engineering & Optimization
+
+**Completed:**
+
+- ✅ RAG approach evaluation
+- ✅ Direct prompting with templates
+- ✅ Prompt variations (v1, v2, v3)
+- ✅ Validation rules and structure constraints
+
+**Future Enhancements:**
+
+- 🔮 **Few-shot learning optimization** - Dynamic example selection and adaptive prompt construction
+- 🔮 **Cost optimization** - Automatic model selection based on cost/quality tradeoff
+- 🔮 **Prompt versioning** - Systematic A/B testing and performance tracking
+
+---
+
+#### Phase 5: RAG & Prompting
+
+**Completed:**
+
+- ✅ FAISS vectorstore implementation
+- ✅ Retrieval-augmented generation pipeline
+- ✅ Direct prompting fallback
+- ✅ Context management
+
+**Future Enhancements:**
+
+- 🔮 **Few-shot learning optimization** - Similarity-based example retrieval for better context
+- 🔮 **Dynamic few-shot selection** - Intelligent example retrieval based on input similarity
+- 🔮 **Cost optimization** - Adaptive context window management for cost reduction
+
+---
+
+#### Phase 6: Evaluation & Testing
+
+**Completed:**
+
+- ✅ Quality tracking (QualityTracker)
+- ✅ Latency tracking (LatencyTracker with P50/P95/P99)
+- ✅ Cost tracking (CostTracker)
+- ✅ 3-dimensional evaluation framework
+- ✅ MLflow experiment tracking
+
+**Future Enhancements:**
+
+- 🔮 **DeepEval framework** - Semantic evaluation, factuality checking, and quality assessment
+- 🔮 **Custom evaluation metrics** - Domain-specific scoring and business KPI alignment
+- 🔮 **Load testing** - Stress testing and throughput benchmarking for production validation
+- 🔮 **Request validation** - Input sanitization and schema validation for robustness
+- 🔮 **Error recovery** - Circuit breaker pattern and automatic retry with exponential backoff
+
+---
+
+#### Phase 7: Deployment & Serving
+
+- ✅ FastAPI endpoints with standardized responses
+- ✅ Request tracing with correlation IDs
+- ✅ Multi-stage Docker containerization
+- ✅ Environment configuration management
+- ⏳ **Rate limiting middleware** - Implement request throttling per IP/API key
+- ⏳ **Authentication & authorization** - Add FastAPI Security with JWT/API keys
+- ⏳ **Load balancing** - Configure Nginx reverse proxy or use Docker Swarm
+
+---
+
+#### Phase 8: Monitoring & Observability
+
+- ✅ Structured JSON logging (CustomJsonFormatter)
+- ✅ Loki log aggregation (7-day retention, BoltDB storage)
+- ✅ Grafana dashboards (Request Rate, Error Rate, LLM Retries, Logs)
+- ✅ Correlation ID propagation (distributed tracing)
+- ✅ MLflow experiment tracking
+- ⏳ **Grafana alert rules** - Configure alerts for:
+  - Error rate > 5%
+  - Latency P95 > 6000ms
+  - LLM retry rate > 10%
+- ⏳ **SLA monitoring** - Custom metrics dashboard for SLO tracking
+- ⏳ **Cost tracking in MLflow** - Add cost field to experiment logging
+- ⏳ **Slack/PagerDuty integration** - Alert on critical issues
+- ⏳ **Prometheus metrics** - Expose /metrics endpoint with Prometheus-compatible format
+- ⏳ **Distributed tracing** - Integration with Jaeger or Tempo for request flow visualization
+
+---
+
+#### Phase 9: Feedback & Iteration
+
+**Failure Analysis & Data Pipeline**:
+
+- ⏳ **FailureAnalyzer class** (Week 1)
+  - Location: `src/application/feedback/failure_extractor.py`
+  - Extract failures from Loki logs using correlation IDs
+  - Categorize failures: JSON parsing, validation, quality, timeout
+  - Generate weekly failure report with patterns
+
+- ⏳ **Prediction analysis script** (Week 1)
+  - Parse `predictions.json` for expected vs actual mismatches
+  - Identify patterns in failures (user story keywords, test case types)
+  - Generate root cause classification
+
+**Prompt & Model Iteration**:
+
+- ⏳ **PromptVariants framework** (Week 2)
+  - Location: `src/application/feedback/prompt_variants.py`
+  - Manage multiple prompt versions (v1, v2, v3...)
+  - Support A/B testing with variant comparison
+  - Track variant performance metrics
+
+- ⏳ **A/B Testing harness** (Week 2)
+  - Run experiments on subsets of evaluation dataset
+  - Compare quality, latency, cost metrics
+  - Statistical significance testing (t-test, confidence intervals)
+  - Automated comparison against baseline in MLflow
+
+- ⏳ **Prompt versioning & CHANGELOG** (Week 2)
+  - Document prompt changes with rationale
+  - Track version history in `docs/PROMPT_CHANGELOG.md`
+  - Include metrics improvement/degradation
+
+**Data & Dataset Management**:
+
+- ⏳ **Dataset refresh pipeline** (Week 3)
+  - Monthly extraction of high-quality examples from production
+  - Add to `data/examples/user_stories_with_test_cases.json`
+  - Track which examples came from production
+
+- ⏳ **Few-shot example manager** (Week 3)
+  - Identify best performing test case examples
+  - Organize by user story type, complexity
+  - Use in future prompt iterations
+
+**Automation & CI/CD**:
+
+- ⏳ **GitHub Actions workflows** (Week 4)
+  - Location: `.github/workflows/`
+  - Test runner: Execute evaluation on PR submissions
+  - Model evaluation: Run full metrics on candidate models
+  - Deployment pipeline: Staging → Production workflow
+  - Automated rollback on metric degradation
+
+- ⏳ **Jupyter notebooks for analysis** (Week 4)
+  - Location: `notebooks/weekly_analysis.ipynb`
+  - Pull data from Loki, MLflow, Grafana
+  - Visualize trends over time
+  - Generate weekly analysis report
+
+- ⏳ **Monitoring & alerting** (Week 5)
+  - Grafana alert rules for key metrics
+  - Slack integration for notifications
+  - Pagerduty integration for critical alerts
+  - Runbook generation for common issues
+
+**Documentation & Governance**:
+
+- ⏳ **Iteration decision log** (Week 5)
+  - Location: `docs/ITERATION_LOG.md`
+  - Record why each prompt/model change was made
+  - Link to A/B test results in MLflow
+  - Track decisions for future reference
+
+- ⏳ **Deployment checklist template** (Week 5)
+  - Quality gates for production deployment
+  - Rollback procedures
+  - Post-deployment monitoring requirements
+
+## 📁 Project Organization
+
+### 🌳 File System Tree
+
 ```
-
-**Expected Outcome:**
-
-- All datasets versioned and tracked
-- Data lineage documented
-- Reproducible data pipelines for future experiments
-- Ability to roll back to previous dataset versions
-
----
-
-#### 2. Integrate Label Studio for Manual Annotation
-
-**Purpose:** Enable manual annotation and quality review of test cases
-
-**Status:** ToDo
-
-**Description:**
-
-- Set up Label Studio instance for human-in-the-loop annotation
-- Create annotation interface for test case quality review
-- Define labeling guidelines and scoring rubrics
-- Build feedback loop from QA to model improvements
-
-**Implementation Details:**
-
-```python
-# Label Studio configuration
-# Annotation tasks:
-# 1. Rate test case quality (1-5 scale)
-# 2. Flag issues (missing steps, vague preconditions, etc.)
-# 3. Suggest improvements
-# 4. Mark edge cases and special scenarios
+LLM--Test-for-UseCase/
+│
+├── 📄 ROOT CONFIGURATION FILES
+│   ├── docker-compose.yml          # Multi-service orchestration (Ollama, Loki, Grafana, API, MLflow)
+│   ├── Dockerfile                  # Multi-stage build with NVIDIA CUDA support
+│   ├── requirements.txt            # Python dependencies
+│   ├── requirements.yaml           # Conda environment specification
+│   ├── loki-config.yml             # Loki log aggregation config (7-day retention, BoltDB)
+│   ├── promtail-config.yml         # Log shipper configuration
+│   ├── .env                        # Environment variables (OLLAMA_HOST, ENVIRONMENT, etc.)
+│   ├── .env.dev                    # Development environment template
+│   ├── .gitignore                  # Git ignore rules
+│   ├── README.md                   # Main documentation (this file)
+│   ├── predictions.json            # Expected vs predicted test case comparisons
+│   └── recommendation.md           # Initial recommendations/notes
+│
+├── 📁 src/ - APPLICATION SOURCE CODE
+│   │
+│   ├── 🔧 main.py                  # FastAPI app initialization, endpoints, health checks, metrics
+│   │
+│   ├── 📦 application/             # Core business logic (clean architecture)
+│   │   │
+│   │   ├── 📋 create_tests/
+│   │   │   │
+│   │   │   ├── application/        # Use case orchestration
+│   │   │   │
+│   │   │   ├── models/             # Signature of third services and bussiness' entities
+│   │   │   │
+│   │   │   └── infra/              # Implementation of third services (LangChaing, Pydantic, RAG, FAISS)
+│   │   │
+│   │   ├── 📊 evaluate_models/
+│   │   │   │
+│   │   │   ├── application/        # Orchestrates QualityTracker, LatencyTracker, CostTracker
+│   │   │   │
+│   │   │   ├── models/             # Signature of QualityTracker, LatencyTracker, CostTracker
+│   │   │   │
+│   │   │   └── infra/              # Implementation of third services (MLflow)
+│   │   │
+│   │   └── 🔐 shared/
+│   │       │   └── Cross-cutting concerns
+│   │       │
+│   │       ├── infrastructure/     # Implementation of third services
+│   │       │
+│   │       ├── middleware/         # Middleware for bussines logic
+│   │       │
+│   │       └── models/             # Bussines Models
+│   │
+│   └── 🎯 presentation/            # API layer (routes & controllers)
+│       │
+│       ├── routes/                 # POST /test-use-cases/ endpoint
+│       │
+│       └── controllers/            # Request handler & orchestration
+│
+├── 📁 data/                        # Datasets & vectorstores
+│
+├── 📁 docs/                        # Documentation
+│   │
+│   └── resource/                   # Images
+│
+├── 📁 grafana/                     # Monitoring dashboards
+│
+├── 📁 logs/                        # Application logs
+│
+├── 📁 scripts/                     # Utility scripts
+│
+├── 📁 tests/                       # Test files
+│
+├── 📁 utils/                       # Utility modules
+│
+└── 📁 mlruns/                      # Mlflow tracking
 ```
-
-**Expected Outcome:**
-
-- Quality annotations for generated test cases
-- Human feedback integrated into evaluation metrics
-- Training data for fine-tuning models
-- Continuous quality improvement cycle
-
----
-
-### Phase 6: Evaluation & Testing
-
-#### 1. Implement DeepEval Framework
-
-**Purpose:** Use LLM evaluation framework with pre-built metrics for automated quality assessment
-
-**Status:** ToDo
-
-**Description:**
-
-- Integrate DeepEval library for standardized LLM evaluation
-- Implement pre-built metrics (relevance, faithfulness, coherence)
-- Create custom metrics for test case evaluation
-- Automate evaluation pipeline in CI/CD
-
-**Installation:**
-
-```bash
-pip install deepeval
-```
-
-**Configuration:**
-
-```python
-from deepeval import evaluate
-from deepeval.metrics import Relevance, Faithfulness
-
-# Define evaluation metrics
-# - Relevance: Test case relevant to user story
-# - Faithfulness: Test case grounded in story requirements
-# - Completeness: Coverage of story scenarios
-# - Clarity: Test steps are clear and specific
-```
-
-**Integration Points:**
-
-- Phase 6 evaluation pipeline
-- CI/CD workflow for automated testing
-- Quality tracking dashboard
-- Report generation
-
-**Expected Outcome:**
-
-- Standardized, reproducible evaluation metrics
-- Automated quality scoring for all generated test cases
-- Benchmarking across model versions
-- Evidence-based model selection
-
----
-
-#### 2. Set Up Load Testing Tools (locust, wrk)
-
-**Purpose:** Latency and throughput benchmarking under production load
-
-**Status:** ToDo
-
-**Description:**
-
-- Install and configure load testing tools (locust and/or wrk)
-- Create load test scenarios simulating production traffic
-- Profile API latency at various request volumes
-- Identify performance bottlenecks and scaling limits
-
-**Installation:**
-
-```bash
-pip install locust
-# or
-brew install wrk  # macOS
-```
-
-**Locust Configuration Example:**
-
-```python
-from locust import HttpUser, task
-
-class TestCaseGenerationUser(HttpUser):
-    @task
-    def generate_tests(self):
-        payload = {
-            "story": "As a customer, I want to search for products...",
-            "difficulty": "medium"
-        }
-        self.client.post("/generate-tests", json=payload)
-```
-
-**Load Test Scenarios:**
-
-- Ramp up: Gradually increase users from 1 to 100
-- Sustained: Hold at peak load for 5-10 minutes
-- Spike: Sudden burst to test handling capacity
-- Stress: Push beyond expected capacity to find limits
-
-**Metrics to Track:**
-
-- Response time (P50, P90, P99)
-- Requests per second (RPS)
-- Error rate under load
-- Memory and CPU usage during load
-- Cache hit rates
-
-**Expected Outcome:**
-
-- Baseline performance metrics at different load levels
-- Identification of performance degradation points
-- Scaling recommendations (vertical vs. horizontal)
-- SLA targets for production deployment
-- Documentation of performance characteristics
-
----
-
-### Summary of All ToDo Items
-
-| Phase       | Feature                   | Priority | Complexity | Est. Effort |
-| ----------- | ------------------------- | -------- | ---------- | ----------- |
-| **Phase 2** | DVC Data Versioning       | Medium   | Medium     | 4-6 hours   |
-| **Phase 2** | Label Studio Integration  | High     | High       | 8-12 hours  |
-| **Phase 6** | DeepEval Metrics          | High     | Medium     | 6-8 hours   |
-| **Phase 6** | Load Testing (locust/wrk) | Medium   | Medium     | 4-6 hours   |
-
----
-
-### Recommended Implementation Order
-
-1. **Start with Load Testing** (Phase 6)
-   - Quick to set up and provides immediate insights
-   - Helps validate current infrastructure
-   - Foundation for scaling decisions
-
-2. **Implement DeepEval** (Phase 6)
-   - Enhances evaluation pipeline
-   - Provides standardized metrics
-   - Feeds into quality tracking
-
-3. **Set Up DVC** (Phase 2)
-   - Enables reproducible workflows
-   - Prepares for iterative improvements
-   - Supports future experiments
-
-4. **Integrate Label Studio** (Phase 2)
-   - Most complex, highest impact long-term
-   - Establishes human-in-the-loop feedback
-   - Powers continuous improvement cycle
-
----
-
-### Integration with Existing Systems
-
-**DeepEval Integration:**
-
-- Feeds evaluation metrics into Phase 6: Evaluation & Testing
-- Metrics displayed on Grafana dashboards (Phase 8)
-- Results logged for feedback analysis (Phase 9)
-
-**Load Testing Integration:**
-
-- Results inform Phase 7: Deployment & Serving scaling decisions
-- Latency metrics feed into monitoring alerts (Phase 8)
-- Data informs infrastructure cost calculations
-
-**DVC Integration:**
-
-- Enables Phase 2: Data Collection & Preparation reproducibility
-- Supports Phase 5: RAG & Prompting with versioned context
-- Facilitates Phase 9: Feedback & Iteration experiments
-
-**Label Studio Integration:**
-
-- Provides ground truth for Phase 6: Evaluation & Testing
-- Generates training data for potential fine-tuning
-- Feeds human feedback into Phase 9: Feedback & Iteration
-
----
