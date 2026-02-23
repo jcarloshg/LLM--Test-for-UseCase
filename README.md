@@ -1482,8 +1482,8 @@ LLM--Test-for-UseCase/
 │   ├── Dockerfile                  # Multi-stage build with NVIDIA CUDA support
 │   ├── requirements.txt            # Python dependencies
 │   ├── requirements.yaml           # Conda environment specification
-│   ├── loki-config.yml            # Loki log aggregation config (7-day retention, BoltDB)
-│   ├── promtail-config.yml        # Log shipper configuration
+│   ├── loki-config.yml             # Loki log aggregation config (7-day retention, BoltDB)
+│   ├── promtail-config.yml         # Log shipper configuration
 │   ├── .env                        # Environment variables (OLLAMA_HOST, ENVIRONMENT, etc.)
 │   ├── .env.dev                    # Development environment template
 │   ├── .gitignore                  # Git ignore rules
@@ -1493,161 +1493,56 @@ LLM--Test-for-UseCase/
 │
 ├── 📁 src/ - APPLICATION SOURCE CODE
 │   │
-│   ├── 🔧 main.py
-│   │   └── FastAPI app initialization, endpoints, health checks, metrics
+│   ├── 🔧 main.py                  # FastAPI app initialization, endpoints, health checks, metrics
 │   │
-│   ├── 📦 application/
-│   │   │   └── Core business logic (clean architecture)
+│   ├── 📦 application/             # Core business logic (clean architecture)
 │   │   │
 │   │   ├── 📋 create_tests/
-│   │   │   │   └── Test case generation pipeline
 │   │   │   │
-│   │   │   ├── application/
-│   │   │   │   └── create_tests_application.py       # Use case orchestration
+│   │   │   ├── application/        # Use case orchestration
 │   │   │   │
-│   │   │   ├── models/
-│   │   │   │   ├── templates.py                      # Prompt templates (RAG, IMPROVED_PROMPT_V1)
-│   │   │   │   ├── models_config.py                  # LLM factory (Singleton pattern)
-│   │   │   │   ├── executable_chain.py               # Abstract chain base class
-│   │   │   │   ├── executable_chain_response.py      # Response model (result, latency, tokens)
-│   │   │   │   ├── generate_test_cases_request.py    # Request validation (user_story field)
-│   │   │   │   └── meta_template.py                  # Metadata template utilities
+│   │   │   ├── models/             # Signature of third services and bussiness' entities
 │   │   │   │
-│   │   │   └── infra/
-│   │   │       ├── executable_chain/
-│   │   │       │   ├── executable_chain_prompting.py # Direct prompting chain with retries
-│   │   │       │   ├── executable_chain_rag.py       # RAG-based chain implementation
-│   │   │       │   ├── robust_json_output_parser.py  # Handles markdown-wrapped JSON
-│   │   │       │   ├── test_case_structure.py        # Pydantic validation models
-│   │   │       │   ├── batch_processor.py            # Batch request processing
-│   │   │       │   └── rag_cache.py                  # RAG context caching
-│   │   │       │
-│   │   │       └── vectorstores/
-│   │   │           ├── vector_store_faiss.py         # FAISS vectorstore wrapper
-│   │   │           ├── faiss_vectorstore.py          # FAISS initialization
-│   │   │           └── __init__.py                   # Export helpers
+│   │   │   └── infra/              # Implementation of third services (LangChaing, Pydantic, RAG, FAISS)
 │   │   │
 │   │   ├── 📊 evaluate_models/
-│   │   │   │   └── Model evaluation & tracking
 │   │   │   │
-│   │   │   ├── application/
-│   │   │   │   └── evaluate_models_application.py    # Orchestrates QualityTracker, LatencyTracker, CostTracker
+│   │   │   ├── application/        # Orchestrates QualityTracker, LatencyTracker, CostTracker
 │   │   │   │
-│   │   │   ├── model/
-│   │   │   │   ├── quality_tracker.py               # Quality heuristics (structure validation)
-│   │   │   │   ├── latency_tracker.py               # Latency stats (P50, P95, P99)
-│   │   │   │   ├── cost_tracker.py                  # Cost analysis ($/ 1K tokens)
-│   │   │   │   ├── quality_tracker_response.py      # Quality response model
-│   │   │   │   ├── latency_tracker_response.py      # Latency response model
-│   │   │   │   ├── cost_tracker_response.py         # Cost response model
-│   │   │   │   ├── test_case.py                     # Test case data model
-│   │   │   │   ├── test_dataset.py                  # Dataset loading & management
-│   │   │   │   └── model_configs.py                 # Model configuration
+│   │   │   ├── models/             # Signature of QualityTracker, LatencyTracker, CostTracker
 │   │   │   │
-│   │   │   └── infra/
-│   │   │       └── mlflow_config.py                 # MLflow experiment setup & tracking
+│   │   │   └── infra/              # Implementation of third services (MLflow)
 │   │   │
-│   │   ├── 🔐 shared/
-│   │   │   │   └── Cross-cutting concerns
-│   │   │   │
-│   │   │   ├── infrastructure/
-│   │   │   │   ├── environment_variables.py         # Pydantic config model (OLLAMA_HOST, LOG_LEVEL, etc.)
-│   │   │   │   ├── logging_config.py                # CustomJsonFormatter, setup_logging()
-│   │   │   │   └── llm_logger.py                    # LLM-specific logging utilities
-│   │   │   │
-│   │   │   ├── middleware/
-│   │   │   │   ├── correlation_middleware.py        # UUID generation & context propagation
-│   │   │   │   └── logging_middleware.py            # Request/response logging with timing
-│   │   │   │
-│   │   │   └── models/
-│   │   │       ├── custom_response.py               # Standard API response (message, is_success, data, status_code)
-│   │   │       └── llm_exceptions.py                # Custom exception types
-│   │   │
-│   │   └── __init__.py
+│   │   └── 🔐 shared/
+│   │       │   └── Cross-cutting concerns
+│   │       │
+│   │       ├── infrastructure/     # Implementation of third services
+│   │       │
+│   │       ├── middleware/         # Middleware for bussines logic
+│   │       │
+│   │       └── models/             # Bussines Models
 │   │
-│   └── 🎯 presentation/
-│       │   └── API layer (routes & controllers)
+│   └── 🎯 presentation/            # API layer (routes & controllers)
 │       │
-│       ├── routes/
-│       │   ├── test_use_cases_route.py             # POST /test-use-cases/ endpoint
-│       │   └── __init__.py
+│       ├── routes/                 # POST /test-use-cases/ endpoint
 │       │
-│       └── controllers/
-│           ├── test_use_cases/
-│           │   ├── creaet_test_controller.py       # Request handler & orchestration
-│           │   └── __init__.py
-│           └── __init__.py
+│       └── controllers/            # Request handler & orchestration
 │
-├── 📁 data/ - DATASETS & VECTORSTORES
-│   │
-│   ├── examples/
-│   │   └── user_stories_with_test_cases.json       # Evaluation dataset (49 stories, 100 test cases)
-│   │
-│   ├── test/
-│   │   └── user_stories.json                       # Test data subset
-│   │
-│   ├── results.json                                 # Evaluation results archive
-│   │
-│   ├── vectorstore_faiss/                          # FAISS index for RAG
-│   │   ├── index.faiss                             # Vector embeddings
-│   │   └── index.pkl                               # Metadata
-│   │
-│   └── vectorstore_chroma/                         # Alternative Chroma vectorstore
-│       ├── index.faiss
-│       └── index.pkl
+├── 📁 data/                        # Datasets & vectorstores
 │
-├── 📁 docs/ - DOCUMENTATION
+├── 📁 docs/                        # Documentation
 │   │
-│   ├── README.md                                   # Additional documentation
-│   ├── decisions.md                                # Architecture & design decisions
-│   ├── new.md                                      # Phase implementation details
-│   │
-│   ├── LLMOps/
-│   │   ├── 01.definition.md                        # Phase 1: Problem Definition
-│   │   ├── 02.data_preparation.md                  # Phase 2: Data Collection
-│   │   └── 03.model-selection.md                   # Phase 3: Model Selection
-│   │
-│   └── resource/
-│       └── img/
-│           ├── image.png                           # Grafana dashboard screenshot
-│           ├── log.png                             # Grafana logs panel screenshot
-│           ├── mlflow.png                          # MLflow comparison (Part 1)
-│           └── mlflow_01.png                       # MLflow comparison (Part 2)
+│   └── resource/                   # Images
 │
-├── 📁 grafana/ - MONITORING DASHBOARDS
-│   │
-│   ├── dashboards/
-│   │   └── fastapi-llm.json                        # FastAPI + LLM Operations dashboard
-│   │                                               # Panels: Request Rate, Error Rate, LLM Retries, Logs
-│   │
-│   └── provisioning/
-│       ├── dashboards/
-│       │   └── default.yml                         # Dashboard provisioning config
-│       │
-│       └── datasources/
-│           └── loki.yml                            # Loki datasource configuration
+├── 📁 grafana/                     # Monitoring dashboards
 │
-├── 📁 logs/ - APPLICATION LOGS
-│   │
-│   └── app.json.log                                # Rotating JSON log file (size-based rotation)
-│                                                   # Format: CustomJsonFormatter with context
+├── 📁 logs/                        # Application logs
 │
-├── 📁 scripts/ - UTILITY SCRIPTS
-│   │
-│   └── save_vectorstore.py                         # FAISS vectorstore persistence script
+├── 📁 scripts/                     # Utility scripts
 │
-├── 📁 tests/ - TEST FILES
-│   │
-│   └── [Empty] Currently placeholder for test suite
-│       └── Planned: Unit tests, integration tests, load tests
+├── 📁 tests/                       # Test files
 │
-├── 📁 utils/ - UTILITY MODULES
-│   │
-│   ├── helpers.py                                  # General utility functions
-│   └── __init__.py
+├── 📁 utils/                       # Utility modules
 │
-└── 📁 mlruns/ - MLFLOW TRACKING
-    │
-    └── [MLflow experiment artifacts & metrics]
-        └── Stores: Quality, latency, cost metrics from evaluations
+└── 📁 mlruns/                      # Mlflow tracking
 ```
