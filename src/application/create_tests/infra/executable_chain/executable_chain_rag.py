@@ -1,6 +1,7 @@
 import time
 import json
 import asyncio
+import logging
 from typing import Optional, List
 
 from langchain_core.prompts import PromptTemplate
@@ -13,6 +14,9 @@ from src.application.create_tests.models.executable_chain_response import Execut
 from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
 from src.application.create_tests.infra.executable_chain.rag_cache import RAGCache
 from src.application.create_tests.infra.executable_chain.robust_json_output_parser import RobustJsonOutputParser
+from src.application.shared.infrastructure.llm_logger import log_llm_error, log_llm_retry, log_rag_cache_stats
+
+logger = logging.getLogger(__name__)
 
 
 def format_docs(docs):
@@ -64,20 +68,13 @@ class ExecutableChainRAG(ExecutableChain):
             return self._execute_with_validation(prompt, max_retries, attempt=1)
 
         except ValueError as e:
-            print(f"="*60)
-            print(f"[ExecutableChainV1] - ValueError: {str(e)}")
-            print(f"="*60)
+            log_llm_error("ValueError", str(e))
             raise
         except TypeError as e:
-            print(f"="*60)
-            print(
-                f"[ExecutableChainV1] - TypeError (Invalid JSON response): {str(e)}")
-            print(f"="*60)
+            log_llm_error("TypeError", f"Invalid JSON response: {str(e)}")
             raise
         except Exception as e:
-            print(f"="*60)
-            print(f"[ExecutableChainV1] - Exception: {str(e)}")
-            print(f"="*60)
+            log_llm_error("Exception", str(e))
             raise Exception(f"Failed to execute chain: {str(e)}")
 
     def _cached_retrieve(self, question: str) -> str:
@@ -151,10 +148,12 @@ class ExecutableChainRAG(ExecutableChain):
             TestCasesResponse(**result)
         except ValidationError as e:
             if attempt < max_retries:
-                print(
-                    f"[ExecutableChainV1] - Structure validation failed on attempt {attempt}/{max_retries}")
-                print(f"[ExecutableChainV1] - Validation errors: {e}")
-                print(f"[ExecutableChainV1] - Re-invoking LLM...")
+                log_llm_retry(
+                    model=getattr(self.llm, 'model_name', 'unknown'),
+                    attempt=attempt,
+                    max_attempts=max_retries,
+                    reason=f"Structure validation failed: {str(e)}"
+                )
                 return self._execute_with_validation(prompt, max_retries, attempt + 1)
             raise ValueError(
                 f"Test case structure validation failed after {max_retries} attempts. "
@@ -168,7 +167,7 @@ class ExecutableChainRAG(ExecutableChain):
         # Log cache statistics
         # ─────────────────────────────────────
         cache_stats = self._rag_cache.get_stats()
-        print(f"[ExecutableChainV1] - RAG Cache Stats: {cache_stats}")
+        logger.debug(f"RAG Cache Stats: {cache_stats}")
 
         # ─────────────────────────────────────
         # Return as ExecutableChainResponse
@@ -193,7 +192,7 @@ class ExecutableChainRAG(ExecutableChain):
     def clear_cache(self) -> None:
         """Clear RAG cache."""
         self._rag_cache.clear()
-        print("[ExecutableChainV1] - RAG cache cleared")
+        logger.debug("RAG cache cleared")
 
     async def execute_async(
         self, prompts: List[str], max_concurrent: int = 3, max_retries: int = 3

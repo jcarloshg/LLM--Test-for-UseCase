@@ -24,6 +24,49 @@ services:
       retries: 5
       start_period: 60s
 
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki-service
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+    networks:
+      - test-gen-network
+    command: -config.file=/etc/loki/local-config.yaml
+    environment:
+      - LOKI_RETENTION_DAYS=7
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: grafana-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - test-gen-network
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   api:
     build: .
     container_name: test-case-api
@@ -38,6 +81,7 @@ services:
       - test-gen-network
     depends_on:
       - ollama
+      - loki
     deploy:
       resources:
         reservations:
@@ -45,6 +89,12 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://loki:3100/loki/api/v1/push"
+        labels: "service=test-case-api,environment=development"
+        mode: "non-blocking"
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
   mlflow:
@@ -73,3 +123,5 @@ networks:
 
 volumes:
   ollama-data:
+  loki-data:
+  grafana-data:
