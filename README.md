@@ -321,13 +321,32 @@ Example: ($100 ÷ (5,000 × 30)) × 1,000 = $0.67 per 1,000 requests
 | CPU Usage > 80%            | Enable load balancing or add replicas         | Prevent throttling        |
 | Efficiency Score < 0.6     | Comprehensive review of configuration         | Improve all metrics       |
 
-#### Model Comparison (1,000 requests/month)
+#### Model Comparison & MLflow Evaluation Results
 
-| Model                 | Input Tokens | Output Tokens | Latency (P90) | Monthly Cost | Recommendation               |
-| --------------------- | ------------ | ------------- | ------------- | ------------ | ---------------------------- |
-| **Llama 3.2 1B**      | 800          | 400           | 1-2s          | $30-50       | Best for speed, good quality |
-| **Llama 3.2 3B**      | 800          | 400           | 2-5s          | $50-100      | Balanced speed/quality       |
-| **Llama 3 ChatQA 8B** | 800          | 400           | 4-8s          | $80-150      | Best quality, slower         |
+**MLflow Experiment Tracking:**
+
+![MLflow Model Comparison - Part 1](docs/resource/img/mlflow.png)
+_MLflow Dashboard showing quality, latency, and throughput metrics across evaluated models_
+
+![MLflow Model Comparison - Part 2](docs/resource/img/mlflow_01.png)
+_MLflow Dashboard showing cost efficiency, resource utilization, and additional performance metrics_
+
+**Model Performance Summary (5,000 requests/day baseline):**
+
+| Model                 | Quality Score | Avg Latency | P95 Latency | Throughput | Cost/1K | Efficiency |
+| --------------------- | ------------- | ----------- | ----------- | ---------- | ------- | ---------- |
+| **Llama 3.2 1B**      | 0.78-0.82     | 1.2s        | 1.8s        | 50 req/min | $0.67   | 0.85       |
+| **Llama 3.2 3B**      | 0.85-0.90     | 2.5s        | 4.2s        | 24 req/min | $0.67   | 0.72       |
+| **Llama 3 ChatQA 8B** | 0.88-0.95     | 4.5s        | 7.1s        | 13 req/min | $0.67   | 0.58       |
+
+**Decision Matrix:**
+
+| Use Case                 | Best Model        | Reason                                        | Trade-offs                         |
+| ------------------------ | ----------------- | --------------------------------------------- | ---------------------------------- |
+| **High-throughput APIs** | Llama 3.2 1B      | Fastest inference, 50 req/min                 | Slightly lower quality (0.78-0.82) |
+| **Balanced Production**  | Llama 3.2 3B      | Good quality (0.85-0.90) + reasonable latency | P95 4.2s, moderate throughput      |
+| **Quality-first**        | Llama 3 ChatQA 8B | Best quality (0.88-0.95) + reasoning          | P95 7.1s, only 13 req/min          |
+| **Cost-sensitive**       | All Models\*      | Same infrastructure cost ($0.67/1K)           | Trade quality vs. speed            |
 
 ### Evidence RAG vs Prompt
 
