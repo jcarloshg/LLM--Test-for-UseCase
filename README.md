@@ -73,14 +73,25 @@ curl -X POST http://localhost:8001/generate-tests \
   -d '{"story": "As a user, I want to log in with my email..."}'
 ```
 
-View logs:
+### Running Model Evaluation
+
+1. Start all services
+2. Verify Ollama is ready
+3. Run evaluation (⏱️ ~5-10 minutes for full dataset)
+4. View results in MLflow
+5. Monitor metrics in Grafana
 
 ```bash
-# Check Docker Compose logs
-docker-compose logs -f api
-
-# View logs in Grafana
-# Navigate to http://localhost:3000 and access Loki logs
+# 1.
+docker compose up -d
+# 2.
+docker compose exec ollama ollama list
+# 3.
+docker compose exec api python src/application/evaluate_models/application/evaluate_models_application.py
+# 4.
+http://localhost:5001
+# 5.
+http://localhost:3000
 ```
 
 ## Phase 1: Problem Definition & Use Case Design
