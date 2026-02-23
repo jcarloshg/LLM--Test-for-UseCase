@@ -38,7 +38,7 @@
       "pluginVersion": "10.2.0",
       "targets": [
         {
-          "expr": "rate({service=\"test-case-api\", level=\"INFO\"}[5m])",
+          "expr": "rate({service=\"test-case-api\"} [5m])",
           "legendFormat": "Request Rate",
           "refId": "A"
         }
@@ -65,7 +65,7 @@
       "pluginVersion": "10.2.0",
       "targets": [
         {
-          "expr": "rate({service=\"test-case-api\", severity=\"ERROR\"}[5m])",
+          "expr": "rate({service=\"test-case-api\"} |= \"ERROR\" [5m])",
           "legendFormat": "Error Rate",
           "refId": "A"
         }
@@ -125,7 +125,7 @@
       "pluginVersion": "10.2.0",
       "targets": [
         {
-          "expr": "rate({service=\"test-case-api\", level=\"WARNING\"}[5m])",
+          "expr": "rate({service=\"test-case-api\"} |= \"WARNING\" [5m])",
           "legendFormat": "LLM Retries",
           "refId": "A"
         }
@@ -159,7 +159,7 @@
       "pluginVersion": "10.2.0",
       "targets": [
         {
-          "expr": "{service=\"test-case-api\", severity=\"ERROR\"}",
+          "expr": "{service=\"test-case-api\"} |= \"ERROR\"",
           "refId": "A"
         }
       ],
