@@ -1,7 +1,10 @@
+import logging
 
 from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.generate_test_cases_request import GenerateRequest
 from src.application.shared.models.custom_response import CustomResponse
+
+logger = logging.getLogger(__name__)
 
 
 class CreateTestsApplication:
@@ -22,7 +25,9 @@ class CreateTestsApplication:
             )
 
         except Exception as e:
-            print("="*60)
-            print(f"[CreateTestsApplication] - Exception {str(e)}")
-            print("="*60)
+            logger.error(
+                f"Application error: {type(e).__name__}",
+                extra={"error": str(e)},
+                exc_info=True
+            )
             return CustomResponse.something_was_wrong()

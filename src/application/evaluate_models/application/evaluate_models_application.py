@@ -2,6 +2,7 @@
 import json
 import os
 import tempfile
+import logging
 from datetime import datetime
 from typing import List, Dict, Any
 
@@ -20,6 +21,8 @@ from src.application.evaluate_models.model.model_configs import ModelConfig, Mod
 from src.application.evaluate_models.model.quality_tracker import QualityTracker
 from src.application.evaluate_models.model.test_case import TestCase
 from src.application.evaluate_models.model.test_dataset import EvaluationDataset
+
+logger = logging.getLogger(__name__)
 
 
 class EvaluateModelsApplication:
@@ -68,10 +71,9 @@ class EvaluateModelsApplication:
             # Evaluate each model with nested runs
             # ─────────────────────────────────────
             for idx, model_config in enumerate(models_to_test, 1):
-                print(f"\n{'='*60}")
-                print(
-                    f"[{idx}/{len(models_to_test)}] Evaluating: {model_config.name}")
-                print(f"{'='*60}")
+                logger.info(
+                    f"Evaluating model [{idx}/{len(models_to_test)}]: {model_config.name}"
+                )
 
                 result = self._evaluate_single_model(
                     model_config,
@@ -174,7 +176,8 @@ class EvaluateModelsApplication:
             # ─────────────────────────────────────
             responses: list[ExecutableChainResponse] = []
 
-            print(f"Running {len(test_dataset)} test cases...")
+            logger.info(
+                f"Running {len(test_dataset)} test cases for model {model_config.name}")
 
             for i, test_case in enumerate(test_dataset, 1):
                 user_story = test_case.user_story
@@ -184,7 +187,8 @@ class EvaluateModelsApplication:
                 responses.append(response)
 
                 if i % 5 == 0 or i == len(test_dataset):
-                    print(f"  Progress: {i}/{len(test_dataset)} completed")
+                    logger.debug(
+                        f"Progress: {i}/{len(test_dataset)} test cases completed")
 
             # ─────────────────────────────────────
             # 1. Quality Metrics (Accuracy & Quality)
@@ -192,10 +196,7 @@ class EvaluateModelsApplication:
             quality = QualityTracker.calculate_quality_score(
                 execution_responses=responses
             )
-            print(f"="*60)
-            print("Quality Metrics:")
-            print(quality)
-            print(f"="*60)
+            logger.info(f"Quality Metrics for {model_config.name}: {quality}")
 
             # Log quality metrics to MLflow
             mlflow.log_metrics({
@@ -221,10 +222,8 @@ class EvaluateModelsApplication:
             latency_stats = LatencyTracker.calculate_latency_stats(
                 latencies=latencies
             )
-            print("="*60)
-            print("Latency Metrics:")
-            print(latency_stats)
-            print("="*60)
+            logger.info(
+                f"Latency Metrics for {model_config.name}: {latency_stats}")
 
             # Log latency metrics to MLflow
             mlflow.log_metrics({
@@ -245,10 +244,8 @@ class EvaluateModelsApplication:
                 monthly_server_cost=100.0,
                 max_requests_per_day=expected_requests_per_day
             )
-            print(f"="*60)
-            print("Cost Analysis:")
-            print(cost_analysis)
-            print(f"="*60)
+            logger.info(
+                f"Cost Analysis for {model_config.name}: {cost_analysis}")
 
             # Log cost metrics to MLflow
             mlflow.log_metrics({
@@ -493,26 +490,49 @@ class EvaluateModelsApplication:
 # ============================================================================
 if __name__ == "__main__":
 
-    # ─────────────────────────────────────
-    # RAG
-    # ─────────────────────────────────────
-    # Initialize pipeline
-    pipeline = EvaluateModelsApplication("RAG-LLAMA")
-    # Load FAISS vectorstore
-    try:
-        retriever = load_faiss_vectorstore()
-    except FileNotFoundError as e:
-        print("="*60)
-        print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
-        print("="*60)
-        raise Exception("Something was wriong")
+    #     # ─────────────────────────────────────
+    #     # RAG
+    #     # ─────────────────────────────────────
+    #     # Initialize pipeline
+    #     pipeline = EvaluateModelsApplication("RAG-LLAMA")
+    #     # Load FAISS vectorstore
+    #     try:
+    #         retriever = load_faiss_vectorstore()
+    #     except FileNotFoundError as e:
+    #         logger.error(f"FileNotFoundError loading vectorstore: {str(e)}", exc_info=True)
+    #         raise Exception("Something was wriong")
+    #
+    #     # ─────────────────────────────────────
+    #     # Initialize the executable chain
+    #     # ─────────────────────────────────────
+    #     executable_chain_rag = ExecutableChainRAG(
+    #         prompt_emplate=RAG_PROMPT,
+    #         retriever=retriever,
+    #     )
+    #
+    #     test_cases = EvaluationDataset.load_stories_for_test(
+    #         num_easy=2,
+    #         num_medium=2,
+    #         num_hard=2
+    #     )
+    #
+    #     model_registry = ModelRegistry()
+    #     models_for_evaluation = model_registry.get_models_to_compare()
+    #
+    #     # Run evaluation
+    #     results = pipeline.run_complete_evaluation(
+    #         expected_requests_per_day=5000,  # Adjust based on expected traffic
+    #         test_dataset=test_cases,
+    #         models_to_test=models_for_evaluation,
+    #         executable_chain=executable_chain_rag
+    #     )
 
     # ─────────────────────────────────────
-    # Initialize the executable chain
+    # prompting
     # ─────────────────────────────────────
-    executable_chain_rag = ExecutableChainRAG(
-        prompt_emplate=RAG_PROMPT,
-        retriever=retriever,
+    pipeline = EvaluateModelsApplication("prompting-model-evaluation")
+    executable_chain_prompting = ExecutableChainPrompting(
+        prompt_emplate=IMPROVED_PROMPT_V1
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
@@ -529,37 +549,10 @@ if __name__ == "__main__":
         expected_requests_per_day=5000,  # Adjust based on expected traffic
         test_dataset=test_cases,
         models_to_test=models_for_evaluation,
-        executable_chain=executable_chain_rag
+        executable_chain=executable_chain_prompting
     )
-
-#     # ─────────────────────────────────────
-#     # prompting
-#     # ─────────────────────────────────────
-#     pipeline = EvaluateModelsApplication("prompting-model-evaluation")
-#     executable_chain_prompting = ExecutableChainPrompting(
-#         prompt_emplate=IMPROVED_PROMPT_V1
-#     )
-#
-#     test_cases = EvaluationDataset.load_stories_for_test(
-#         num_easy=2,
-#         num_medium=2,
-#         num_hard=2
-#     )
-#
-#     model_registry = ModelRegistry()
-#     models_for_evaluation = model_registry.get_models_to_compare()
-#
-#     # Run evaluation
-#     results = pipeline.run_complete_evaluation(
-#         expected_requests_per_day=5000,  # Adjust based on expected traffic
-#         test_dataset=test_cases,
-#         models_to_test=models_for_evaluation,
-#         executable_chain=executable_chain_prompting
-#     )
 
     # # Generate report
     # pipeline.generate_report()
 
-    print("\n" + "="*60)
-    print("EVALUATION COMPLETE!")
-    print("="*60)
+    logger.info("Evaluation complete!")

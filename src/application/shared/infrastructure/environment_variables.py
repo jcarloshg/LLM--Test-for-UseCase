@@ -93,6 +93,45 @@ class EnvironmentConfig(BaseModel):
         description="Path to the FAISS vectorstore directory"
     )
 
+    # // ─────────────────────────────────────
+    # LOGGING & OBSERVABILITY
+    # // ─────────────────────────────────────
+    LOG_LEVEL: str = Field(
+        default="INFO",
+        alias="LOG_LEVEL",
+        description="Logging level (DEBUG, INFO, WARNING, ERROR)"
+    )
+    LOG_FORMAT: str = Field(
+        default="json",
+        alias="LOG_FORMAT",
+        description="Log format (json or text)"
+    )
+    LOG_FILE_PATH: str = Field(
+        default="logs/app.json.log",
+        alias="LOG_FILE_PATH",
+        description="Path to log file for structured logging"
+    )
+    LOG_ROTATION_SIZE: int = Field(
+        default=10485760,
+        alias="LOG_ROTATION_SIZE",
+        description="Log rotation size in bytes (10MB default)"
+    )
+    LOG_BACKUP_COUNT: int = Field(
+        default=5,
+        alias="LOG_BACKUP_COUNT",
+        description="Number of backup log files to keep"
+    )
+    ENVIRONMENT: str = Field(
+        default="development",
+        alias="ENVIRONMENT",
+        description="Deployment environment (development, staging, production)"
+    )
+    SERVICE_VERSION: str = Field(
+        default="1.0.0",
+        alias="SERVICE_VERSION",
+        description="Service version"
+    )
+
     def __str__(self) -> str:
         """String representation of environment configuration."""
         return (
@@ -110,6 +149,11 @@ class EnvironmentConfig(BaseModel):
             f"  MAX_RETRIES_DEV_MSG: {self.MAX_RETRIES_DEV_MSG}\n"
             f"  JSON_FILE_PATH: {self.JSON_FILE_PATH}\n"
             f"  VECTORSTORE_PATH: {self.VECTORSTORE_PATH}\n"
+            f"  LOG_LEVEL: {self.LOG_LEVEL}\n"
+            f"  LOG_FORMAT: {self.LOG_FORMAT}\n"
+            f"  LOG_FILE_PATH: {self.LOG_FILE_PATH}\n"
+            f"  ENVIRONMENT: {self.ENVIRONMENT}\n"
+            f"  SERVICE_VERSION: {self.SERVICE_VERSION}\n"
             f")"
         )
 
@@ -179,7 +223,33 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "VECTORSTORE_PATH",
             "data/vectorstore_faiss"
         ),
+        "LOG_LEVEL": os.getenv(
+            "LOG_LEVEL",
+            "INFO"
+        ),
+        "LOG_FORMAT": os.getenv(
+            "LOG_FORMAT",
+            "json"
+        ),
+        "LOG_FILE_PATH": os.getenv(
+            "LOG_FILE_PATH",
+            "logs/app.json.log"
+        ),
+        "LOG_ROTATION_SIZE": int(os.getenv(
+            "LOG_ROTATION_SIZE",
+            "10485760"
+        )),
+        "LOG_BACKUP_COUNT": int(os.getenv(
+            "LOG_BACKUP_COUNT",
+            "5"
+        )),
+        "ENVIRONMENT": os.getenv(
+            "ENVIRONMENT",
+            "development"
+        ),
+        "SERVICE_VERSION": os.getenv(
+            "SERVICE_VERSION",
+            "1.0.0"
+        ),
     }
 )
-
-print(f"ENVIRONMENT_CONFIG {ENVIRONMENT_CONFIG.__str__()}")

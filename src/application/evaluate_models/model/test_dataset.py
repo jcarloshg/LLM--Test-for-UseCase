@@ -2,9 +2,12 @@
 from abc import ABC, abstractmethod
 from typing import List
 import json
+import logging
 import random
 
 from src.application.evaluate_models.model.test_case import TestCase
+
+logger = logging.getLogger(__name__)
 
 
 class EvaluationDataset(ABC):
@@ -60,18 +63,11 @@ class EvaluationDataset(ABC):
             return test_cases
 
         except FileNotFoundError as e:
-            print("="*60)
-            print(f"[EvaluationDataset] - FileNotFoundError {str(e)}")
-            print("="*60)
+            logger.error(f"FileNotFoundError loading test dataset: {str(e)}")
             return []
         except (json.JSONDecodeError, KeyError) as e:
-            print("="*60)
-            print(
-                f"[EvaluationDataset] - json.JSONDecodeError, KeyError {str(e)}")
-            print("="*60)
+            logger.error(f"JSON or Key error loading test dataset: {str(e)}")
             return []
         except Exception as e:
-            print("="*60)
-            print(f"[EvaluationDataset] - Exception {str(e)}")
-            print("="*60)
+            logger.error(f"Exception loading test dataset: {str(e)}", exc_info=True)
             return []

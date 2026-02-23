@@ -83,7 +83,9 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
             message=f"Validation error: {e.errors()[0]}"
         )
     except Exception as e:
-        print(f"={'='*60}")
-        print(f"Controller error: {e}")
-        print(f"{'='*60}")
+        logger.error(
+            f"Controller error: {type(e).__name__}",
+            extra={"error": str(e)},
+            exc_info=True
+        )
         return CustomResponse.something_was_wrong()
