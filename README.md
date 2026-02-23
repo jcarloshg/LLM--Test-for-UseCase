@@ -323,7 +323,15 @@ Example: ($100 ÷ (5,000 × 30)) × 1,000 = $0.67 per 1,000 requests
 
 #### Model Comparison & MLflow Evaluation Results
 
-**MLflow Experiment Tracking:**
+| Model                 | Quality Score | Avg Latency | P95 Latency | Throughput | Cost/1K | Efficiency |
+| --------------------- | ------------- | ----------- | ----------- | ---------- | ------- | ---------- |
+| **Llama 3.2 1B**      | 0.78-0.82     | 1.2s        | 1.8s        | 50 req/min | $0.67   | 0.85       |
+| **Llama 3.2 3B**      | 0.85-0.90     | 2.5s        | 4.2s        | 24 req/min | $0.67   | 0.72       |
+| **Llama 3 ChatQA 8B** | 0.88-0.95     | 4.5s        | 7.1s        | 13 req/min | $0.67   | 0.58       |
+
+_Model Performance Summary (5,000 requests/day baseline)_
+
+### Evidence RAG vs Prompt
 
 ![MLflow Model Comparison - Part 1](docs/resource/img/mlflow.png)
 _MLflow Dashboard showing quality, latency, and throughput metrics across evaluated models_
@@ -331,24 +339,74 @@ _MLflow Dashboard showing quality, latency, and throughput metrics across evalua
 ![MLflow Model Comparison - Part 2](docs/resource/img/mlflow_01.png)
 _MLflow Dashboard showing cost efficiency, resource utilization, and additional performance metrics_
 
-**Model Performance Summary (5,000 requests/day baseline):**
+## Phase 4: Prompt Engineering & Optimization
 
-| Model                 | Quality Score | Avg Latency | P95 Latency | Throughput | Cost/1K | Efficiency |
-| --------------------- | ------------- | ----------- | ----------- | ---------- | ------- | ---------- |
-| **Llama 3.2 1B**      | 0.78-0.82     | 1.2s        | 1.8s        | 50 req/min | $0.67   | 0.85       |
-| **Llama 3.2 3B**      | 0.85-0.90     | 2.5s        | 4.2s        | 24 req/min | $0.67   | 0.72       |
-| **Llama 3 ChatQA 8B** | 0.88-0.95     | 4.5s        | 7.1s        | 13 req/min | $0.67   | 0.58       |
+### Objective
 
-**Decision Matrix:**
+Craft effective instructions that guide LLMs to produce desired outputs through iterative refinement. This phase often yields **80% of performance improvements** without model changes. Design system prompts, add examples (few-shot learning), structure outputs, and establish reusable templates.
 
-| Use Case                 | Best Model        | Reason                                        | Trade-offs                         |
-| ------------------------ | ----------------- | --------------------------------------------- | ---------------------------------- |
-| **High-throughput APIs** | Llama 3.2 1B      | Fastest inference, 50 req/min                 | Slightly lower quality (0.78-0.82) |
-| **Balanced Production**  | Llama 3.2 3B      | Good quality (0.85-0.90) + reasonable latency | P95 4.2s, moderate throughput      |
-| **Quality-first**        | Llama 3 ChatQA 8B | Best quality (0.88-0.95) + reasoning          | P95 7.1s, only 13 req/min          |
-| **Cost-sensitive**       | All Models\*      | Same infrastructure cost ($0.67/1K)           | Trade quality vs. speed            |
+> **Key Insight:** A well-engineered prompt can make a 1B model outperform a poorly-prompted 8B model.
 
-### Evidence RAG vs Prompt
+### Key Activities
 
-![alt text](docs/resource/img/mlflow.png)
-![alt text](docs/resource/img/mlflow_01.png)
+**1. Create Prompt Templates**
+
+- Build reusable templates with variables
+- Support different input variations
+- Enable A/B testing of prompt versions
+
+**2. Implement Few-Shot Examples**
+
+- Provide representative input-output examples
+- Show desired format and quality levels
+- Improve accuracy through demonstration learning
+
+### Prompt Engineering Techniques
+
+- Implementation: [src/application/create_tests/models/templates.py](src/application/create_tests/models/templates.py)
+
+| Technique             | Use Case               | Implementation                                                                                                       |
+| --------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Role-Based**        | Domain expertise       | "You are an expert QA Engineer specializing in test case design..."                                                  |
+| **Structured Output** | JSON schema            | Strict JSON with 8 required fields (id, type, title, priority, preconditions, steps, expected_result, quality_score) |
+| **Few-Shot Learning** | Format consistency     | Example test case structure embedded in prompt template                                                              |
+| **Explicit Rules**    | Error prevention       | 8 numbered rules (coverage balance, priority distribution, array format requirements)                                |
+| **Edge Case Focus**   | Comprehensive coverage | Test type categories: positive / negative / edge_case / boundary                                                     |
+
+**Active Prompt Variants from templates.py:**
+
+1. **RAG_PROMPT** (Advanced)
+   - Incorporates external context via RAG retrieval
+   - Best for: Complex or domain-specific user stories
+   - Structure: Role-based → Task clarity → Test field table → Rules → Few-shot example
+
+2. **PROMPT** (Basic)
+   - Minimal instructions, fastest inference
+   - Best for: Simple stories, speed-critical deployments
+   - Structure: Compact field definitions → JSON example
+
+3. **IMPROVED_PROMPT_V1** (Production Default)
+   - Enhanced with detailed validation rules and table structure
+   - Best for: Quality-critical, production environments
+   - Structure: Role-based → Test field table → 8 explicit rules → Few-shot example
+   - Key Rules: Coverage balance (3-8 test cases), Priority distribution (1-2 critical, 2-3 high), Quality score (6-9 range)
+
+**Validation Framework (IMPROVED_PROMPT_V1):**
+
+```
+Rule 1: Generate 3-8 test cases covering happy path, edge cases, errors
+Rule 2: Ensure balanced coverage across positive, negative, edge case types
+Rule 3: Each test case MUST have all required fields
+Rule 4: Priority distribution (1-2 critical, 2-3 high, 1-2 medium, 0-1 low)
+Rule 5: Quality score should reflect comprehensiveness (6-9 typical)
+Rule 6: Be specific and actionable in each step
+Rule 7: "steps" MUST be array of strings ONLY (NOT objects)
+Rule 8: "preconditions" MUST be array of strings ONLY (NOT objects)
+```
+
+### Tools & Technologies
+
+| Tool          | Purpose                      | Status         |
+| ------------- | ---------------------------- | -------------- |
+| **Pydantic**  | Structured output validation | ✅ Implemented |
+| **LangChain** | Prompt templating & chaining | ✅ Implemented |
