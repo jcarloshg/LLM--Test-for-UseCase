@@ -410,3 +410,153 @@ Rule 8: "preconditions" MUST be array of strings ONLY (NOT objects)
 | ------------- | ---------------------------- | -------------- |
 | **Pydantic**  | Structured output validation | ✅ Implemented |
 | **LangChain** | Prompt templating & chaining | ✅ Implemented |
+
+## Phase 6: Evaluation & Testing
+
+### Objective
+
+Systematically measure if your LLM application meets quality standards before production deployment. Use both automated metrics and human evaluation to assess accuracy, relevance, safety, and consistency. Testing catches issues early and provides benchmarks for measuring improvements.
+
+Implementation: [src/application/evaluate_models/](src/application/evaluate_models/)
+
+### Key Activities
+
+**1. Run Automated Evaluations**
+
+- Execute evaluation scripts against held-out test stories
+- Measure structural and semantic quality using QualityTracker
+- Validate JSON parsing success, field completeness, test case coverage
+- Generate quality metrics (accuracy, compliance, coverage)
+
+**2. Implement LLM-as-Judge Evaluation**
+
+- Use separate LLM prompt to assess test case relevance
+- Evaluate completeness and alignment with user stories
+- Compare generated vs. ground truth test cases
+- Establish semantic relevance scores
+
+**3. Conduct Human Evaluation Samples**
+
+- QA specialists review 10-20% of generated test cases
+- Score on 1-5 scale: Relevance, Completeness, Clarity, Usability
+- Achieve ≥90% inter-rater agreement
+- Validate model outputs meet quality expectations
+
+**4. Test Edge Cases & Adversarial Inputs**
+
+- Evaluate on vague, conflicting, multi-role stories
+- Test non-functional requirements and complex flows
+- Assess boundary conditions and unusual scenarios
+- Measure model robustness and failure modes
+
+**5. Profile Performance Metrics**
+
+- Measure latency (P50, P90, P99 percentiles)
+- Calculate throughput and resource utilization
+- Profile memory usage and CPU consumption
+- Establish cost per request and cost efficiency
+
+### Evaluation Framework
+
+#### 1. Automated Metrics
+
+Implementation: [QualityTracker](src/application/evaluate_models/model/quality_tracker.py)
+
+| Metric                    | Target   | Measurement                     | Implementation              |
+| ------------------------- | -------- | ------------------------------- | --------------------------- |
+| **Structural Compliance** | >95%     | % valid JSON on 1st attempt     | Pydantic parsing validation |
+| **Field Completeness**    | >90%     | All required fields non-empty   | Schema field validation     |
+| **Test Case Count**       | ≥3/story | Avg test cases per story        | Count analysis              |
+| **Quality Score**         | ≥4.0/5.0 | Overall quality assessment      | QualityTracker heuristics   |
+| **Precondition Quality**  | ≥4.0/5.0 | Non-generic, meaningful setup   | LLM evaluation              |
+| **Step Specificity**      | ≥4.0/5.0 | Concrete, measurable actions    | LLM evaluation              |
+| **Result Clarity**        | ≥4.0/5.0 | Clear, verifiable assertions    | LLM evaluation              |
+| **Retry Rate**            | <5%      | Failed attempts requiring retry | Execution tracking          |
+
+**Quality Metrics Calculation:**
+
+The `QualityTracker.calculate_quality_score()` computes:
+
+- `quality_score`: Overall composite score (0.0-1.0)
+- `precondition_score`: Precondition quality (0.0-1.0)
+- `structure_score`: JSON structure adherence (0.0-1.0)
+- `passing_rate`: % of tests meeting criteria
+- `json_parsing_success_rate`: % successful JSON parses
+- `avg_quality_score`: Average test case quality (0-10 scale)
+- `retry_rate`: % requests requiring retries
+
+#### 2. Human Evaluation Protocol
+
+**Sample Selection:**
+
+- Random sampling: 10-20% of test dataset (5-10 stories)
+- Stratified sampling: 2-3 stories per difficulty level (easy/medium/hard)
+- Edge case samples: Stories with unusual requirements or complex scenarios
+
+**Evaluation Rubric (1-5 scale):**
+
+| Criterion        | 1 (Poor)                     | 3 (Acceptable)                         | 5 (Excellent)                           |
+| ---------------- | ---------------------------- | -------------------------------------- | --------------------------------------- |
+| **Relevance**    | Test case unrelated to story | Covers main feature but misses details | Fully addresses all story aspects       |
+| **Completeness** | Missing test scenarios       | Has positive + negative cases          | Includes positive, negative, edge cases |
+| **Clarity**      | Steps are vague/confusing    | Steps are mostly clear                 | Steps are precise, specific, actionable |
+| **Usability**    | Tester cannot execute        | Tester needs clarification             | Ready to execute, fully self-contained  |
+
+#### 3. Edge Case Testing
+
+Test model behavior on challenging scenarios:
+
+```
+Edge Case Categories:
+1. Vague Requirements - "As a user, I want better performance"
+2. Conflicting Criteria - Requirements that contradict each other
+3. Multi-Role Stories - Stories with multiple actors/roles
+4. Non-Functional Requirements - Stories focused on performance, security, or compliance
+5. Complex User Flows - Stories with many sequential steps
+6. Boundary Conditions - Stories with specific limits or constraints
+```
+
+#### 4. Performance Benchmarks
+
+| Metric                     | Target      | Measurement                     |
+| -------------------------- | ----------- | ------------------------------- |
+| **P50 Latency**            | <3s         | Median response time            |
+| **P90 Latency**            | <5s         | 90th percentile                 |
+| **P99 Latency**            | <10s        | 99th percentile                 |
+| **Throughput**             | >10 req/min | Single instance sustained load  |
+| **Memory Usage**           | <4GB        | Peak RAM during inference       |
+| **Cost per 1,000 Stories** | <$100       | Infrastructure cost calculation |
+
+### Evaluation Workflow
+
+```
+Input Use Cases
+    ↓
+Execute on Model
+    ↓
+Capture ExecutableChainResponse (latency, test_cases, quality_score)
+    ↓
+Run QualityTracker.calculate_quality_score()
+    ↓
+Run LatencyTracker.calculate_latency_stats()
+    ↓
+Run CostTracker.calculate_cost_analysis()
+    ↓
+Generate MLflow Artifacts
+    ↓
+Compare Models (Quality vs. Latency vs. Cost)
+    ↓
+Output Evaluation Report
+```
+
+### Tools & Technologies
+
+| Tool                           | Purpose                                   | Status         | Implementation                                                                                               |
+| ------------------------------ | ----------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Pydantic**                   | Schema validation & structural compliance | ✅ Implemented | Built into response parsing                                                                                  |
+| **QualityTracker**             | Heuristic quality evaluation              | ✅ Implemented | [quality_tracker.py](src/application/evaluate_models/model/quality_tracker.py)                               |
+| **LatencyTracker**             | Latency & performance metrics             | ✅ Implemented | [latency_tracker.py](src/application/evaluate_models/model/latency_tracker.py)                               |
+| **CostTracker**                | Infrastructure cost analysis              | ✅ Implemented | [cost_tracker.py](src/application/evaluate_models/model/cost_tracker.py)                                     |
+| **MLflow**                     | Experiment tracking & comparison          | ✅ Implemented | [evaluate_models_application.py](src/application/evaluate_models/application/evaluate_models_application.py) |
+| **DeepEval**                   | LLM evaluation framework                  | 📋 ToDo        | Would enhance semantic evaluation                                                                            |
+| **Load Testing** (locust, wrk) | Throughput benchmarking                   | 📋 ToDo        | External load simulation recommended                                                                         |
