@@ -139,3 +139,70 @@ With Ollama, token cost = $0. Cost shifts to compute infrastructure.
 | ------------------------ | ------------------------- | ----------------------------------------- |
 | **Infrastructure Cost**  | Monitor resource usage    | Monthly server cost ÷ max throughput      |
 | **Resource Utilization** | Log CPU/RAM/VRAM baseline | Docker container consumption at peak load |
+
+## Phase 2: Data Collection & Preparation
+
+### Objective
+
+Prepare high-quality training and evaluation data for your LLM application:
+
+- Gather diverse examples for prompts, evaluation, and potential fine-tuning
+- Ensure data quality, diversity, and proper formatting
+- Maintain reproducibility and traceability throughout the data lifecycle
+
+> **Key Principle:** Quality over quantity—100 high-quality examples often outperform 1,000 noisy ones.
+
+### Key Activities
+
+**1. Collect Representative Examples**
+
+- Gather diverse user stories covering different features, complexity levels, and user personas
+- Aim for balanced representation across domains (e-commerce, authentication, analytics, etc.)
+- Capture edge cases and boundary conditions
+
+**2. Clean & Anonymize Data**
+
+- Remove personally identifiable information (PII) from stories and test data
+- Standardize formatting and remove inconsistencies
+- Validate data integrity before storage
+
+**3. Structure Data for Use**
+
+- Format as JSON, JSONL, or CSV for easy loading
+- Include metadata (difficulty, domain, quality score)
+- Create clear separation between input and output
+
+### Dataset Overview
+
+Currently, the project includes **49 diverse user stories** across an e-commerce platform:
+
+| Dataset                   | Location                                                                                           | Contents                                                      | Size        |
+| ------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------- |
+| **Test Stories**          | [data/test/user_stories.json](data/test/user_stories.json)                                         | 49 user stories with difficulty levels (easy/medium/hard)     | 1,097 bytes |
+| **Ground Truth Examples** | [data/examples/user_stories_with_test_cases.json](data/examples/user_stories_with_test_cases.json) | 49 user stories with 100 test cases, quality scores 0.71-0.92 | ~90+ KB     |
+
+### Data Distribution
+
+**49 User Stories Across Difficulty Levels:**
+
+| Difficulty | Count | Example User Stories                                                               |
+| ---------- | ----- | ---------------------------------------------------------------------------------- |
+| **Easy**   | ~15   | Product recommendations, account export, invoice printing, voice search, wishlists |
+| **Medium** | ~27   | Shopping cart, search, inventory, notifications, checkout, product variants        |
+| **Hard**   | ~7    | Login/auth, password reset, profile updates, 2FA, secure payment processing        |
+
+### Tools & Technologies
+
+| Tool                           | Purpose                                          | Status         | Implementation                                                                                                                                                         |
+| ------------------------------ | ------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pydantic**                   | Input/output validation with schema enforcement  | ✅ Implemented | [input](src/application/create_tests/models/generate_test_cases_request.py) [output](src/application/create_tests/infra/executable_chain/robust_json_output_parser.py) |
+| **JSON Schema Validator**      | Validate test case structure compliance          | ✅ Implemented | [robust_json_output_parser.py](src/application/create_tests/infra/executable_chain/robust_json_output_parser.py)                                                       |
+| **DVC (Data Version Control)** | Version control for datasets and reproducibility | 📋 ToDo        | 📋 ToDo                                                                                                                                                                |
+| **Label Studio**               | Human-in-the-loop annotation and QA review       | 📋 ToDo        | 📋 ToDo                                                                                                                                                                |
+
+**Data Pipeline (ToDo):**
+
+```
+Raw Data → Collection → Cleaning → Validation → Versioning → Ready for Use
+           (49 stories)   (PII)      (Schema)     (DVC)      (training/eval)
+```
