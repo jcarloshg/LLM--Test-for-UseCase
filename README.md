@@ -1028,13 +1028,230 @@ _Grafana Dashboard showing real-time request rate (5min average), time series me
 ![Grafana Logs Panel - Structured Log Analysis](docs/resource/img/log.png)
 _Grafana Logs panel displaying detailed JSON logs with correlation IDs, request paths, HTTP methods, status codes, and execution duration for end-to-end distributed request tracing_
 
-### **Phase 9: Feedback & Iteration: (ToDo)**
+## Phase 9: Feedback & Iteration (ToDo)
 
-| Section            | Details                                                                                                                                                                                                                                                                            |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase Name**     | Feedback & Iteration                                                                                                                                                                                                                                                               |
-| **Objective**      | LLMOps is a continuous cycle—analyze production data, identify improvements, update prompts or models, and respond to changing requirements. Regular maintenance ensures your application stays relevant, accurate, and aligned with user needs as technology and business evolve. |
-| **Key Activities** | • Review monitoring data for improvement areas<br>• Collect and analyze user feedback<br>• Update prompts based on failure patterns<br>• Retrain or switch models when needed<br>• Expand evaluation datasets with production examples                                             |
-| **Tools**          | • **GitHub Actions** - Automated testing and deployment<br>• **Jupyter Notebooks** - Data analysis<br>• **Linear/Jira** - Issue tracking                                                                                                                                           |
-| **Outputs**        | • Updated prompts and models<br>• Improved evaluation datasets<br>• Performance improvement reports<br>• Roadmap for next iteration                                                                                                                                                |
-| **Challenges**     | **Deployment fatigue:** Treating launch as finish line instead of starting line. **Feedback bias:** Only listening to vocal minority. **No experimentation framework:** Making changes without measuring impact through A/B tests.                                                 |
+### Objective
+
+LLMOps is a continuous cycle: analyze production data, identify improvements, update prompts or models, and respond to changing requirements. This phase creates systematic feedback loops to:
+
+- **Monitor Production Performance**: Use Loki/Grafana dashboards and MLflow metrics to track real-world performance
+- **Collect Failure Cases**: Analyze prediction mismatches and error logs to identify improvement opportunities
+- **Iterate Prompts & Models**: Test variations using A/B testing before production deployment
+- **Expand Evaluation Datasets**: Incorporate production examples into evaluation to improve test coverage
+- **Document Learnings**: Capture insights from each iteration for future improvements
+
+### Key Activities
+
+#### 1. Performance Analysis & Monitoring Dashboard
+
+Continuously monitor production metrics to identify degradation and opportunities:
+
+**Monitoring Workflow**:
+
+```
+Grafana Dashboard (Real-time)
+  ├─ Request Rate: Daily/Weekly trends
+  ├─ Error Rate: Spike detection
+  ├─ LLM Retries: Validation failure tracking
+  └─ Latency: P95/P99 performance
+         ↓
+    MLflow Experiments (Historical)
+      ├─ Model comparison metrics
+      ├─ Quality scores by prompt
+      └─ Cost efficiency trends
+         ↓
+    Analysis (Weekly Review)
+      ├─ Identify degradation
+      ├─ Compare vs baseline
+      └─ Prioritize improvements
+```
+
+**Key Metrics to Track**:
+
+| Metric                  | Source             | Alert Threshold  | Action                                          |
+| ----------------------- | ------------------ | ---------------- | ----------------------------------------------- |
+| **Error Rate**          | Loki logs, Grafana | >5% increase     | Page on-call, investigate root cause            |
+| **LLM Retry Rate**      | Warning logs       | >10% of requests | Review prompt validation rules, adjust template |
+| **Quality Score Trend** | MLflow experiments | >10% drop        | A/B test new prompt version                     |
+| **Latency P95**         | LoggingMiddleware  | >6000ms          | Profile bottleneck (LLM vs parsing)             |
+| **Cost per 1K Tokens**  | CostTracker        | >$0.15           | Evaluate smaller model or quantization          |
+
+#### 2. Prompt Engineering Iteration Workflow
+
+Systematically test and deploy prompt improvements:
+
+**A/B Testing Framework** (To be implemented):
+
+```python
+# Location: (To be created) src/application/feedback/prompt_variants.py
+
+class PromptVariants:
+    """Manage multiple prompt versions for A/B testing."""
+
+    VARIANTS = {
+        "v1": {
+            "name": "IMPROVED_PROMPT_V1",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Current production prompt",
+            "created_date": "2025-02-01",
+            "status": "active",
+        },
+        "v2": {
+            "name": "IMPROVED_PROMPT_V2_STRICT_RULES",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Add explicit JSON formatting rules, stricter validation",
+            "created_date": "2025-02-23",
+            "status": "candidate",
+            "changes": [
+                "Enforce array format for steps/preconditions",
+                "Add JSON schema example",
+                "Reduce token budget, focus on essential fields",
+            ]
+        },
+        "v3": {
+            "name": "IMPROVED_PROMPT_V3_FEW_SHOT",
+            "file": "src/application/create_tests/models/templates.py",
+            "description": "Add few-shot examples from successful test cases",
+            "created_date": "2025-02-23",
+            "status": "candidate",
+            "changes": [
+                "Include 3 high-quality example test cases",
+                "Show edge case handling",
+                "Demonstrate proper JSON output",
+            ]
+        }
+    }
+
+    @staticmethod
+    def run_experiment(variant: str, dataset: List[str], sample_size: int = 100):
+        """
+        A/B test a prompt variant against production baseline.
+
+        Returns:
+            ExperimentResult with quality_score, latency, cost metrics
+        """
+        pass
+```
+
+**Iteration Workflow**:
+
+```
+1. Hypothesis Formation
+   └─ Based on failure analysis
+
+2. Prompt Variation Creation
+   └─ v2, v3, v4 variants
+
+3. Small-Scale Testing (10-20 examples)
+   ├─ Quick validation of concept
+   ├─ Check for regressions
+   └─ Estimate improvement
+
+4. Full Evaluation (100+ examples)
+   ├─ Run quality_tracker, latency_tracker, cost_tracker
+   ├─ Compare against baseline (MLflow)
+   └─ Statistical significance testing
+
+5. Comparison & Decision
+   ├─ If improvement > 5%: Candidate for deployment
+   ├─ If improvement < 2%: Archive variant, try different approach
+   └─ If regression: Debug and iterate
+
+6. Production Deployment
+   ├─ Update IMPROVED_PROMPT_V1 in templates.py
+   ├─ Update version number
+   ├─ Document changes in CHANGELOG
+   └─ Monitor metrics for 24h post-deployment
+```
+
+#### 3. Model Selection & Switching Strategy
+
+Periodically evaluate if a different model is better:
+
+**Model Evaluation Criteria**:
+
+| Factor             | Current (1B)    | Candidate (3B) | Candidate (8B)   |
+| ------------------ | --------------- | -------------- | ---------------- |
+| **Quality Score**  | 0.78            | 0.85           | 0.91             |
+| **Latency P95**    | 2100ms          | 3200ms         | 5100ms           |
+| **Cost per 1K**    | $0.05           | $0.08          | $0.12            |
+| **Throughput**     | 476 req/hr      | 318 req/hr     | 204 req/hr       |
+| **Memory**         | 4GB             | 8GB            | 16GB             |
+| **Recommendation** | **Low latency** | **Balanced**   | **High quality** |
+
+#### 4. Dataset Expansion & Continuous Improvement
+
+Incorporate production data into evaluation:
+
+**Production Data Pipeline**:
+
+```
+Production Requests
+  ├─ user_story (input)
+  ├─ generated_test_cases (output)
+  ├─ quality_assessment (manual or heuristic)
+  ├─ correlation_id (for tracing)
+  └─ timestamp
+     ↓
+Monthly Dataset Refresh
+  ├─ Extract N (e.g., 50) successful, high-quality examples
+  ├─ Extract N failure cases that were recovered
+  └─ Add to evaluation dataset (data/examples/user_stories_with_test_cases.json)
+     ↓
+Benefits
+  ├─ Evaluation dataset stays representative of actual usage
+  ├─ Few-shot examples reflect real-world patterns
+  ├─ New edge cases are captured
+  └─ Model retraining benefits from production insights
+```
+
+**Feedback Loop Integration**:
+
+| Data Source          | Signal                   | Action                   |
+| -------------------- | ------------------------ | ------------------------ |
+| **Loki Logs**        | Common error patterns    | Update validation rules  |
+| **Grafana Retries**  | Retry threshold exceeded | Relax or adjust rules    |
+| **MLflow Metrics**   | Quality score declining  | Trigger A/B testing      |
+| **predictions.json** | Mismatches increasing    | Expand evaluation set    |
+| **User Feedback**    | Quality ratings <0.7     | Add examples to few-shot |
+
+### Tools & Technologies for Implementation
+
+| Tool                        | Purpose                            | Status       | Future Implementation              |
+| --------------------------- | ---------------------------------- | ------------ | ---------------------------------- |
+| **MLflow Experiments**      | Compare prompt/model variants      | ✅ Available | Automated A/B comparison           |
+| **Loki/Grafana**            | Real-time monitoring               | ✅ Running   | Custom alert rules                 |
+| **Python Analysis Scripts** | Failure detection & categorization | ⏳ (ToDo)    | Build FailureAnalyzer class        |
+| **Jupyter Notebooks**       | Data exploration & visualization   | ⏳ (ToDo)    | Weekly analysis notebooks          |
+| **GitHub Actions**          | Automated testing & deployment     | ⏳ (ToDo)    | CI/CD pipeline (.github/workflows) |
+| **Version Control**         | Track prompt/config changes        | ✅ Git       | Document changes in CHANGELOG      |
+| **Slack/Email Alerts**      | Notify on metric degradation       | ⏳ (ToDo)    | Grafana alert integration          |
+
+### Feedback Bias Mitigation
+
+**Avoiding Common Pitfalls**:
+
+| Pitfall               | Risk                                           | Mitigation                            |
+| --------------------- | ---------------------------------------------- | ------------------------------------- |
+| **Recency Bias**      | Over-weight recent failures                    | Use 7-day rolling window for analysis |
+| **Vocal Minority**    | Focus only on high-traffic errors              | Weight by frequency × severity        |
+| **Confirmation Bias** | Only look for failures that confirm hypothesis | Examine unexpected success cases too  |
+| **Survivorship Bias** | Only analyze successful test cases             | Explicitly track failures & timeouts  |
+| **Change Bias**       | Believe improvements that don't exist          | Use statistical significance testing  |
+
+### Success Metrics for Phase 9
+
+Track these KPIs to measure iteration effectiveness:
+
+| KPI                      | Target             | Measurement                                |
+| ------------------------ | ------------------ | ------------------------------------------ |
+| **Quality Score Trend**  | +2% per month      | MLflow quality_score metric                |
+| **Error Rate**           | <3%                | Loki log analysis                          |
+| **Deployment Frequency** | 2-3 per month      | Git commits to main branch                 |
+| **Iteration Cycle Time** | 1 week             | From hypothesis to deployment              |
+| **A/B Test Win Rate**    | >60%               | Percent of variants outperforming baseline |
+| **Dataset Coverage**     | 100+ real examples | Monthly refresh of evaluation dataset      |
+
+## Next Steps
+
+
