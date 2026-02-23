@@ -1254,4 +1254,192 @@ Track these KPIs to measure iteration effectiveness:
 
 ## Next Steps
 
+### Comprehensive ToDo List
 
+This section tracks all planned improvements and features across the LLMOps framework:
+
+#### Phase 1-6: Completed Core Phases
+
+- ✅ Problem definition & use case design
+- ✅ Data collection & preparation (49 user stories, 100 test cases)
+- ✅ Model selection & evaluation (1B, 3B, 8B models)
+- ✅ Prompt engineering & optimization (RAG, prompting, few-shot)
+- ✅ Evaluation & testing framework
+- ✅ Deployment & serving (FastAPI, Docker, Loki/Grafana)
+
+#### Phase 7: Deployment & Serving
+
+- ✅ FastAPI endpoints with standardized responses
+- ✅ Request tracing with correlation IDs
+- ✅ Multi-stage Docker containerization
+- ✅ Environment configuration management
+- ⏳ **Rate limiting middleware** - Implement request throttling per IP/API key
+- ⏳ **Authentication & authorization** - Add FastAPI Security with JWT/API keys
+- ⏳ **Load balancing** - Configure Nginx reverse proxy or use Docker Swarm
+
+#### Phase 8: Monitoring & Observability
+
+- ✅ Structured JSON logging (CustomJsonFormatter)
+- ✅ Loki log aggregation (7-day retention, BoltDB storage)
+- ✅ Grafana dashboards (Request Rate, Error Rate, LLM Retries, Logs)
+- ✅ Correlation ID propagation (distributed tracing)
+- ✅ MLflow experiment tracking
+- ⏳ **Grafana alert rules** - Configure alerts for:
+  - Error rate > 5%
+  - Latency P95 > 6000ms
+  - LLM retry rate > 10%
+- ⏳ **SLA monitoring** - Custom metrics dashboard for SLO tracking
+- ⏳ **Cost tracking in MLflow** - Add cost field to experiment logging
+- ⏳ **Slack/PagerDuty integration** - Alert on critical issues
+- ⏳ **Prometheus metrics** - Expose /metrics endpoint with Prometheus-compatible format
+- ⏳ **Distributed tracing** - Integration with Jaeger or Tempo for request flow visualization
+
+#### Phase 9: Feedback & Iteration
+
+**Failure Analysis & Data Pipeline**:
+
+- ⏳ **FailureAnalyzer class** (Week 1)
+  - Location: `src/application/feedback/failure_extractor.py`
+  - Extract failures from Loki logs using correlation IDs
+  - Categorize failures: JSON parsing, validation, quality, timeout
+  - Generate weekly failure report with patterns
+
+- ⏳ **Prediction analysis script** (Week 1)
+  - Parse `predictions.json` for expected vs actual mismatches
+  - Identify patterns in failures (user story keywords, test case types)
+  - Generate root cause classification
+
+**Prompt & Model Iteration**:
+
+- ⏳ **PromptVariants framework** (Week 2)
+  - Location: `src/application/feedback/prompt_variants.py`
+  - Manage multiple prompt versions (v1, v2, v3...)
+  - Support A/B testing with variant comparison
+  - Track variant performance metrics
+
+- ⏳ **A/B Testing harness** (Week 2)
+  - Run experiments on subsets of evaluation dataset
+  - Compare quality, latency, cost metrics
+  - Statistical significance testing (t-test, confidence intervals)
+  - Automated comparison against baseline in MLflow
+
+- ⏳ **Prompt versioning & CHANGELOG** (Week 2)
+  - Document prompt changes with rationale
+  - Track version history in `docs/PROMPT_CHANGELOG.md`
+  - Include metrics improvement/degradation
+
+**Data & Dataset Management**:
+
+- ⏳ **Dataset refresh pipeline** (Week 3)
+  - Monthly extraction of high-quality examples from production
+  - Add to `data/examples/user_stories_with_test_cases.json`
+  - Track which examples came from production
+
+- ⏳ **Few-shot example manager** (Week 3)
+  - Identify best performing test case examples
+  - Organize by user story type, complexity
+  - Use in future prompt iterations
+
+**Automation & CI/CD**:
+
+- ⏳ **GitHub Actions workflows** (Week 4)
+  - Location: `.github/workflows/`
+  - Test runner: Execute evaluation on PR submissions
+  - Model evaluation: Run full metrics on candidate models
+  - Deployment pipeline: Staging → Production workflow
+  - Automated rollback on metric degradation
+
+- ⏳ **Jupyter notebooks for analysis** (Week 4)
+  - Location: `notebooks/weekly_analysis.ipynb`
+  - Pull data from Loki, MLflow, Grafana
+  - Visualize trends over time
+  - Generate weekly analysis report
+
+- ⏳ **Monitoring & alerting** (Week 5)
+  - Grafana alert rules for key metrics
+  - Slack integration for notifications
+  - Pagerduty integration for critical alerts
+  - Runbook generation for common issues
+
+**Documentation & Governance**:
+
+- ⏳ **Iteration decision log** (Week 5)
+  - Location: `docs/ITERATION_LOG.md`
+  - Record why each prompt/model change was made
+  - Link to A/B test results in MLflow
+  - Track decisions for future reference
+
+- ⏳ **Deployment checklist template** (Week 5)
+  - Quality gates for production deployment
+  - Rollback procedures
+  - Post-deployment monitoring requirements
+
+### Architecture Enhancements (Future Phases)
+
+#### Data Infrastructure
+
+- ⏳ **DVC (Data Version Control)**
+  - Version control for evaluation dataset
+  - Track dataset changes and reproducibility
+  - Link to MLflow experiments
+
+- ⏳ **Label Studio integration**
+  - Human-in-the-loop annotation
+  - Quality review and scoring interface
+  - Feedback collection from domain experts
+
+- ⏳ **Data pipeline orchestration**
+  - Apache Airflow or Prefect
+  - Automated ETL: Production → Evaluation dataset
+  - Scheduled model re-evaluation
+
+#### Evaluation Enhancements
+
+- ⏳ **DeepEval framework**
+  - Semantic similarity evaluation
+  - Factuality checking
+  - Hallucination detection
+
+- ⏳ **Load testing** (locust, wrk)
+  - Throughput benchmarking
+  - Stress testing with concurrent requests
+  - Identify latency bottlenecks
+
+- ⏳ **Custom evaluation metrics**
+  - Domain-specific quality scoring
+  - Business KPI tracking
+  - User satisfaction metrics
+
+#### Production Hardening
+
+- ⏳ **Request validation**
+  - Input sanitization
+  - Schema validation for all endpoints
+  - Rate limiting per user/IP
+
+- ⏳ **Error recovery**
+  - Automatic retry with exponential backoff
+  - Circuit breaker pattern
+  - Graceful degradation
+
+- ⏳ **Performance optimization**
+  - Caching layer (Redis) for repeated queries
+  - Batch processing for bulk requests
+  - Model quantization for faster inference
+
+#### Advanced Features
+
+- ⏳ **Multi-model ensemble**
+  - Combine predictions from multiple models
+  - Weighted voting based on confidence
+  - Fallback to larger model on low confidence
+
+- ⏳ **Few-shot learning optimization**
+  - Dynamic few-shot example selection
+  - Similarity-based example retrieval
+  - Adaptive prompt construction
+
+- ⏳ **Cost optimization**
+  - Model-specific cost calculations
+  - Automatic model selection based on cost/quality tradeoff
+  - Infrastructure cost tracking
