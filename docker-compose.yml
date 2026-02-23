@@ -34,6 +34,7 @@ services:
     volumes:
       - ./:/app
       - ./mlruns:/app/mlruns
+      - ./logs:/app/logs
     networks:
       - test-gen-network
     depends_on:
@@ -67,9 +68,57 @@ services:
       retries: 3
       start_period: 10s
 
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki-service
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/config.yaml
+      - loki-data:/loki
+    networks:
+      - test-gen-network
+    command: -config.file=/etc/loki/config.yaml
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail-agent
+    volumes:
+      - ./config/promtail-config.yaml:/etc/promtail/config.yaml
+      - ./logs:/var/log/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - test-gen-network
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: grafana-ui
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    networks:
+      - test-gen-network
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - loki
+
 networks:
   test-gen-network:
     driver: bridge
 
 volumes:
   ollama-data:
+  loki-data:
+  grafana-data:

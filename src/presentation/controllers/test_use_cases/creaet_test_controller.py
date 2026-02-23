@@ -10,8 +10,10 @@ from src.application.create_tests.models import RAG_PROMPT, IMPROVED_PROMPT_V1
 from src.application.create_tests.models.generate_test_cases_request import GenerateRequest
 from src.application.create_tests.models.models_config import ModelsConfig
 from src.application.shared.models.custom_response import CustomResponse
+from src.application.shared.infrastructure.logging_config import get_logger
+from src.application.shared.infrastructure.logging_context import get_correlation_id
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def creaet_test_controller(request: Request) -> CustomResponse:
@@ -66,11 +68,25 @@ async def creaet_test_controller(request: Request) -> CustomResponse:
         return create_tests_application_responde
 
     except ValidationError as e:
+        logger.warning(
+            "Request validation error",
+            extra={
+                "correlation_id": get_correlation_id(),
+                "error_type": "ValidationError",
+                "error_message": str(e.errors()[0]),
+            }
+        )
         return CustomResponse.error(
             message=f"Validation error: {e.errors()[0]}"
         )
     except Exception as e:
-        print(f"={'='*60}")
-        print(f"Controller error: {e}")
-        print(f"{'='*60}")
+        logger.error(
+            "Controller error during test case generation",
+            extra={
+                "correlation_id": get_correlation_id(),
+                "error_type": type(e).__name__,
+                "error_message": str(e),
+            },
+            exc_info=True,
+        )
         return CustomResponse.something_was_wrong()

@@ -1,5 +1,6 @@
 # evaluate_models_application.py
 import json
+import logging
 import os
 import tempfile
 from datetime import datetime
@@ -20,6 +21,9 @@ from src.application.evaluate_models.model.model_configs import ModelConfig, Mod
 from src.application.evaluate_models.model.quality_tracker import QualityTracker
 from src.application.evaluate_models.model.test_case import TestCase
 from src.application.evaluate_models.model.test_dataset import EvaluationDataset
+from src.application.shared.infrastructure.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class EvaluateModelsApplication:
@@ -68,16 +72,30 @@ class EvaluateModelsApplication:
             # Evaluate each model with nested runs
             # ─────────────────────────────────────
             for idx, model_config in enumerate(models_to_test, 1):
-                print(f"\n{'='*60}")
-                print(
-                    f"[{idx}/{len(models_to_test)}] Evaluating: {model_config.name}")
-                print(f"{'='*60}")
+                logger.info(
+                    f"Starting evaluation for model {idx}/{len(models_to_test)}",
+                    extra={
+                        "model_name": model_config.name,
+                        "model_index": idx,
+                        "total_models": len(models_to_test),
+                        "model_provider": model_config.provider,
+                    }
+                )
 
                 result = self._evaluate_single_model(
                     model_config,
                     test_dataset,
                     expected_requests_per_day,
                     executable_chain=executable_chain
+                )
+
+                logger.info(
+                    f"Completed evaluation for model {model_config.name}",
+                    extra={
+                        "model_name": model_config.name,
+                        "quality_score": result["quality_metrics"]["quality_score"],
+                        "avg_latency": result["latency_metrics"].get("mean", 0),
+                    }
                 )
 
                 all_results.append(result)
@@ -174,7 +192,13 @@ class EvaluateModelsApplication:
             # ─────────────────────────────────────
             responses: list[ExecutableChainResponse] = []
 
-            print(f"Running {len(test_dataset)} test cases...")
+            logger.info(
+                f"Running {len(test_dataset)} test cases for model {model_config.name}",
+                extra={
+                    "model_name": model_config.name,
+                    "total_test_cases": len(test_dataset),
+                }
+            )
 
             for i, test_case in enumerate(test_dataset, 1):
                 user_story = test_case.user_story
@@ -184,7 +208,15 @@ class EvaluateModelsApplication:
                 responses.append(response)
 
                 if i % 5 == 0 or i == len(test_dataset):
-                    print(f"  Progress: {i}/{len(test_dataset)} completed")
+                    logger.debug(
+                        "Test case execution progress",
+                        extra={
+                            "model_name": model_config.name,
+                            "completed": i,
+                            "total": len(test_dataset),
+                            "percentage": (i / len(test_dataset)) * 100,
+                        }
+                    )
 
             # ─────────────────────────────────────
             # 1. Quality Metrics (Accuracy & Quality)
@@ -192,10 +224,16 @@ class EvaluateModelsApplication:
             quality = QualityTracker.calculate_quality_score(
                 execution_responses=responses
             )
-            print(f"="*60)
-            print("Quality Metrics:")
-            print(quality)
-            print(f"="*60)
+            logger.info(
+                "Quality metrics calculated",
+                extra={
+                    "model_name": model_config.name,
+                    "quality_score": float(quality.quality_score),
+                    "precondition_score": float(quality.precondition_score),
+                    "structure_score": float(quality.structure_score),
+                    "passing_rate": float(quality.passing_rate),
+                }
+            )
 
             # Log quality metrics to MLflow
             mlflow.log_metrics({
@@ -221,10 +259,17 @@ class EvaluateModelsApplication:
             latency_stats = LatencyTracker.calculate_latency_stats(
                 latencies=latencies
             )
-            print("="*60)
-            print("Latency Metrics:")
-            print(latency_stats)
-            print("="*60)
+            logger.info(
+                "Latency metrics calculated",
+                extra={
+                    "model_name": model_config.name,
+                    "mean_latency": float(latency_stats.mean),
+                    "p95_latency": float(latency_stats.p95),
+                    "p99_latency": float(latency_stats.p99),
+                    "min_latency": float(latency_stats.min),
+                    "max_latency": float(latency_stats.max),
+                }
+            )
 
             # Log latency metrics to MLflow
             mlflow.log_metrics({
@@ -245,10 +290,15 @@ class EvaluateModelsApplication:
                 monthly_server_cost=100.0,
                 max_requests_per_day=expected_requests_per_day
             )
-            print(f"="*60)
-            print("Cost Analysis:")
-            print(cost_analysis)
-            print(f"="*60)
+            logger.info(
+                "Cost analysis completed",
+                extra={
+                    "model_name": model_config.name,
+                    "cost_per_thousand": float(cost_analysis.cost_per_thousand_requests),
+                    "efficiency_score": float(cost_analysis.cost_efficiency_score),
+                    "throughput_req_per_min": float(cost_analysis.resource_utilization.throughput_requests_per_min),
+                }
+            )
 
             # Log cost metrics to MLflow
             mlflow.log_metrics({
@@ -493,26 +543,51 @@ class EvaluateModelsApplication:
 # ============================================================================
 if __name__ == "__main__":
 
-    # ─────────────────────────────────────
-    # RAG
-    # ─────────────────────────────────────
-    # Initialize pipeline
-    pipeline = EvaluateModelsApplication("RAG-LLAMA")
-    # Load FAISS vectorstore
-    try:
-        retriever = load_faiss_vectorstore()
-    except FileNotFoundError as e:
-        print("="*60)
-        print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
-        print("="*60)
-        raise Exception("Something was wriong")
+    #     # ─────────────────────────────────────
+    #     # RAG
+    #     # ─────────────────────────────────────
+    #     # Initialize pipeline
+    #     pipeline = EvaluateModelsApplication("RAG-LLAMA")
+    #     # Load FAISS vectorstore
+    #     try:
+    #         retriever = load_faiss_vectorstore()
+    #     except FileNotFoundError as e:
+    #         print("="*60)
+    #         print(f"[creaet_test_controller] - FileNotFoundError {str(e)} ")
+    #         print("="*60)
+    #         raise Exception("Something was wriong")
+    #
+    #     # ─────────────────────────────────────
+    #     # Initialize the executable chain
+    #     # ─────────────────────────────────────
+    #     executable_chain_rag = ExecutableChainRAG(
+    #         prompt_emplate=RAG_PROMPT,
+    #         retriever=retriever,
+    #     )
+    #
+    #     test_cases = EvaluationDataset.load_stories_for_test(
+    #         num_easy=2,
+    #         num_medium=2,
+    #         num_hard=2
+    #     )
+    #
+    #     model_registry = ModelRegistry()
+    #     models_for_evaluation = model_registry.get_models_to_compare()
+    #
+    #     # Run evaluation
+    #     results = pipeline.run_complete_evaluation(
+    #         expected_requests_per_day=5000,  # Adjust based on expected traffic
+    #         test_dataset=test_cases,
+    #         models_to_test=models_for_evaluation,
+    #         executable_chain=executable_chain_rag
+    #     )
 
     # ─────────────────────────────────────
-    # Initialize the executable chain
+    # prompting
     # ─────────────────────────────────────
-    executable_chain_rag = ExecutableChainRAG(
-        prompt_emplate=RAG_PROMPT,
-        retriever=retriever,
+    pipeline = EvaluateModelsApplication("prompting-model-evaluation")
+    executable_chain_prompting = ExecutableChainPrompting(
+        prompt_emplate=IMPROVED_PROMPT_V1
     )
 
     test_cases = EvaluationDataset.load_stories_for_test(
@@ -529,33 +604,8 @@ if __name__ == "__main__":
         expected_requests_per_day=5000,  # Adjust based on expected traffic
         test_dataset=test_cases,
         models_to_test=models_for_evaluation,
-        executable_chain=executable_chain_rag
+        executable_chain=executable_chain_prompting
     )
-
-#     # ─────────────────────────────────────
-#     # prompting
-#     # ─────────────────────────────────────
-#     pipeline = EvaluateModelsApplication("prompting-model-evaluation")
-#     executable_chain_prompting = ExecutableChainPrompting(
-#         prompt_emplate=IMPROVED_PROMPT_V1
-#     )
-#
-#     test_cases = EvaluationDataset.load_stories_for_test(
-#         num_easy=2,
-#         num_medium=2,
-#         num_hard=2
-#     )
-#
-#     model_registry = ModelRegistry()
-#     models_for_evaluation = model_registry.get_models_to_compare()
-#
-#     # Run evaluation
-#     results = pipeline.run_complete_evaluation(
-#         expected_requests_per_day=5000,  # Adjust based on expected traffic
-#         test_dataset=test_cases,
-#         models_to_test=models_for_evaluation,
-#         executable_chain=executable_chain_prompting
-#     )
 
     # # Generate report
     # pipeline.generate_report()

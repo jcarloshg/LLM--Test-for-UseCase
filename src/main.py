@@ -1,11 +1,25 @@
 # src/api/main.py
 
+import logging
 from fastapi import FastAPI
 import uvicorn
 
 from src.application.shared.infrastructure.environment_variables import ENVIRONMENT_CONFIG
+from src.application.shared.infrastructure.logging_config import setup_logging, get_logger
+from src.application.shared.infrastructure.logging_middleware import LoggingMiddleware
 from src.presentation.routes import test_use_cases
 
+
+# Initialize logging
+setup_logging(
+    log_level=ENVIRONMENT_CONFIG.LOG_LEVEL,
+    log_format=ENVIRONMENT_CONFIG.LOG_FORMAT,
+    log_file_path=ENVIRONMENT_CONFIG.LOG_FILE_PATH,
+    rotation_size=ENVIRONMENT_CONFIG.LOG_ROTATION_SIZE,
+    backup_count=ENVIRONMENT_CONFIG.LOG_BACKUP_COUNT,
+)
+
+logger = get_logger(__name__)
 
 app = FastAPI(
     title="Test Case Generator API",
@@ -13,7 +27,27 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
+
 app.include_router(test_use_cases)
+
+# Log startup event
+@app.on_event("startup")
+async def startup_event():
+    logger.info(
+        "Application started",
+        extra={
+            "service": "Test Case Generator API",
+            "version": "1.0.0",
+            "log_level": ENVIRONMENT_CONFIG.LOG_LEVEL,
+        }
+    )
+
+# Log shutdown event
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Application shutdown")
 
 
 @app.get("/")

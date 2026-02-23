@@ -58,6 +58,10 @@ venv.bak/
 mlruns/
 .mlflow/
 
+# Application Logs
+logs/*.log
+logs/*.log.*
+
 # Testing
 .pytest_cache/
 .coverage

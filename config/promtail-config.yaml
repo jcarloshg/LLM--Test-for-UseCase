@@ -1,0 +1,46 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: app-logs
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: test-case-generator
+          environment: development
+          __path__: /var/log/app/*.json.log
+    pipeline_stages:
+      # Parse JSON logs
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: levelname
+            logger: name
+            message: message
+            correlation_id: correlation_id
+            model_name: model_name
+            latency: latency
+            endpoint: endpoint
+            status_code: status_code
+      # Extract labels from JSON fields
+      - labels:
+          level:
+          logger:
+          correlation_id:
+          model_name:
+          endpoint:
+      # Set timestamp from log entry
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      # Set log level
+      - output:
+          source: message

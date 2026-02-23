@@ -1,5 +1,6 @@
 import time
 import json
+import logging
 import re
 import asyncio
 from typing import Optional, Dict, Any, List
@@ -14,6 +15,9 @@ from src.application.create_tests.models.executable_chain import ExecutableChain
 from src.application.create_tests.models.executable_chain_response import ExecutableChainResponse
 from src.application.create_tests.infra.executable_chain.test_case_structure import TestCaseStructure, TestCasesResponse
 from src.application.create_tests.infra.executable_chain.rag_cache import RAGCache
+from src.application.shared.infrastructure.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def format_docs(docs):
@@ -92,20 +96,34 @@ class ExecutableChainRAG(ExecutableChain):
             return self._execute_with_validation(prompt, max_retries, attempt=1)
 
         except ValueError as e:
-            print(f"="*60)
-            print(f"[ExecutableChainV1] - ValueError: {str(e)}")
-            print(f"="*60)
+            logger.error(
+                "ValueError in RAG chain execution",
+                extra={
+                    "error_type": "ValueError",
+                    "error_message": str(e),
+                },
+                exc_info=True,
+            )
             raise
         except TypeError as e:
-            print(f"="*60)
-            print(
-                f"[ExecutableChainV1] - TypeError (Invalid JSON response): {str(e)}")
-            print(f"="*60)
+            logger.error(
+                "TypeError - Invalid JSON response in RAG chain",
+                extra={
+                    "error_type": "TypeError",
+                    "error_message": str(e),
+                },
+                exc_info=True,
+            )
             raise
         except Exception as e:
-            print(f"="*60)
-            print(f"[ExecutableChainV1] - Exception: {str(e)}")
-            print(f"="*60)
+            logger.error(
+                "Unexpected exception in RAG chain execution",
+                extra={
+                    "error_type": type(e).__name__,
+                    "error_message": str(e),
+                },
+                exc_info=True,
+            )
             raise Exception(f"Failed to execute chain: {str(e)}")
 
     def _cached_retrieve(self, question: str) -> str:
@@ -179,10 +197,14 @@ class ExecutableChainRAG(ExecutableChain):
             TestCasesResponse(**result)
         except ValidationError as e:
             if attempt < max_retries:
-                print(
-                    f"[ExecutableChainV1] - Structure validation failed on attempt {attempt}/{max_retries}")
-                print(f"[ExecutableChainV1] - Validation errors: {e}")
-                print(f"[ExecutableChainV1] - Re-invoking LLM...")
+                logger.warning(
+                    f"Structure validation failed on attempt {attempt}/{max_retries}, retrying...",
+                    extra={
+                        "attempt": attempt,
+                        "max_retries": max_retries,
+                        "validation_errors": str(e),
+                    }
+                )
                 return self._execute_with_validation(prompt, max_retries, attempt + 1)
             raise ValueError(
                 f"Test case structure validation failed after {max_retries} attempts. "
@@ -196,7 +218,13 @@ class ExecutableChainRAG(ExecutableChain):
         # Log cache statistics
         # ─────────────────────────────────────
         cache_stats = self._rag_cache.get_stats()
-        print(f"[ExecutableChainV1] - RAG Cache Stats: {cache_stats}")
+        logger.debug(
+            "RAG cache statistics",
+            extra={
+                "cache_stats": cache_stats,
+                "latency": latency,
+            }
+        )
 
         # ─────────────────────────────────────
         # Return as ExecutableChainResponse
@@ -221,7 +249,7 @@ class ExecutableChainRAG(ExecutableChain):
     def clear_cache(self) -> None:
         """Clear RAG cache."""
         self._rag_cache.clear()
-        print("[ExecutableChainV1] - RAG cache cleared")
+        logger.info("RAG cache cleared")
 
     async def execute_async(
         self, prompts: List[str], max_concurrent: int = 3, max_retries: int = 3

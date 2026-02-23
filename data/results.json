@@ -1,16 +1,130 @@
 {
-  "id": "TC-001",
-  "type": "positive",
-  "title": "...",
-  "priority": "high",
-  "preconditions": [
-    "..."
-  ],
-  "steps": [
-    "...",
-    "...",
-    "..."
-  ],
-  "expected_result": "...",
-  "quality_score": 8
+  "message": "Test for use case",
+  "is_success": true,
+  "data": {
+    "test_cases": [
+      {
+        "id": "TC-001",
+        "title": "Joining the loyalty program for rewards",
+        "priority": "high",
+        "type": "positive",
+        "preconditions": [
+          "Setup requirement 1",
+          "Setup requirement 2"
+        ],
+        "steps": [
+          "Click on the loyalty program link",
+          "Fill in the required information",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-002",
+        "title": "Error: Invalid email address",
+        "priority": "high",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "Invalid email address",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 8
+      },
+      {
+        "id": "TC-003",
+        "title": "Error: Missing required information",
+        "priority": "high",
+        "type": "negative",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "Missing required information",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 8
+      },
+      {
+        "id": "TC-004",
+        "title": "Edge case: Multiple accounts",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "Multiple accounts",
+          "Submit the application form for each account"
+        ],
+        "expected_result": "You have successfully joined all loyalty programs and can start earning rewards.",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-005",
+        "title": "Edge case: No email address provided",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "No email address provided",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-006",
+        "title": "Edge case: Invalid password",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "Invalid password",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-007",
+        "title": "Edge case: No account created",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "No account created",
+          "Submit the application form"
+        ],
+        "expected_result": "You have successfully joined the loyalty program and can start earning rewards.",
+        "quality_score": 9
+      },
+      {
+        "id": "TC-008",
+        "title": "Edge case: Multiple accounts with same email address",
+        "priority": "high",
+        "type": "edge_case",
+        "preconditions": [
+          "Setup requirement 1"
+        ],
+        "steps": [
+          "Multiple accounts with same email address",
+          "Submit the application form for each account"
+        ],
+        "expected_result": "You have successfully joined all loyalty programs and can start earning rewards.",
+        "quality_score": 9
+      }
+    ]
+  }
 }

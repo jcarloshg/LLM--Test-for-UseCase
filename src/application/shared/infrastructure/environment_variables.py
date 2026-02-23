@@ -93,6 +93,35 @@ class EnvironmentConfig(BaseModel):
         description="Path to the FAISS vectorstore directory"
     )
 
+    # // ─────────────────────────────────────
+    # LOGGING CONFIGURATION
+    # // ─────────────────────────────────────
+    LOG_LEVEL: str = Field(
+        default="INFO",
+        alias="LOG_LEVEL",
+        description="Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)"
+    )
+    LOG_FORMAT: str = Field(
+        default="json",
+        alias="LOG_FORMAT",
+        description="Log format (json or console)"
+    )
+    LOG_FILE_PATH: str = Field(
+        default="logs/app.json.log",
+        alias="LOG_FILE_PATH",
+        description="Path to log file"
+    )
+    LOG_ROTATION_SIZE: int = Field(
+        default=10485760,
+        alias="LOG_ROTATION_SIZE",
+        description="Log file rotation size in bytes (default: 10MB)"
+    )
+    LOG_BACKUP_COUNT: int = Field(
+        default=5,
+        alias="LOG_BACKUP_COUNT",
+        description="Number of backup log files to keep"
+    )
+
     def __str__(self) -> str:
         """String representation of environment configuration."""
         return (
@@ -110,6 +139,11 @@ class EnvironmentConfig(BaseModel):
             f"  MAX_RETRIES_DEV_MSG: {self.MAX_RETRIES_DEV_MSG}\n"
             f"  JSON_FILE_PATH: {self.JSON_FILE_PATH}\n"
             f"  VECTORSTORE_PATH: {self.VECTORSTORE_PATH}\n"
+            f"  LOG_LEVEL: {self.LOG_LEVEL}\n"
+            f"  LOG_FORMAT: {self.LOG_FORMAT}\n"
+            f"  LOG_FILE_PATH: {self.LOG_FILE_PATH}\n"
+            f"  LOG_ROTATION_SIZE: {self.LOG_ROTATION_SIZE}\n"
+            f"  LOG_BACKUP_COUNT: {self.LOG_BACKUP_COUNT}\n"
             f")"
         )
 
@@ -179,6 +213,26 @@ ENVIRONMENT_CONFIG = EnvironmentConfig(
             "VECTORSTORE_PATH",
             "data/vectorstore_faiss"
         ),
+        "LOG_LEVEL": os.getenv(
+            "LOG_LEVEL",
+            "INFO"
+        ),
+        "LOG_FORMAT": os.getenv(
+            "LOG_FORMAT",
+            "json"
+        ),
+        "LOG_FILE_PATH": os.getenv(
+            "LOG_FILE_PATH",
+            "logs/app.json.log"
+        ),
+        "LOG_ROTATION_SIZE": int(os.getenv(
+            "LOG_ROTATION_SIZE",
+            "10485760"
+        )),
+        "LOG_BACKUP_COUNT": int(os.getenv(
+            "LOG_BACKUP_COUNT",
+            "5"
+        )),
     }
 )
 
