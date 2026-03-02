@@ -2,6 +2,11 @@
 
 This project implements a microservice that leverages Large Language Models (LLMs) to automatically generate structured test cases from user stories and project requirements. Using prompt engineering and validation techniques, the service produces JSON-formatted test artifacts with clear acceptance criteria, preconditions, and test steps.
 
+## 🛠️ Technologies & Tools
+
+- 🏗️ Clean Architecture, 🛑 Domain Driven Design, 🧪 Unit Testing
+- 🟦 Python, 🟩 FastAPI, 🟧 Uvicorn, 🛡️ Pydantic, 🧠 LangChain (langchain, langchain-community, langchain-core, langchain-ollama), 🤖 Ollama (LLM backend), 📚 FAISS (faiss-cpu), 📊 MLflow, 📦 python-dotenv, 📝 python-json-logger, 🌐 requests, 🐳 Docker & Docker Compose, 🔥 NVIDIA CUDA, 📈 Loki, 📉 Grafana, 🧪 Pytest
+
 ## Table of Contents
 
 ### 🚀 Getting Started & Deployment
